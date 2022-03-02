@@ -13,7 +13,6 @@
 #include"CameraController.h"
 #include "window.h"
 
-
 WGPUDevice device;
 WGPUQueue queue;
 WGPUSwapChain swapchain;
