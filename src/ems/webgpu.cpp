@@ -34,7 +34,7 @@ WGPUSwapChain webgpu::createSwapChain(WGPUDevice device) {
 	swapDesc.usage  = WGPUTextureUsage_RenderAttachment;
 	swapDesc.format = WGPUTextureFormat_BGRA8Unorm;
 	swapDesc.width  = 800;
-	swapDesc.height = 450;
+	swapDesc.height = 600;
 	swapDesc.presentMode = WGPUPresentMode_Fifo;
 	
 	WGPUSwapChain swapchain = wgpuDeviceCreateSwapChain(device, surface, &swapDesc);

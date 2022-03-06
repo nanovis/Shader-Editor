@@ -18,3 +18,5 @@ WGPUSwapChain createSwapChain(WGPUDevice device);
  */
 WGPUTextureFormat getSwapChainFormat(WGPUDevice device);
 }
+
+

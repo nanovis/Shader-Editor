@@ -5,7 +5,7 @@
 #include <iostream>
 Camera::Camera()
 {
-    this->cameraPosition = glm::vec3(0.0f, 0.0f, 3.0f);  //eye
+    this->cameraPosition = glm::vec3(0.0f, 3.0f, 5.0f);  //eye
     this->cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
     this->upVector = glm::vec3(0.0f, 1.0f, 0.0f);
 

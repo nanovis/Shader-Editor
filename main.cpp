@@ -7,6 +7,7 @@
 #include "SDL_image.h"
 #include "SDL.h"
 #include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 #include <emscripten/html5.h>
 #include<emscripten/emscripten.h>
 #include"Camera.h"
@@ -37,6 +38,17 @@ WGPUExtent3D texSize = {};
 WGPUTextureDescriptor texDesc = {};
 WGPUTextureDataLayout texDataLayout = {};
 WGPUImageCopyTexture texCopy = {};
+
+//instance part
+struct Instance
+{
+    glm::vec3 position;
+    glm::quat rotation;
+};
+const int NUM_INSTANCE=6;
+float instances[16*NUM_INSTANCE];
+WGPUBuffer instance_buffer; 
+
 /**
  * Current rotation angle (in degrees, updated per frame).
  */
@@ -58,19 +70,24 @@ static char const triangle_vert_wgsl[] = R"(
 	struct Rotation {
 		[[location(0)]] degs : f32;
 	};
+	struct InstanceInput {
+    [[location(5)]] model_matrix_0: vec4<f32>;
+    [[location(6)]] model_matrix_1: vec4<f32>;
+    [[location(7)]] model_matrix_2: vec4<f32>;
+    [[location(8)]] model_matrix_3: vec4<f32>;
+	};
+
 	[[group(0),binding(0)]] var<uniform> uRot : Rotation;
 	[[stage(vertex)]]
-	fn main(input : VertexIn) -> VertexOut {
-		var rads : f32 = radians(uRot.degs);
-		var cosA : f32 = cos(rads);
-		var sinA : f32 = sin(rads);
-		var rot : mat4x4<f32> = mat4x4<f32>(
-			vec4<f32>( cosA, sinA, 0.0,0.0),
-			vec4<f32>(-sinA, cosA, 0.0,0.0),
-			vec4<f32>( 0.0,  0.0,  1.0,0.0),
-			vec4<f32>( 0.0,  0.0,  0.0,1.0));
+	fn main(input : VertexIn, instance:InstanceInput) -> VertexOut {
+		let model_matrix = mat4x4<f32>(
+        instance.model_matrix_0,
+        instance.model_matrix_1,
+        instance.model_matrix_2,
+        instance.model_matrix_3,
+    	);
 		var output : VertexOut;
-		output.Position = camera.view_proj * rot*vec4<f32>(input.aPos, 1.0);
+		output.Position = camera.view_proj *model_matrix * vec4<f32>(input.aPos, 1.0);
 		output.vCol = input.aCol;
 		return output;
 	}
@@ -101,12 +118,9 @@ EM_JS(void, jsprint, (const char* str), {
 });
 EM_JS(void, jsprintfloat, (float a), {
   console.log(a);
-  //alert('hai');
 });
 EM_JS(void, jsprintmatrix, (float a,float b,float c,float d), {
 console.log([a,b,c,d]);
-
-
 });
 EM_BOOL key_callback(int eventType, const EmscriptenKeyboardEvent *e, void *userData)
 {
@@ -175,6 +189,14 @@ static WGPUBuffer createBuffer(const void* data, size_t size, WGPUBufferUsage us
 	return buffer;
 }
 
+glm::mat4 fromInstanceToInstanceRaw(const Instance instance)
+{
+	glm::mat4 trans=glm::mat4(1.0f);
+	trans = glm::translate(trans, instance.position);
+	glm::mat4 rot=glm::mat4_cast(instance.rotation);
+	return trans*rot;
+}
+
 static WGPUTexture createTexture(unsigned char* data, unsigned int w, unsigned int h) {
 
 
@@ -204,6 +226,32 @@ static WGPUTexture createTexture(unsigned char* data, unsigned int w, unsigned i
  * Draws using the above pipeline and buffers.
  */
 static void createPipelineAndBuffers() {
+	int instance_flag=0;
+	for (float i=-0.75;i<1;i=i+1.5) //instances initialize
+	{
+		for (float j=-0.75;j<1;j=j+0.75)
+		{
+			Instance temp;
+			temp.position=glm::vec3(i,0.0f,j);
+			if(glm::length(temp.position)==0)
+			{
+				temp.rotation=glm::quat(0.0f,0.0f,0.0f,0.0f);
+			}
+			else
+			{
+				temp.rotation=glm::quat(0.0f,0.0f,0.0f,0.0f);
+			}
+			glm::mat4 tempmat4=fromInstanceToInstanceRaw(temp);
+			    for(int l=0;l<4;l++)
+    			{
+        			for(int m=0;m<4;m++)
+            		{instances[instance_flag+l*4+m]=tempmat4[l][m];}
+   				}
+
+			instance_flag=instance_flag+16;
+		}
+	}
+
 	// compile shaders
 	// NOTE: these are now the WGSL shaders (tested with Dawn and Chrome Canary)
 	WGPUShaderModule vertMod = createShader(triangle_vert_wgsl);
@@ -302,7 +350,33 @@ static void createPipelineAndBuffers() {
 	WGPUVertexBufferLayout vertexBufferLayout = {};
 	vertexBufferLayout.arrayStride = 5 * sizeof(float);
 	vertexBufferLayout.attributeCount = 2;
+	vertexBufferLayout.stepMode =WGPUVertexStepMode_Vertex;
 	vertexBufferLayout.attributes = vertAttrs;
+
+	// describe instance layouts
+	WGPUVertexAttribute vertAttrs_instance[4] = {};
+	vertAttrs_instance[0].format = WGPUVertexFormat_Float32x4;
+	vertAttrs_instance[0].offset = 0;
+	vertAttrs_instance[0].shaderLocation = 5;
+	vertAttrs_instance[1].format = WGPUVertexFormat_Float32x4;
+	vertAttrs_instance[1].offset = 4 * sizeof(float);
+	vertAttrs_instance[1].shaderLocation = 6;
+	vertAttrs_instance[2].format = WGPUVertexFormat_Float32x4;
+	vertAttrs_instance[2].offset = 8 * sizeof(float);
+	vertAttrs_instance[2].shaderLocation = 7;
+	vertAttrs_instance[3].format = WGPUVertexFormat_Float32x4;
+	vertAttrs_instance[3].offset = 12 * sizeof(float);
+	vertAttrs_instance[3].shaderLocation = 8;
+	WGPUVertexBufferLayout vertexBufferLayout_instance = {};
+	vertexBufferLayout_instance.arrayStride = 16 * sizeof(float);
+	vertexBufferLayout_instance.attributeCount = 4;
+	vertexBufferLayout_instance.stepMode =WGPUVertexStepMode_Instance;//0x00000001;//WGPUInputStepMode_Instance//WGPUVertexStepMode_Instance
+	vertexBufferLayout_instance.attributes = vertAttrs_instance;
+
+	WGPUVertexBufferLayout* vertexBufferLayouts=new WGPUVertexBufferLayout[2];
+	vertexBufferLayouts[0]=vertexBufferLayout;
+	vertexBufferLayouts[1]=vertexBufferLayout_instance;
+
 
 	// Fragment state
 	WGPUBlendState blend = {};
@@ -333,8 +407,8 @@ static void createPipelineAndBuffers() {
 
 	desc.vertex.module = vertMod;
 	desc.vertex.entryPoint = "main";
-	desc.vertex.bufferCount = 1;
-	desc.vertex.buffers = &vertexBufferLayout;
+	desc.vertex.bufferCount = 2;
+	desc.vertex.buffers = vertexBufferLayouts;
 
 	desc.multisample.count = 1;
 	desc.multisample.mask = 0xFFFFFFFF;
@@ -368,6 +442,7 @@ static void createPipelineAndBuffers() {
 		0 // padding (better way of doing this?)
 	};
 	vertBuf = createBuffer(vertData, sizeof(vertData), WGPUBufferUsage_Vertex);
+	instance_buffer = createBuffer(&instances, sizeof(instances), WGPUBufferUsage_Vertex);
 	indxBuf = createBuffer(indxData, sizeof(indxData), WGPUBufferUsage_Index);
 
 	// create the uniform bind group (note 'rotDeg' is copied here, not bound in any way)
@@ -452,8 +527,9 @@ static bool redraw() {
 	wgpuRenderPassEncoderSetBindGroup(pass, 0, bindGroup, 0, 0);
 	wgpuRenderPassEncoderSetBindGroup(pass, 1, bindGroup_camera, 0, 0);
 	wgpuRenderPassEncoderSetVertexBuffer(pass, 0, vertBuf, 0, WGPU_WHOLE_SIZE);
+	wgpuRenderPassEncoderSetVertexBuffer(pass, 1, instance_buffer, 0, WGPU_WHOLE_SIZE);
 	wgpuRenderPassEncoderSetIndexBuffer(pass, indxBuf, WGPUIndexFormat_Uint16, 0, WGPU_WHOLE_SIZE);
-	wgpuRenderPassEncoderDrawIndexed(pass, 9, 1, 0, 0, 0);
+	wgpuRenderPassEncoderDrawIndexed(pass, 9, NUM_INSTANCE, 0, 0, 0);
 
 	wgpuRenderPassEncoderEndPass(pass);
 	wgpuRenderPassEncoderRelease(pass);														// release pass
