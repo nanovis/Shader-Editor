@@ -5,7 +5,7 @@
 #include <iostream>
 Camera::Camera()
 {
-    this->cameraPosition = glm::vec3(0.0f, 3.0f, 5.0f);  //eye
+    this->cameraPosition = glm::vec3(0.0f, 0.0f, 5.0f);  //eye
     this->cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
     this->upVector = glm::vec3(0.0f, 1.0f, 0.0f);
 
@@ -18,7 +18,7 @@ Camera::Camera()
     glm::mat4 model_matrix=glm::mat4(1.0f);
     updatetransformMatrix(model_matrix);
 }
-Camera::Camera(glm::vec3 &position, glm::vec3 &target, glm::vec3 &upVector)
+Camera::Camera(glm::vec3 position, glm::vec3 target, glm::vec3 upVector)
 {
     this->cameraPosition = position;  //eye
     this->cameraTarget = target;

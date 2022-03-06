@@ -53,3 +53,4 @@ $(EXE): $(OBJS) $(WEB_DIR)
 
 clean:
 	rm -f $(EXE) $(OBJS) $(WEB_DIR)/*.js $(WEB_DIR)/*.wasm $(WEB_DIR)/*.wasm.pre
+	find . -name ‘.DS_Store’ -type f -delete

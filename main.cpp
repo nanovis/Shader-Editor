@@ -20,7 +20,7 @@ WGPUSwapChain swapchain;
 unsigned char* img=new unsigned char[256*256*4];
 int imgw=0,imgh=0;
 CameraController cameraController=CameraController(0.2);
-Camera camera=Camera();
+Camera camera=Camera(glm::vec3(0.0f, 0.0f, 5.0f),glm::vec3(0.0f, 0.0f, 0.0f),glm::vec3(0.0f, 1.0f, 0.0f));
 glm::mat4 model_matrix=glm::mat4(1.0f);
 glm::mat4 transform_matrix=glm::mat4(1.0f);
 WGPURenderPipeline pipeline;
@@ -87,7 +87,7 @@ static char const triangle_vert_wgsl[] = R"(
         instance.model_matrix_3,
     	);
 		var output : VertexOut;
-		output.Position = camera.view_proj *model_matrix * vec4<f32>(input.aPos, 1.0);
+		output.Position = camera.view_proj * model_matrix * vec4<f32>(input.aPos, 1.0);
 		output.vCol = input.aCol;
 		return output;
 	}
@@ -239,7 +239,8 @@ static void createPipelineAndBuffers() {
 			}
 			else
 			{
-				temp.rotation=glm::quat(0.0f,0.0f,0.0f,0.0f);
+				//temp.rotation=glm::quat(0.0f,0.0f,0.0f,0.0f); 
+				temp.rotation=glm::quat(glm::radians(glm::vec3(0.0f, 0.0f, 0.0f)));
 			}
 			glm::mat4 tempmat4=fromInstanceToInstanceRaw(temp);
 			    for(int l=0;l<4;l++)
