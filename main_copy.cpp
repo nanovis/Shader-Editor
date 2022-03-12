@@ -60,6 +60,18 @@ static char const triangle_vert_wgsl[] = R"(
 
 static char const triangle_frag_wgsl[] = R"([[group(0),binding(0)]] var<uniform> Time : f32;[[group(0),binding(1)]] var<uniform> Resolution : vec2<f32>;[[stage(fragment)]]fn main([[builtin(position)]] position: vec4<f32>) -> [[location(0)]] vec4<f32> {var uv: vec3<f32> =vec3<f32>(position.xyx/Resolution.xyx);var col:vec3<f32> =0.5f+vec3<f32> ( 0.5*cos(uv+Time+vec3<f32>(0.0,2.0,4.0)));return vec4<f32>(col, 1.0);})"; // fragment shader end
 
+
+
+/*
+[[group(0),binding(0)]] var<uniform> Time : f32;
+[[group(0),binding(1)]] var<uniform> Resolution : vec2<f32>;
+[[stage(fragment)]]
+fn main([[builtin(position)]] position: vec4<f32>) -> [[location(0)]] vec4<f32> {
+  var uv: vec3<f32> =vec3<f32>(position.xyx/Resolution.xyx);
+  var col:vec3<f32> =0.5f+vec3<f32> ( 0.5*cos(uv+Time+vec3<f32>(0.0,2.0,4.0)));
+  return vec4<f32>(col, 1.0);
+}
+*/
 static WGPUShaderModule createShader(const char* const code, const char* label = nullptr) {
 	WGPUShaderModuleWGSLDescriptor wgsl = {};
 	wgsl.chain.sType = WGPUSType_ShaderModuleWGSLDescriptor;
