@@ -39,6 +39,7 @@ WGPUImageCopyTexture texCopy = {};
 /**
  * Current rotation angle (in degrees, updated per frame).
  */
+clock_t startTime,endTime;
 float runtime = 0.0f;
 glm::vec2 resolution=glm::vec2(800.0f,600.0f);
 
@@ -341,8 +342,9 @@ static bool redraw() {
 	WGPUCommandEncoder encoder = wgpuDeviceCreateCommandEncoder(device, nullptr);			// create encoder
 	WGPURenderPassEncoder pass = wgpuCommandEncoderBeginRenderPass(encoder, &renderPass);	// create pass
 
-	// update the rotation
-	runtime += 0.02f;
+	// update the time 
+	endTime = clock();
+	runtime = (float)(endTime - startTime) / CLOCKS_PER_SEC;
 	
 	wgpuQueueWriteBuffer(queue, timeBuf,0, &runtime, sizeof(runtime));
 	wgpuQueueWriteBuffer(queue, resolutionBuf,0, &resolution, sizeof(resolution));
@@ -405,6 +407,7 @@ extern "C" int __main__(int /*argc*/, char* /*argv*/[]) {
 			swapchain = webgpu::createSwapChain(device);
 			createPipelineAndBuffers();
 			window::show(wHnd);
+			startTime = clock();
 			window::loop(wHnd, redraw);
 		#ifndef __EMSCRIPTEN__
 			wgpuBindGroupRelease(bindGroup);
