@@ -13,24 +13,20 @@
 #include"Camera.h"
 #include"CameraController.h"
 #include "window.h"
+#include<ctime>
 
 WGPUDevice device;
 WGPUQueue queue;
 WGPUSwapChain swapchain;
 unsigned char* img=new unsigned char[256*256*4];
 int imgw=0,imgh=0;
-CameraController cameraController=CameraController(0.2);
-Camera camera=Camera(glm::vec3(0.0f, 0.0f, 5.0f),glm::vec3(0.0f, 0.0f, 0.0f),glm::vec3(0.0f, 1.0f, 0.0f));
-glm::mat4 model_matrix=glm::mat4(1.0f);
-glm::mat4 transform_matrix=glm::mat4(1.0f);
 WGPURenderPipeline pipeline;
 WGPUBuffer vertBuf; // vertex buffer with triangle position and colours
 WGPUBuffer indxBuf; // index buffer
-WGPUBuffer uRotBuf; // uniform buffer (containing the rotation angle)
-WGPUBuffer matrixBuf;  //uniform buffer
+WGPUBuffer timeBuf; // uniform buffer (containing the rotation angle)
+WGPUBuffer resolutionBuf;  //uniform buffer
 WGPUBindGroup bindGroup;
-WGPUBindGroup bindGroup_camera; //bindgroup for view transformation
-bool keypress_lock=false;
+
 WGPUTexture tex; // Texture
 WGPUSampler samplerTex;
 WGPUTextureView texView;
@@ -39,130 +35,39 @@ WGPUTextureDescriptor texDesc = {};
 WGPUTextureDataLayout texDataLayout = {};
 WGPUImageCopyTexture texCopy = {};
 
-//instance part
-struct Instance
-{
-    glm::vec3 position;
-    glm::quat rotation;
-};
-const int NUM_INSTANCE=6;
-float instances[16*NUM_INSTANCE];
-WGPUBuffer instance_buffer; 
 
 /**
  * Current rotation angle (in degrees, updated per frame).
  */
-float rotDeg = 0.0f;
+float runtime = 0.0f;
+glm::vec2 resolution=glm::vec2(800.0f,600.0f);
 
 static char const triangle_vert_wgsl[] = R"(
-	struct CameraUniform {
-    view_proj: mat4x4<f32>;
-	};
-	[[group(1), binding(0)]] var<uniform> camera: CameraUniform;
 	struct VertexIn {
-		[[location(0)]] aPos : vec3<f32>;
-		[[location(1)]] aCol : vec2<f32>;
+		[[location(0)]] aPos : vec2<f32>;
 	};
 	struct VertexOut {
-		[[location(0)]] vCol : vec2<f32>;
 		[[builtin(position)]] Position : vec4<f32>;
 	};
-	struct Rotation {
-		[[location(0)]] degs : f32;
-	};
-	struct InstanceInput {
-    [[location(5)]] model_matrix_0: vec4<f32>;
-    [[location(6)]] model_matrix_1: vec4<f32>;
-    [[location(7)]] model_matrix_2: vec4<f32>;
-    [[location(8)]] model_matrix_3: vec4<f32>;
-	};
-
-	[[group(0),binding(0)]] var<uniform> uRot : Rotation;
 	[[stage(vertex)]]
-	fn main(input : VertexIn, instance:InstanceInput) -> VertexOut {
-		let model_matrix = mat4x4<f32>(
-        instance.model_matrix_0,
-        instance.model_matrix_1,
-        instance.model_matrix_2,
-        instance.model_matrix_3,
-    	);
+	fn main(input : VertexIn) -> VertexOut {
 		var output : VertexOut;
-		output.Position = camera.view_proj * model_matrix * vec4<f32>(input.aPos, 1.0);
-		output.vCol = input.aCol;
+		output.Position = vec4<f32>(input.aPos,0.0, 1.0);
 		return output;
 	}
 )";
 
 static char const triangle_frag_wgsl[] = R"(
-	[[group(0), binding(1)]]
-	var t_diffuse: texture_2d<f32>;
-	[[group(0), binding(2)]]
-	var s_diffuse: sampler;
-	[[stage(fragment)]]
-	fn main([[location(0)]] tex : vec2<f32>) -> [[location(0)]] vec4<f32> {
-		return textureSample(t_diffuse, s_diffuse, tex);
-	}
+[[group(0),binding(0)]] var<uniform> Time : f32;
+[[group(0),binding(1)]] var<uniform> Resolution : vec2<f32>;
+[[stage(fragment)]]
+fn main([[builtin(position)]] position: vec4<f32>) -> [[location(0)]] vec4<f32> {
+  var uv: vec3<f32> =vec3<f32>(position.xyx/Resolution.xyx);
+  var col:vec3<f32> =0.5f+vec3<f32> ( 0.5*cos(uv+Time+vec3<f32>(0.0,2.0,4.0)));
+  return vec4<f32>(col, 1.0);
+}
 )"; 
 
-
-/**
- * Helper to create a shader from SPIR-V IR.
- *
- * \param[in] code shader source (output using the \c -V \c -x options in \c glslangValidator)
- * \param[in] size size of \a code in bytes
- * \param[in] label optional shader name
- */
-EM_JS(void, jsprint, (const char* str), {
-  console.log(UTF8ToString(str));
-  //alert('hai');
-});
-EM_JS(void, jsprintfloat, (float a), {
-  console.log(a);
-});
-EM_JS(void, jsprintmatrix, (float a,float b,float c,float d), {
-console.log([a,b,c,d]);
-});
-EM_BOOL key_callback(int eventType, const EmscriptenKeyboardEvent *e, void *userData)
-{
-  /*printf("%s, key: \"%s\", code: \"%s\", location: %lu,%s%s%s%s repeat: %d, locale: \"%s\", char: \"%s\", charCode: %lu, keyCode: %lu, which: %lu, timestamp: %lf\n",
-    emscripten_event_type_to_string(eventType), e->key, e->code, e->location, 
-    e->ctrlKey ? " CTRL" : "", e->shiftKey ? " SHIFT" : "", e->altKey ? " ALT" : "", e->metaKey ? " META" : "", 
-    e->repeat, e->locale, e->charValue, e->charCode, e->keyCode, e->which,
-    e->timestamp);
-  */
-if (keypress_lock==false)
-  {
-	  if (eventType == EMSCRIPTEN_EVENT_KEYPRESS && (!strcmp(e->key, "w") )) {
-	  cameraController.process_events(1);
-	  cameraController.update_camera(camera);
-	  camera.updatetransformMatrix(model_matrix);
-	  keypress_lock=true;
-  	}
-    if (eventType == EMSCRIPTEN_EVENT_KEYPRESS && (!strcmp(e->key, "a") )) {
-	  cameraController.process_events(3);
-	  cameraController.update_camera(camera);
-	  camera.updatetransformMatrix(model_matrix);
-	  keypress_lock=true;
- 	 }
-    if (eventType == EMSCRIPTEN_EVENT_KEYPRESS && (!strcmp(e->key, "s") )) {
-	  cameraController.process_events(2);
-	  cameraController.update_camera(camera);
-	  camera.updatetransformMatrix(model_matrix);
-	  keypress_lock=true;
-
- 	 }
-    if (eventType == EMSCRIPTEN_EVENT_KEYPRESS && (!strcmp(e->key, "d") )) {
-	  cameraController.process_events(4);
-	  cameraController.update_camera(camera);
-	  camera.updatetransformMatrix(model_matrix);
-	  keypress_lock=true;
-
- 	 }
-  }
-
-  return 0;
-
-  }
 static WGPUShaderModule createShader(const char* const code, const char* label = nullptr) {
 	WGPUShaderModuleWGSLDescriptor wgsl = {};
 	wgsl.chain.sType = WGPUSType_ShaderModuleWGSLDescriptor;
@@ -189,13 +94,7 @@ static WGPUBuffer createBuffer(const void* data, size_t size, WGPUBufferUsage us
 	return buffer;
 }
 
-glm::mat4 fromInstanceToInstanceRaw(const Instance instance)
-{
-	glm::mat4 trans=glm::mat4(1.0f);
-	trans = glm::translate(trans, instance.position);
-	glm::mat4 rot=glm::mat4_cast(instance.rotation);
-	return trans*rot;
-}
+
 
 static WGPUTexture createTexture(unsigned char* data, unsigned int w, unsigned int h) {
 
@@ -226,35 +125,7 @@ static WGPUTexture createTexture(unsigned char* data, unsigned int w, unsigned i
  * Draws using the above pipeline and buffers.
  */
 static void createPipelineAndBuffers() {
-	int instance_flag=0;
-	for (float i=-0.75;i<1;i=i+1.5) //instances initialize
-	{
-		for (float j=-0.75;j<1;j=j+0.75)
-		{
-			Instance temp;
-			temp.position=glm::vec3(i,0.0f,j);
-			if(glm::length(temp.position)==0)
-			{
-				temp.rotation=glm::quat(0.0f,0.0f,0.0f,0.0f);
-			}
-			else
-			{
-				//temp.rotation=glm::quat(0.0f,0.0f,0.0f,0.0f); 
-				temp.rotation=glm::quat(glm::radians(glm::vec3(0.0f, 0.0f, 0.0f)));
-			}
-			glm::mat4 tempmat4=fromInstanceToInstanceRaw(temp);
-			    for(int l=0;l<4;l++)
-    			{
-        			for(int m=0;m<4;m++)
-            		{instances[instance_flag+l*4+m]=tempmat4[l][m];}
-   				}
 
-			instance_flag=instance_flag+16;
-		}
-	}
-
-	// compile shaders
-	// NOTE: these are now the WGSL shaders (tested with Dawn and Chrome Canary)
 	WGPUShaderModule vertMod = createShader(triangle_vert_wgsl);
 	WGPUShaderModule fragMod = createShader(triangle_frag_wgsl);
 	
@@ -262,10 +133,15 @@ static void createPipelineAndBuffers() {
 	buf.type = WGPUBufferBindingType_Uniform;
 
 	// bind group layout (used by both the pipeline layout and uniform bind group, released at the end of this function)
-	WGPUBindGroupLayoutEntry bglEntry = {};
-	bglEntry.binding = 0;
-	bglEntry.visibility = WGPUShaderStage_Vertex;
-	bglEntry.buffer = buf;
+	WGPUBindGroupLayoutEntry timelEntry = {};
+	timelEntry.binding = 0;
+	timelEntry.visibility = WGPUShaderStage_Fragment;
+	timelEntry.buffer = buf;
+
+	WGPUBindGroupLayoutEntry resolutionlEntry = {};
+	resolutionlEntry.binding = 1;
+	resolutionlEntry.visibility = WGPUShaderStage_Fragment;
+	resolutionlEntry.buffer = buf;
 
 	tex = createTexture(img, imgw, imgh);
 	WGPUTextureViewDescriptor texViewDesc = {};
@@ -298,85 +174,50 @@ static void createPipelineAndBuffers() {
 	texLayout.multisampled = false;
 
 	WGPUBindGroupLayoutEntry bglTexEntry = {};
-	bglTexEntry.binding = 1;
+	bglTexEntry.binding = 2;
 	bglTexEntry.visibility = WGPUShaderStage_Fragment;
 	bglTexEntry.texture = texLayout;
 
 	WGPUBindGroupLayoutEntry bglSamplerEntry = {};
-	bglSamplerEntry.binding = 2;
+	bglSamplerEntry.binding = 3;
 	bglSamplerEntry.visibility = WGPUShaderStage_Fragment;
 	bglSamplerEntry.sampler = samplerLayout;
 
-	WGPUBindGroupLayoutEntry* allBgLayoutEntries = new WGPUBindGroupLayoutEntry[3];
-	allBgLayoutEntries[0] = bglEntry;
-	allBgLayoutEntries[1] = bglTexEntry;
-	allBgLayoutEntries[2] = bglSamplerEntry;
+	WGPUBindGroupLayoutEntry* allBgLayoutEntries = new WGPUBindGroupLayoutEntry[4];
+	allBgLayoutEntries[0] = timelEntry;
+	allBgLayoutEntries[1] = resolutionlEntry;
+	allBgLayoutEntries[2] = bglTexEntry;
+	allBgLayoutEntries[3] = bglSamplerEntry;
 
 	WGPUBindGroupLayoutDescriptor bglDesc = {};
-	bglDesc.entryCount = 3;  
+	bglDesc.entryCount = 4;  
 	bglDesc.entries = allBgLayoutEntries;
 	WGPUBindGroupLayout bindGroupLayout = wgpuDeviceCreateBindGroupLayout(device, &bglDesc);
 	
-	
-	//create camera bindgroup
-	WGPUBindGroupLayoutEntry bglcameraEntry = {};
-	bglcameraEntry.binding = 0;
-	bglcameraEntry.visibility = WGPUShaderStage_Vertex;
-	bglcameraEntry.buffer = buf;
-
-	WGPUBindGroupLayoutDescriptor bglcameraDesc = {};
-	bglcameraDesc.entryCount = 1;  
-	bglcameraDesc.entries = &bglcameraEntry;
-	WGPUBindGroupLayout camerabindGroupLayout = wgpuDeviceCreateBindGroupLayout(device, &bglcameraDesc);
-
-
-	WGPUBindGroupLayout* bindGroupLayouts= new WGPUBindGroupLayout[2];
+	WGPUBindGroupLayout* bindGroupLayouts= new WGPUBindGroupLayout[0];
 	bindGroupLayouts[0]=bindGroupLayout;
-	bindGroupLayouts[1]=camerabindGroupLayout;
+
 
 	// pipeline layout (used by the render pipeline, released after its creation)
 	WGPUPipelineLayoutDescriptor layoutDesc = {};
-	layoutDesc.bindGroupLayoutCount = 2;
+	layoutDesc.bindGroupLayoutCount = 1;
 	layoutDesc.bindGroupLayouts = bindGroupLayouts;
 	WGPUPipelineLayout pipelineLayout = wgpuDeviceCreatePipelineLayout(device, &layoutDesc);
 
 	// describe buffer layouts
-	WGPUVertexAttribute vertAttrs[2] = {};
-	vertAttrs[0].format = WGPUVertexFormat_Float32x3;
+	WGPUVertexAttribute vertAttrs[1] = {};
+	vertAttrs[0].format = WGPUVertexFormat_Float32x2;
 	vertAttrs[0].offset = 0;
 	vertAttrs[0].shaderLocation = 0;
-	vertAttrs[1].format = WGPUVertexFormat_Float32x2;
-	vertAttrs[1].offset = 3 * sizeof(float);
-	vertAttrs[1].shaderLocation = 1;
 	WGPUVertexBufferLayout vertexBufferLayout = {};
-	vertexBufferLayout.arrayStride = 5 * sizeof(float);
-	vertexBufferLayout.attributeCount = 2;
+	vertexBufferLayout.arrayStride = 2 * sizeof(float);
+	vertexBufferLayout.attributeCount = 1;
 	vertexBufferLayout.stepMode =WGPUVertexStepMode_Vertex;
 	vertexBufferLayout.attributes = vertAttrs;
 
-	// describe instance layouts
-	WGPUVertexAttribute vertAttrs_instance[4] = {};
-	vertAttrs_instance[0].format = WGPUVertexFormat_Float32x4;
-	vertAttrs_instance[0].offset = 0;
-	vertAttrs_instance[0].shaderLocation = 5;
-	vertAttrs_instance[1].format = WGPUVertexFormat_Float32x4;
-	vertAttrs_instance[1].offset = 4 * sizeof(float);
-	vertAttrs_instance[1].shaderLocation = 6;
-	vertAttrs_instance[2].format = WGPUVertexFormat_Float32x4;
-	vertAttrs_instance[2].offset = 8 * sizeof(float);
-	vertAttrs_instance[2].shaderLocation = 7;
-	vertAttrs_instance[3].format = WGPUVertexFormat_Float32x4;
-	vertAttrs_instance[3].offset = 12 * sizeof(float);
-	vertAttrs_instance[3].shaderLocation = 8;
-	WGPUVertexBufferLayout vertexBufferLayout_instance = {};
-	vertexBufferLayout_instance.arrayStride = 16 * sizeof(float);
-	vertexBufferLayout_instance.attributeCount = 4;
-	vertexBufferLayout_instance.stepMode =WGPUVertexStepMode_Instance;//0x00000001;//WGPUInputStepMode_Instance//WGPUVertexStepMode_Instance
-	vertexBufferLayout_instance.attributes = vertAttrs_instance;
 
-	WGPUVertexBufferLayout* vertexBufferLayouts=new WGPUVertexBufferLayout[2];
+	WGPUVertexBufferLayout* vertexBufferLayouts=new WGPUVertexBufferLayout[1];
 	vertexBufferLayouts[0]=vertexBufferLayout;
-	vertexBufferLayouts[1]=vertexBufferLayout_instance;
 
 
 	// Fragment state
@@ -408,7 +249,7 @@ static void createPipelineAndBuffers() {
 
 	desc.vertex.module = vertMod;
 	desc.vertex.entryPoint = "main";
-	desc.vertex.bufferCount = 2;
+	desc.vertex.bufferCount = 1;
 	desc.vertex.buffers = vertexBufferLayouts;
 
 	desc.multisample.count = 1;
@@ -430,85 +271,68 @@ static void createPipelineAndBuffers() {
 
 	// create the buffers (x, y,z, texture_x,texture_y)
 	float const vertData[] = {
-		-0.0868241f, 0.49240386f, 0.0f, 0.4131759f, 0.00759614f,//A
-		 -0.49513406f, 0.06958647f, 0.0f, 0.0048659444f, 0.43041354f,  // B
-		-0.21918549f, -0.44939706f, 0.0f, 0.28081453f, 0.949397f,  // C
-		0.35966998f, -0.3473291f, 0.0f,0.85967f, 0.84732914f,//D
-		0.44147372f, 0.2347359f, 0.0f,0.9414737f, 0.2652641f//E
+		-1.0f, 1.0f, //A
+		1.0f, 1.0f,   // B
+		-1.0f, -1.0f,  // C
+		1.0f, -1.0f //D
+
 	};
 	uint16_t const indxData[] = {
-		0, 1, 4,
-    	1, 2, 4,
-    	2, 3, 4,
-		0 // padding (better way of doing this?)
+		0, 2, 1,
+    	1, 2, 3
 	};
 	vertBuf = createBuffer(vertData, sizeof(vertData), WGPUBufferUsage_Vertex);
-	instance_buffer = createBuffer(&instances, sizeof(instances), WGPUBufferUsage_Vertex);
 	indxBuf = createBuffer(indxData, sizeof(indxData), WGPUBufferUsage_Index);
 
-	// create the uniform bind group (note 'rotDeg' is copied here, not bound in any way)
-	uRotBuf = createBuffer(&rotDeg, sizeof(rotDeg), WGPUBufferUsage_Uniform);
-	matrixBuf = createBuffer(&transform_matrix, sizeof(transform_matrix), WGPUBufferUsage_Uniform);
-	WGPUBindGroupEntry bgEntry = {};
-	bgEntry.binding = 0;
-	bgEntry.buffer = uRotBuf;
-	bgEntry.offset = 0;
-	bgEntry.size = sizeof(rotDeg);
+	timeBuf = createBuffer(&runtime, sizeof(runtime), WGPUBufferUsage_Uniform);
+	resolutionBuf = createBuffer(&resolution, sizeof(resolution), WGPUBufferUsage_Uniform);
+	WGPUBindGroupEntry timeEntry = {};
+	timeEntry.binding = 0;
+	timeEntry.buffer = timeBuf;
+	timeEntry.offset = 0;
+	timeEntry.size = sizeof(runtime);
+	
+	WGPUBindGroupEntry resolutionEntry = {};
+	resolutionEntry.binding = 1;
+	resolutionEntry.buffer = resolutionBuf;
+	//bgEntry.offset = 0;
+	resolutionEntry.size = sizeof(resolution);
 
 	WGPUBindGroupEntry bgTexEntry = {};
-	bgTexEntry.binding = 1;
+	bgTexEntry.binding = 2;
 	bgTexEntry.textureView = texView;
 
 	WGPUBindGroupEntry bgSamplerEntry = {};
-	bgSamplerEntry.binding = 2;
+	bgSamplerEntry.binding = 3;
 	bgSamplerEntry.sampler = samplerTex;
 
-	WGPUBindGroupEntry* allBgEntries = new WGPUBindGroupEntry[3];
-	allBgEntries[0] = bgEntry;
-	allBgEntries[1] = bgTexEntry;
-	allBgEntries[2] = bgSamplerEntry;
+	WGPUBindGroupEntry* allBgEntries = new WGPUBindGroupEntry[4];
+	allBgEntries[0] = timeEntry;
+	allBgEntries[1] = resolutionEntry;
+	allBgEntries[2] = bgTexEntry;
+	allBgEntries[3] = bgSamplerEntry;
 
 	WGPUBindGroupDescriptor bgDesc = {};
 	bgDesc.layout = bindGroupLayout;
-	bgDesc.entryCount = 3;   
+	bgDesc.entryCount = 4;   
 	bgDesc.entries = allBgEntries;
 
 	bindGroup = wgpuDeviceCreateBindGroup(device, &bgDesc);
 
-	WGPUBindGroupEntry bgcameraEntry = {};
-	bgcameraEntry.binding = 0;
-	bgcameraEntry.buffer = matrixBuf;
-	bgcameraEntry.offset = 0;
-	bgcameraEntry.size = sizeof(transform_matrix);
-
-	WGPUBindGroupEntry* allcameraBgEntries = new WGPUBindGroupEntry[1];
-	allcameraBgEntries[0] = bgcameraEntry;
-
-	WGPUBindGroupDescriptor bgcameraDesc = {};
-	bgcameraDesc.layout = camerabindGroupLayout;
-	bgcameraDesc.entryCount = 1;  
-	bgcameraDesc.entries = allcameraBgEntries;
-
-	bindGroup_camera = wgpuDeviceCreateBindGroup(device, &bgcameraDesc);
 	// last bit of clean-up
 	wgpuBindGroupLayoutRelease(bindGroupLayout);
-	wgpuBindGroupLayoutRelease(camerabindGroupLayout);
 }
 static bool redraw() {
-	EMSCRIPTEN_RESULT ret = emscripten_set_keypress_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, key_callback);
-	transform_matrix=camera.transformMatrix;
-
-	keypress_lock=false;
 	WGPUTextureView backBufView = wgpuSwapChainGetCurrentTextureView(swapchain);			// create textureView
 
 	WGPURenderPassColorAttachment colorDesc = {};
 	colorDesc.view    = backBufView;
 	colorDesc.loadOp  = WGPULoadOp_Clear;
 	colorDesc.storeOp = WGPUStoreOp_Store;
-	colorDesc.clearColor.r = 0.3f;
-	colorDesc.clearColor.g = 0.3f;
-	colorDesc.clearColor.b = 0.3f;
-	colorDesc.clearColor.a = 1.0f;
+	colorDesc.clearColor.r = 0.0f;
+	colorDesc.clearColor.g = 0.0f;
+	colorDesc.clearColor.b = 0.0f;
+	colorDesc.clearColor.a = 0.0f;
 
 	WGPURenderPassDescriptor renderPass = {};
 	renderPass.colorAttachmentCount = 1;
@@ -518,19 +342,17 @@ static bool redraw() {
 	WGPURenderPassEncoder pass = wgpuCommandEncoderBeginRenderPass(encoder, &renderPass);	// create pass
 
 	// update the rotation
-	rotDeg += 0.1f;
+	runtime += 0.02f;
 	
-	wgpuQueueWriteBuffer(queue, uRotBuf, 0, &rotDeg, sizeof(rotDeg));
-	wgpuQueueWriteBuffer(queue, matrixBuf,0, &transform_matrix, sizeof(transform_matrix));
+	wgpuQueueWriteBuffer(queue, timeBuf,0, &runtime, sizeof(runtime));
+	wgpuQueueWriteBuffer(queue, resolutionBuf,0, &resolution, sizeof(resolution));
 	wgpuQueueWriteTexture(queue, &texCopy, img, imgh * imgw * 4, &texDataLayout, &texSize);
 	// draw the triangle (comment these five lines to simply clear the screen)
 	wgpuRenderPassEncoderSetPipeline(pass, pipeline);
 	wgpuRenderPassEncoderSetBindGroup(pass, 0, bindGroup, 0, 0);
-	wgpuRenderPassEncoderSetBindGroup(pass, 1, bindGroup_camera, 0, 0);
 	wgpuRenderPassEncoderSetVertexBuffer(pass, 0, vertBuf, 0, WGPU_WHOLE_SIZE);
-	wgpuRenderPassEncoderSetVertexBuffer(pass, 1, instance_buffer, 0, WGPU_WHOLE_SIZE);
 	wgpuRenderPassEncoderSetIndexBuffer(pass, indxBuf, WGPUIndexFormat_Uint16, 0, WGPU_WHOLE_SIZE);
-	wgpuRenderPassEncoderDrawIndexed(pass, 9, NUM_INSTANCE, 0, 0, 0);
+	wgpuRenderPassEncoderDrawIndexed(pass, 6, 1, 0, 0, 0);
 
 	wgpuRenderPassEncoderEndPass(pass);
 	wgpuRenderPassEncoderRelease(pass);														// release pass
@@ -586,8 +408,8 @@ extern "C" int __main__(int /*argc*/, char* /*argv*/[]) {
 			window::loop(wHnd, redraw);
 		#ifndef __EMSCRIPTEN__
 			wgpuBindGroupRelease(bindGroup);
-			wgpuBufferRelease(uRotBuf);
-			wgpuBufferRelease(matrixBuf);
+			wgpuBufferRelease(resolutionBuf);
+			wgpuBufferRelease(timeBuf);
 			wgpuBufferRelease(indxBuf);
 			wgpuBufferRelease(vertBuf);
 			wgpuRenderPipelineRelease(pipeline);
