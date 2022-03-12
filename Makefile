@@ -44,9 +44,10 @@ all: $(EXE)
 
 $(WEB_DIR):
 	mkdir $@
-	
+
+## python -m SimpleHTTPServer
 serve: all
-	python -m SimpleHTTPServer
+	node out/server.js
 
 $(EXE): $(OBJS) $(WEB_DIR)
 	$(CXX) -o $@ $(OBJS) $(LIBS) $(LDFLAGS)
