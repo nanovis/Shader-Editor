@@ -25,6 +25,7 @@ WGPUBuffer vertBuf; // vertex buffer with triangle position and colours
 WGPUBuffer indxBuf; // index buffer
 WGPUBuffer timeBuf; // uniform buffer (containing the rotation angle)
 WGPUBuffer resolutionBuf;  //uniform buffer
+WGPUBuffer mouseBuf;
 WGPUBindGroup bindGroup;
 
 WGPUTexture tex; // Texture
@@ -34,6 +35,7 @@ WGPUExtent3D texSize = {};
 WGPUTextureDescriptor texDesc = {};
 WGPUTextureDataLayout texDataLayout = {};
 WGPUImageCopyTexture texCopy = {};
+glm::vec4 mouselocation=glm::vec4(2.0f,3.0f,0.0f,0.0f);
 
 
 /**
@@ -58,11 +60,12 @@ static char const triangle_vert_wgsl[] = R"(
 	}
 )";
 
-static char const triangle_frag_wgsl[] = R"([[group(0),binding(0)]] var<uniform> Time : f32;[[group(0),binding(1)]] var<uniform> Resolution : vec2<f32>;[[stage(fragment)]]fn main([[builtin(position)]] position: vec4<f32>) -> [[location(0)]] vec4<f32> {  var uv: vec3<f32> =vec3<f32>(position.xyx/Resolution.xyx);  var col:vec3<f32> =0.5f+vec3<f32> ( 0.5*cos(uv+Time+vec3<f32>(0.0,2.0,4.0)));  return vec4<f32>(col, 1.0);}      )"; // fragment shader end
+static char const triangle_frag_wgsl[] = R"([[group(0),binding(0)]] var<uniform> Time : f32;[[group(0),binding(1)]] var<uniform> Resolution : vec2<f32>;[[group(0),binding(2)]] var<uniform> Mouse : vec4<f32>;[[stage(fragment)]]fn main([[builtin(position)]] position: vec4<f32>) -> [[location(0)]] vec4<f32> {  return vec4<f32>(Mouse.xy/Resolution.xy, 0.0,1.0);}      )"; // fragment shader end
 
 /*
 [[group(0),binding(0)]] var<uniform> Time : f32;
 [[group(0),binding(1)]] var<uniform> Resolution : vec2<f32>;
+[[group(0),binding(2)]] var<uniform> Mouse : vec4<f32>;
 [[stage(fragment)]]
 fn main([[builtin(position)]] position: vec4<f32>) -> [[location(0)]] vec4<f32> {
   var uv: vec3<f32> =vec3<f32>(position.xyx/Resolution.xyx);
@@ -145,6 +148,11 @@ static void createPipelineAndBuffers() {
 	resolutionlEntry.visibility = WGPUShaderStage_Fragment;
 	resolutionlEntry.buffer = buf;
 
+	WGPUBindGroupLayoutEntry mouselEntry = {};
+	mouselEntry.binding = 2;
+	mouselEntry.visibility = WGPUShaderStage_Fragment;
+	mouselEntry.buffer = buf;
+
 	tex = createTexture(img, imgw, imgh);
 	WGPUTextureViewDescriptor texViewDesc = {};
 	texViewDesc.dimension = WGPUTextureViewDimension_2D;
@@ -176,23 +184,24 @@ static void createPipelineAndBuffers() {
 	texLayout.multisampled = false;
 
 	WGPUBindGroupLayoutEntry bglTexEntry = {};
-	bglTexEntry.binding = 2;
+	bglTexEntry.binding = 3;
 	bglTexEntry.visibility = WGPUShaderStage_Fragment;
 	bglTexEntry.texture = texLayout;
 
 	WGPUBindGroupLayoutEntry bglSamplerEntry = {};
-	bglSamplerEntry.binding = 3;
+	bglSamplerEntry.binding = 4;
 	bglSamplerEntry.visibility = WGPUShaderStage_Fragment;
 	bglSamplerEntry.sampler = samplerLayout;
 
-	WGPUBindGroupLayoutEntry* allBgLayoutEntries = new WGPUBindGroupLayoutEntry[4];
+	WGPUBindGroupLayoutEntry* allBgLayoutEntries = new WGPUBindGroupLayoutEntry[5];
 	allBgLayoutEntries[0] = timelEntry;
 	allBgLayoutEntries[1] = resolutionlEntry;
-	allBgLayoutEntries[2] = bglTexEntry;
-	allBgLayoutEntries[3] = bglSamplerEntry;
+	allBgLayoutEntries[2] = mouselEntry;
+	allBgLayoutEntries[3] = bglTexEntry;
+	allBgLayoutEntries[4] = bglSamplerEntry;
 
 	WGPUBindGroupLayoutDescriptor bglDesc = {};
-	bglDesc.entryCount = 4;  
+	bglDesc.entryCount = 5;  
 	bglDesc.entries = allBgLayoutEntries;
 	WGPUBindGroupLayout bindGroupLayout = wgpuDeviceCreateBindGroupLayout(device, &bglDesc);
 	
@@ -288,6 +297,7 @@ static void createPipelineAndBuffers() {
 
 	timeBuf = createBuffer(&runtime, sizeof(runtime), WGPUBufferUsage_Uniform);
 	resolutionBuf = createBuffer(&resolution, sizeof(resolution), WGPUBufferUsage_Uniform);
+	mouseBuf = createBuffer(&mouselocation, sizeof(mouselocation), WGPUBufferUsage_Uniform);
 	WGPUBindGroupEntry timeEntry = {};
 	timeEntry.binding = 0;
 	timeEntry.buffer = timeBuf;
@@ -300,23 +310,29 @@ static void createPipelineAndBuffers() {
 	//bgEntry.offset = 0;
 	resolutionEntry.size = sizeof(resolution);
 
+	WGPUBindGroupEntry mouseEntry = {};
+	mouseEntry.binding = 2;
+	mouseEntry.buffer = mouseBuf;
+	mouseEntry.size = sizeof(mouselocation);
+
 	WGPUBindGroupEntry bgTexEntry = {};
-	bgTexEntry.binding = 2;
+	bgTexEntry.binding = 3;
 	bgTexEntry.textureView = texView;
 
 	WGPUBindGroupEntry bgSamplerEntry = {};
-	bgSamplerEntry.binding = 3;
+	bgSamplerEntry.binding = 4;
 	bgSamplerEntry.sampler = samplerTex;
 
-	WGPUBindGroupEntry* allBgEntries = new WGPUBindGroupEntry[4];
+	WGPUBindGroupEntry* allBgEntries = new WGPUBindGroupEntry[5];
 	allBgEntries[0] = timeEntry;
 	allBgEntries[1] = resolutionEntry;
-	allBgEntries[2] = bgTexEntry;
-	allBgEntries[3] = bgSamplerEntry;
+	allBgEntries[2] = mouseEntry;
+	allBgEntries[3] = bgTexEntry;
+	allBgEntries[4] = bgSamplerEntry;
 
 	WGPUBindGroupDescriptor bgDesc = {};
 	bgDesc.layout = bindGroupLayout;
-	bgDesc.entryCount = 4;   
+	bgDesc.entryCount = 5;   
 	bgDesc.entries = allBgEntries;
 
 	bindGroup = wgpuDeviceCreateBindGroup(device, &bgDesc);
@@ -324,7 +340,34 @@ static void createPipelineAndBuffers() {
 	// last bit of clean-up
 	wgpuBindGroupLayoutRelease(bindGroupLayout);
 }
+EM_JS(void, jsprint, ( float x,float y), {
+  console.log(x,y);
+});
+EM_BOOL mouse_callback(int eventType, const EmscriptenMouseEvent *e, void *userData)
+{
+  /*printf("%s, screen: (%ld,%ld), client: (%ld,%ld),%s%s%s%s button: %hu, buttons: %hu, movement: (%ld,%ld), canvas: (%ld,%ld), timestamp: %lf\n",
+    emscripten_event_type_to_string(eventType), e->screenX, e->screenY, e->clientX, e->clientY,
+    e->ctrlKey ? " CTRL" : "", e->shiftKey ? " SHIFT" : "", e->altKey ? " ALT" : "", e->metaKey ? " META" : "", 
+    e->button, e->buttons, e->movementX, e->movementY, e->canvasX, e->canvasY,
+    e->timestamp);*/
+	mouselocation[0]=e->clientX;
+	mouselocation[1]=e->clientY;
+  return 0;
+}
+EM_BOOL mouse_click_callback(int eventType, const EmscriptenMouseEvent *e, void *userData)
+{
+  /*printf("%s, screen: (%ld,%ld), client: (%ld,%ld),%s%s%s%s button: %hu, buttons: %hu, movement: (%ld,%ld), canvas: (%ld,%ld), timestamp: %lf\n",
+    emscripten_event_type_to_string(eventType), e->screenX, e->screenY, e->clientX, e->clientY,
+    e->ctrlKey ? " CTRL" : "", e->shiftKey ? " SHIFT" : "", e->altKey ? " ALT" : "", e->metaKey ? " META" : "", 
+    e->button, e->buttons, e->movementX, e->movementY, e->canvasX, e->canvasY,
+    e->timestamp);*/
+	mouselocation[2]=e->clientX;
+	mouselocation[3]=e->clientY;
+  return 0;
+}
 static bool redraw() {
+	EMSCRIPTEN_RESULT ret = emscripten_set_mousemove_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, mouse_callback);
+	ret = emscripten_set_click_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, mouse_click_callback);
 	WGPUTextureView backBufView = wgpuSwapChainGetCurrentTextureView(swapchain);			// create textureView
 
 	WGPURenderPassColorAttachment colorDesc = {};
@@ -349,6 +392,7 @@ static bool redraw() {
 	
 	wgpuQueueWriteBuffer(queue, timeBuf,0, &runtime, sizeof(runtime));
 	wgpuQueueWriteBuffer(queue, resolutionBuf,0, &resolution, sizeof(resolution));
+	wgpuQueueWriteBuffer(queue, mouseBuf,0, &mouselocation, sizeof(mouselocation));
 	wgpuQueueWriteTexture(queue, &texCopy, img, imgh * imgw * 4, &texDataLayout, &texSize);
 	// draw the triangle (comment these five lines to simply clear the screen)
 	wgpuRenderPassEncoderSetPipeline(pass, pipeline);
@@ -414,6 +458,7 @@ extern "C" int __main__(int /*argc*/, char* /*argv*/[]) {
 			wgpuBindGroupRelease(bindGroup);
 			wgpuBufferRelease(resolutionBuf);
 			wgpuBufferRelease(timeBuf);
+			wgpuBufferRelease(mouseBuf);
 			wgpuBufferRelease(indxBuf);
 			wgpuBufferRelease(vertBuf);
 			wgpuRenderPipelineRelease(pipeline);

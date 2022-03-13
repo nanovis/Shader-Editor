@@ -26,7 +26,6 @@ app.post('/compile', (req, res) => {
                     if(err) throw err;
                     else
                     {
-                        //res.send({success: true, message: req.body.story})
                         res.redirect("/")
                     }
                 })
