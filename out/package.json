@@ -12,6 +12,7 @@
   "dependencies": {
     "body-parser": "^1.19.2",
     "express": "^4.17.3",
-    "node-cmd": "^5.0.0"
+    "node-cmd": "^5.0.0",
+    "puppeteer": "^13.5.1"
   }
 }

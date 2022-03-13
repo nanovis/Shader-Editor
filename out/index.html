@@ -58,7 +58,7 @@
     </nav>
     <div class="container">
       <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
-      <form action="replace" method="post">
+      <form action="compile" method="post">
       <div class="textbox">
         <p>
         <textarea id="story" name="story" rows="24" cols="60">
@@ -72,7 +72,7 @@ fn main([[builtin(position)]] position: vec4<f32>) -> [[location(0)]] vec4<f32> 
 }
       </textarea>
     </p>
-      <button type="submit" class="btn btn-primary">Compile</button>
+      <button type="submit" class="btn btn-primary" >Compile</button>
       </div>
     </form>
     </div>

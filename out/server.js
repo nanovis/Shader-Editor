@@ -11,7 +11,7 @@ app.use(express.static(".."))
 app.get('/', (req, res) => {
   res.sendFile("index.html")
 })
-app.post('/replace', (req, res) => {
+app.post('/compile', (req, res) => {
     fragment_code=req.body.story.replace(/\r?\n/g,'')
     fragment_code="static char const triangle_frag_wgsl[] = R\"("+fragment_code+")\"; // fragment shader end"
     fs.readFile('/Users/jdg/Documents/GitHub/shadertoy-webgpu/main.cpp',function(err,data){
@@ -24,7 +24,11 @@ app.post('/replace', (req, res) => {
                 cmd.run("cd /Users/jdg/Documents/GitHub/shadertoy-webgpu && make",function(err,data)
                 {
                     if(err) throw err;
-                    else{res.redirect("/")}
+                    else
+                    {
+                        //res.send({success: true, message: req.body.story})
+                        res.redirect("/")
+                    }
                 })
                 
             })
