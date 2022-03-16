@@ -1,6 +1,7 @@
 var cmd=require('node-cmd');
 const express = require('express')
 const bodyParser=require("body-parser")
+var hbs = require('hbs');
 var fs = require('fs')
 const app = express()
 const port = 8000
@@ -8,8 +9,22 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use(express.static(__dirname))
 app.use(express.static(".."))
+app.set('view engine', 'html');
+app.engine('html', hbs.__express);
 app.get('/', (req, res) => {
-  res.sendFile("index.html")
+
+  res.render('index.html')
+})
+app.get('/new', (req, res) => {
+
+  res.render(__dirname+"/new.html")
+})
+app.get('/signin', (req, res) => {
+
+  res.render(__dirname+"/signin.html")
+})
+app.get('/signup', (req, res) => {
+  res.render(__dirname+"/signup.html")
 })
 app.post('/compile', (req, res) => {
     fragment_code=req.body.story.replace(/\r?\n/g,'')
@@ -26,7 +41,7 @@ app.post('/compile', (req, res) => {
                     if(err) throw err;
                     else
                     {
-                        res.redirect("/")
+                        res.render(__dirname+"/new_template.html",{wgsl_code:req.body.story})
                     }
                 })
                 
@@ -34,7 +49,10 @@ app.post('/compile', (req, res) => {
         }
     })
   })
-
+app.use(function(request, response) {
+  response.writeHead(404, { "Content-Type": "text/plain" });
+  response.end("404 error!\n");
+})
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })

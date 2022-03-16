@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"/>
+    <title>shader toy example</title>
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+    <style>
+        body { margin: 0; background-color: rgba(110, 109, 109, 0.432) }
+        .emscripten {
+            position: absolute;
+            top: 10%;
+            left: 3%;
+            margin: 0px;
+            border: 0;
+            width: 45%;
+            height: 50%;
+            overflow: hidden;
+            display: block;
+            image-rendering: optimizeSpeed;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: -o-crisp-edges;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: optimize-contrast;
+            image-rendering: crisp-edges;
+            image-rendering: pixelated;
+            -ms-interpolation-mode: nearest-neighbor;
+        }
+        .signin
+        {
+          position: absolute;
+          top: 10%;
+          left: 40%;
+          width: 15%;
+        }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-static-top" >
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">Shader Editor</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="/">Home</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/contact">Contact</a></li>
+              </ul>
+              <ul class="nav navbar-nav navbar-right">
+                <li><a href="/browse">Browse</a></li>
+                <li><a href="/new">New</a></li>
+                <li><a href="/signin">Sign In</a></li>
+              </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="signin">
+        <form class="form-signin">
+            <h2 class="form-signin-heading">Please sign in</h2>
+            <label for="inputEmail" >Email address</label>
+            <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required="" autofocus="">
+            <label for="inputPassword" >Password</label>
+            <input type="password" id="inputPassword" class="form-control" placeholder="Password" required="">
+            <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+          </form>
+          <p>Not have account?<a href="/signup">create account</a></p>
+    </div>
+
+
+    <script type='text/javascript'>
+      var Module;
+      (async () => {
+        Module = {
+          preRun: [],
+          postRun: [],
+          print: (function() {
+              return function(text) {
+                  text = Array.prototype.slice.call(arguments).join(' ');
+                  console.log(text);
+              };
+          })(),
+          printErr: function(text) {
+              text = Array.prototype.slice.call(arguments).join(' ');
+              console.error(text);
+          },
+          canvas: (function() {
+              var canvas = document.getElementById('canvas');
+  
+              return canvas;
+          })(),
+          setStatus: function(text) {
+              console.log("status: " + text);
+          },
+          monitorRunDependencies: function(left) {
+              // no run dependencies to log
+          }
+        };
+        window.onerror = function() {
+          console.log("onerror: " + event);
+        };
+
+      // Initialize the graphics adapter
+      {
+          const adapter = await navigator.gpu.requestAdapter();
+          const device = await adapter.requestDevice();
+          Module.preinitializedWebGPUDevice = device;
+      }
+
+      {
+          const js = document.createElement('script');
+          js.async = true;
+          js.src = "new_template.js";
+          document.body.appendChild(js);
+      }
+      })();
+    </script>
+    <!-- jQuery  -->
+    <script src="https://fastly.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>
+    <!-- load bootstrap -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+  </body>
+</html>

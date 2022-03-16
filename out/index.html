@@ -27,13 +27,6 @@
             image-rendering: pixelated;
             -ms-interpolation-mode: nearest-neighbor;
         }
-        .textbox
-        {
-          position: absolute;
-          top: 10%;
-          left: 60%;
-          width: 40%;
-        }
     </style>
   </head>
   <body>
@@ -44,89 +37,18 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li><a href="#">Home</a></li>
-            <li><a href="#">About</a></li>
-            <li><a href="#">Contact</a></li>
+            <li><a href="/">Home</a></li>
+            <li><a href="/about">About</a></li>
+            <li><a href="/contact">Contact</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
-            <li><a href="#">Browse</a></li>
-            <li><a href="#">New</a></li>
-            <li><a href="#">Sign In</a></li>
+            <li><a href="/browse">Browse</a></li>
+            <li><a href="/new">New</a></li>
+            <li><a href="/signin">Sign In</a></li>
           </ul>
         </div>
       </div>
     </nav>
-    <div class="container">
-      <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
-      <form action="compile" method="post">
-      <div class="textbox">
-        <p>
-        <textarea id="story" name="story" rows="24" cols="60">
-[[group(0),binding(0)]] var<uniform> Time : f32;
-[[group(0),binding(1)]] var<uniform> Resolution : vec2<f32>;
-[[group(0),binding(2)]] var<uniform> Mouse : vec4<f32>;
-[[stage(fragment)]]
-fn main([[builtin(position)]] position: vec4<f32>) -> [[location(0)]] vec4<f32> {
-  var uv: vec3<f32> =vec3<f32>(position.xyx/Resolution.xyx);
-  var col:vec3<f32> =0.5f+vec3<f32> ( 0.5*cos(uv+Time+vec3<f32>(0.0,2.0,4.0)));
-  return vec4<f32>(col, 1.0);
-}
-      </textarea>
-    </p>
-      <button type="submit" class="btn btn-primary" >Compile</button>
-      </div>
-    </form>
-    </div>
-
-
-    <script type='text/javascript'>
-      var Module;
-      (async () => {
-        Module = {
-          preRun: [],
-          postRun: [],
-          print: (function() {
-              return function(text) {
-                  text = Array.prototype.slice.call(arguments).join(' ');
-                  console.log(text);
-              };
-          })(),
-          printErr: function(text) {
-              text = Array.prototype.slice.call(arguments).join(' ');
-              console.error(text);
-          },
-          canvas: (function() {
-              var canvas = document.getElementById('canvas');
-  
-              return canvas;
-          })(),
-          setStatus: function(text) {
-              console.log("status: " + text);
-          },
-          monitorRunDependencies: function(left) {
-              // no run dependencies to log
-          }
-        };
-        window.onerror = function() {
-          console.log("onerror: " + event);
-        };
-
-      // Initialize the graphics adapter
-      {
-          const adapter = await navigator.gpu.requestAdapter();
-          const device = await adapter.requestDevice();
-          Module.preinitializedWebGPUDevice = device;
-      }
-
-      {
-          const js = document.createElement('script');
-          js.async = true;
-          js.src = "index.js";
-          document.body.appendChild(js);
-      }
-      })();
-    </script>
-    <!-- jQuery  -->
     <script src="https://fastly.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>
     <!-- load bootstrap -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>

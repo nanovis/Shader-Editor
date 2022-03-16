@@ -3,7 +3,7 @@ CXX = em++
 INC_DIR = inc
 SRC_DIR = src
 WEB_DIR = out
-EXE=out/index.js
+EXE=out/new_template.js
 EMS_DIR = $(SRC_DIR)/ems
 SOURCES = main.cpp $(SRC_DIR)/Camera.cpp $(SRC_DIR)/CameraController.cpp $(EMS_DIR)/glue.cpp $(EMS_DIR)/webgpu.cpp $(EMS_DIR)/window.cpp
 OBJS = $(addsuffix .o, $(basename $(notdir $(SOURCES))))
@@ -53,5 +53,6 @@ $(EXE): $(OBJS) $(WEB_DIR)
 	$(CXX) -o $@ $(OBJS) $(LIBS) $(LDFLAGS)
 
 clean:
-	rm -f $(EXE) $(OBJS) $(WEB_DIR)/index.js $(WEB_DIR)/*.wasm $(WEB_DIR)/*.wasm.pre
+##rm -f $(EXE) $(OBJS) $(WEB_DIR)/index.js $(WEB_DIR)/new_template.wasm $(WEB_DIR)/new_template.wasm.pre
+	rm -f $(OBJS)
 	find . -name ‘.DS_Store’ -type f -delete
