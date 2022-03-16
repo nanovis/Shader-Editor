@@ -60,7 +60,21 @@ static char const triangle_vert_wgsl[] = R"(
 	}
 )";
 
-static char const triangle_frag_wgsl[] = R"([[group(0),binding(0)]] var<uniform> Time : f32;[[group(0),binding(1)]] var<uniform> Resolution : vec2<f32>;[[group(0),binding(2)]] var<uniform> Mouse : vec4<f32>;[[stage(fragment)]]fn main([[builtin(position)]] position: vec4<f32>) -> [[location(0)]] vec4<f32> {  var uv: vec3<f32> =vec3<f32>(position.xyx/Resolution.xyx);  var col:vec3<f32> =0.5f+vec3<f32> ( 0.5*cos(uv+vec3<f32>(0.0,2.0,4.0)));  return vec4<f32>(col, 1.0);}      )"; // fragment shader end
+static char const triangle_frag_wgsl[] = R"([[group(0),binding(0)]] var<uniform> Time : f32;
+[[group(0),binding(1)]] var<uniform> Resolution : vec2<f32>;
+[[group(0),binding(2)]] var<uniform> Mouse : vec4<f32>;
+[[stage(fragment)]]
+fn main([[builtin(position)]] position: vec4<f32>) -> [[location(0)]] vec4<f32> {
+  var glsl_position:vec2<f32>=vec2<f32>(position.x,Resolution.y-position.y);
+  var uv:vec2<f32>=vec2<f32>(glsl_position/Resolution + Mouse.xy/4.0);
+  var color:f32=0.0;
+  color=color+sin(uv.x*cos(Time/15.0)*80.0)+cos(uv.y*cos(Time/15.0)*10.0);
+  color=color+sin(uv.y*sin(Time/10.0)*40.0)+cos(uv.x*sin(Time/25.0)*40.0);
+  color=color+sin(uv.x*sin(Time/5.0)*10.0)+cos(uv.y*sin(Time/35.0)*80.0);
+  color=color*sin(Time/10.0)*0.5;
+  return vec4<f32>(color,color*0.5,sin(color+Time/3.0)*0.75,1.0);
+}
+      )"; // fragment shader end
 
 /*
 [[group(0),binding(0)]] var<uniform> Time : f32;
@@ -388,7 +402,7 @@ static bool redraw() {
 
 	// update the time 
 	endTime = clock();
-	runtime = (float)(endTime - startTime) / CLOCKS_PER_SEC;
+	runtime = (float)(endTime - startTime) / (CLOCKS_PER_SEC*2);
 	
 	wgpuQueueWriteBuffer(queue, timeBuf,0, &runtime, sizeof(runtime));
 	wgpuQueueWriteBuffer(queue, resolutionBuf,0, &resolution, sizeof(resolution));
