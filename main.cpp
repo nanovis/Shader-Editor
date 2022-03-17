@@ -47,12 +47,12 @@ glm::vec2 resolution=glm::vec2(800.0f,600.0f);
 
 static char const triangle_vert_wgsl[] = R"(
 	struct VertexIn {
-		[[location(0)]] aPos : vec2<f32>;
+		@location(0) aPos : vec2<f32>;
 	};
 	struct VertexOut {
-		[[builtin(position)]] Position : vec4<f32>;
+		@builtin(position) Position : vec4<f32>;
 	};
-	[[stage(vertex)]]
+	@stage(vertex)
 	fn main(input : VertexIn) -> VertexOut {
 		var output : VertexOut;
 		output.Position = vec4<f32>(input.aPos,0.0, 1.0);
@@ -60,20 +60,45 @@ static char const triangle_vert_wgsl[] = R"(
 	}
 )";
 
-static char const triangle_frag_wgsl[] = R"([[group(0),binding(0)]] var<uniform> Time : f32;
-[[group(0),binding(1)]] var<uniform> Resolution : vec2<f32>;
-[[group(0),binding(2)]] var<uniform> Mouse : vec4<f32>;
-[[stage(fragment)]]
-fn main([[builtin(position)]] position: vec4<f32>) -> [[location(0)]] vec4<f32> {
+static char const triangle_frag_wgsl[] = R"(@group(0) @binding(0) var<uniform> Time : f32;
+@group(0) @binding(1) var<uniform> Resolution : vec2<f32>;
+@group(0) @binding(2) var<uniform> Mouse : vec4<f32>;
+@stage(fragment)
+fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
   var glsl_position:vec2<f32>=vec2<f32>(position.x,Resolution.y-position.y);
-  var uv:vec2<f32>=vec2<f32>(glsl_position/Resolution + Mouse.xy/4.0);
-  var color:f32=0.0;
-  color=color+sin(uv.x*cos(Time/15.0)*80.0)+cos(uv.y*cos(Time/15.0)*10.0);
-  color=color+sin(uv.y*sin(Time/10.0)*40.0)+cos(uv.x*sin(Time/25.0)*40.0);
-  color=color+sin(uv.x*sin(Time/5.0)*10.0)+cos(uv.y*sin(Time/35.0)*80.0);
-  color=color*sin(Time/10.0)*0.5;
-  return vec4<f32>(color,color*0.5,sin(color+Time/3.0)*0.75,1.0);
+  var normalized_dot:vec3<f32>=normalize(vec3<f32>((glsl_position.xy-Resolution.xy*0.55)/Resolution.x,0.1));
+  var sized:vec3<f32>=vec3<f32>(7.0);
+  var foreground:vec3<f32>=vec3<f32>(7.0);
+  var fracted_normalized_dot:vec3<f32>=vec3<f32>(2.0);
+  var camera:vec3<f32>=vec3<f32>(0.0);
+  var background:vec3<f32>=normalized_dot;
+  var light:vec3<f32>=vec3<f32>(1.0,3.0,0.0);
+  camera.x=0.99;
+  camera.z=Time*8.0;
+  camera.y=3.2*cos(camera.x*camera.z);
+  camera.x=camera.x-sin(Time)+3.0;
+  for(var depth: f32 = 0.80; depth< 21.0; depth=depth+0.95) {
+  camera=camera+normalized_dot*depth*0.09;
+  foreground = camera;
+  fracted_normalized_dot=fract(foreground);
+  sized = floor( foreground )*0.4;
+  sized.y=sized.y+1.0;
+  if ((cos(sized.z) + sin(sized.x)) > sized.y){
+  var flag:f32=fracted_normalized_dot.y-(0.04*cos((foreground.x+foreground.z)*10.0));
+  if (flag>0.5)
+  {
+    background = light/depth;
+  }
+  else
+  {
+    background =(fracted_normalized_dot.x*light.yxz)/depth;
+  }
+    break;
+  }
 }
+  return vec4<f32>(background,10.8);
+}
+
       )"; // fragment shader end
 
 /*

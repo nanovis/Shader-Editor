@@ -1,0 +1,115 @@
+@group(0) @binding(0) var<uniform> Time : f32;
+@group(0) @binding(1) var<uniform> Resolution : vec2<f32>;
+@group(0) @binding(2) var<uniform> Mouse : vec4<f32>;
+@stage(fragment)
+fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
+  var uv: vec3<f32> =vec3<f32>(position.xyx/Resolution.xyx);
+  var col:vec3<f32> =0.5f+vec3<f32> ( 0.5*cos(uv+Time+vec3<f32>(0.0,2.0,4.0)));
+  return vec4<f32>(col, 1.0);
+}
+
+
+-------------------------------------------------------------------------------------
+
+
+@group(0) @binding(0) var<uniform> Time : f32;
+@group(0) @binding(1) var<uniform> Resolution : vec2<f32>;
+@group(0) @binding(2) var<uniform> Mouse : vec4<f32>;
+@stage(fragment)
+fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
+  return vec4<f32>(Mouse.xy/Resolution.xy, 0.0,1.0);
+}
+
+
+-------------------------------------------------------------------------------------
+
+@group(0) @binding(0) var<uniform> Time : f32;
+@group(0) @binding(1) var<uniform> Resolution : vec2<f32>;
+@group(0) @binding(2) var<uniform> Mouse : vec4<f32>;
+@stage(fragment)
+fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
+  return vec4<f32>(Mouse.zw/Resolution.xy, 0.0,1.0);
+}
+-----------------------------------------------------------------------------------
+fire
+
+@group(0) @binding(0) var<uniform> Time : f32;
+@group(0) @binding(1) var<uniform> Resolution : vec2<f32>;
+@group(0) @binding(2) var<uniform> Mouse : vec4<f32>;
+@stage(fragment)
+fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
+  var glsl_position:vec2<f32>=vec2<f32>(position.x,Resolution.y-position.y);
+  var uv:vec2<f32>=vec2<f32>((glsl_position-(0.7*Resolution.xy))/Resolution.y);
+  var x:f32=uv.x*3.0;
+  var y:f32=uv.y*4.0;
+var m:f32= 1.0-(y*9.0)*(12.0+sin(-Time/4.0)*0.6)*0.7+sin(y*3.0+x*2.0-Time*9.0)*sin(y*1.7-x*6.0-Time+sin(x*3.0-y*0.3-Time*2.0)+cos(Time/6.0-y*6.0+x*6.0)/3.0)*69.0;
+  return vec4<f32>(m*0.016,m*0.008,m*0.001,1.0);
+}
+
+---------------------------------------------------------------------------------------
+
+
+@group(0) @binding(0) var<uniform> Time : f32;
+@group(0) @binding(1) var<uniform> Resolution : vec2<f32>;
+@group(0) @binding(2) var<uniform> Mouse : vec4<f32>;
+@stage(fragment)
+fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
+  var glsl_position:vec2<f32>=vec2<f32>(position.x,Resolution.y-position.y);
+  var uv:vec2<f32>=vec2<f32>(glsl_position/Resolution + Mouse.xy/4.0);
+  var color:f32=0.0;
+  color=color+sin(uv.x*cos(Time/15.0)*80.0)+cos(uv.y*cos(Time/15.0)*10.0);
+  color=color+sin(uv.y*sin(Time/10.0)*40.0)+cos(uv.x*sin(Time/25.0)*40.0);
+  color=color+sin(uv.x*sin(Time/5.0)*10.0)+cos(uv.y*sin(Time/35.0)*80.0);
+  color=color*sin(Time/10.0)*0.5;
+  return vec4<f32>(color,color*0.5,sin(color+Time/3.0)*0.75,1.0);
+}
+----------------------------------------------------------------
+
+@group(0) @binding(0) var<uniform> Time : f32;
+@group(0) @binding(1) var<uniform> Resolution : vec2<f32>;
+@group(0) @binding(2) var<uniform> Mouse : vec4<f32>;
+@stage(fragment)
+fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
+  var glsl_position:vec2<f32>=vec2<f32>(position.x,Resolution.y-position.y);
+  var normalized_dot:vec3<f32>=normalize(vec3<f32>((glsl_position.xy-Resolution.xy*0.55)/Resolution.x,0.1));
+  var sized:vec3<f32>=vec3<f32>(7.0);
+  var foreground:vec3<f32>=vec3<f32>(7.0);
+  var fracted_normalized_dot:vec3<f32>=vec3<f32>(2.0);
+  var camera:vec3<f32>=vec3<f32>(0.0);
+  var background:vec3<f32>=normalized_dot;
+  var light:vec3<f32>=vec3<f32>(1.0,3.0,0.0);
+  camera.x=0.99;
+  camera.z=Time*8.0;
+  camera.y=3.2*cos(camera.x*camera.z);
+  camera.x=camera.x-sin(Time)+3.0;
+  for(var depth: f32 = 0.80; depth< 21.0; depth=depth+0.95) {
+  camera=camera+normalized_dot*depth*0.09;
+  foreground = camera;
+  fracted_normalized_dot=fract(foreground);
+  sized = floor( foreground )*0.4;
+  sized.y=sized.y+1.0;
+  if ((cos(sized.z) + sin(sized.x)) > sized.y){
+  var flag:f32=fracted_normalized_dot.y-(0.04*cos((foreground.x+foreground.z)*10.0));
+  if (flag>0.5)
+  {
+    background = light/depth;
+  }
+  else
+  {
+    background =(fracted_normalized_dot.x*light.yxz)/depth;
+  }
+    break;
+  }
+}
+  return vec4<f32>(background,7.8);
+}
+
+
+
+
+
+
+
+
+
+

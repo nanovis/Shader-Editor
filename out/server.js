@@ -23,6 +23,14 @@ app.get('/signin', (req, res) => {
 
   res.render(__dirname+"/signin.html")
 })
+app.get('/browse', (req, res) => {
+
+  res.render(__dirname+"/browse.html")
+})
+app.get('/about', (req, res) => {
+
+  res.render(__dirname+"/about.html")
+})
 app.get('/signup', (req, res) => {
   res.render(__dirname+"/signup.html")
 })

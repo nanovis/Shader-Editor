@@ -204,7 +204,7 @@ var objAssign = Object.assign;
     }
 
     }
-    loadPackage({"files": [{"filename": "/happytree.jpg", "start": 0, "end": 28134}], "remote_package_size": 28134, "package_uuid": "c078a5a8-ceb3-4b64-abd2-d80da6d4b0ab"});
+    loadPackage({"files": [{"filename": "/happytree.jpg", "start": 0, "end": 28134}], "remote_package_size": 28134, "package_uuid": "87702b24-e4f8-43f9-a04a-9b1ac244ad78"});
 
   })();
 
