@@ -103,13 +103,74 @@ fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
 }
   return vec4<f32>(background,7.8);
 }
+-----------------------------------------------------------------------------------------------
+load simple texture
 
+@group(0) @binding(0) var<uniform> Time : f32;
+@group(0) @binding(1) var<uniform> Resolution : vec2<f32>;
+@group(0) @binding(2) var<uniform> Mouse : vec4<f32>;
+@group(0) @binding(3) var t_diffuse: texture_2d<f32>;
+@group(0) @binding(4) var s_diffuse: sampler;
 
+@stage(fragment)
+fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
+  return textureSample(t_diffuse, s_diffuse, position.xy/Resolution);
+}
+-------------------------------------------------------------------------------------------------
 
+load repeat texture
 
+@group(0) @binding(0) var<uniform> Time : f32;
+@group(0) @binding(1) var<uniform> Resolution : vec2<f32>;
+@group(0) @binding(2) var<uniform> Mouse : vec4<f32>;
+@group(0) @binding(3) var t_diffuse: texture_2d<f32>;
+@group(0) @binding(4) var s_diffuse: sampler;
 
+@stage(fragment)
+fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
+    var uv:vec2<f32>=vec2<f32>(position.xy/Resolution);
+    let Row_num:i32=5;
+    let Column_num:i32=4;
+    var temp:vec2<f32>=vec2<f32>(uv.x*Row_num,uv.y*Column_num);
+    var real:vec2<f32>=vec2<f32>(temp.x-floor(temp.x),temp.y-floor(temp.y));
+  return textureSample(t_diffuse, s_diffuse, real);
+}
 
+-----------------------------------------------------------------------------------------------------
 
+@group(0) @binding(0) var<uniform> Time : f32;
+@group(0) @binding(1) var<uniform> Resolution : vec2<f32>;
+@group(0) @binding(2) var<uniform> Mouse : vec4<f32>;
+@group(0) @binding(3) var t_diffuse: texture_2d<f32>;
+@group(0) @binding(4) var s_diffuse: sampler;
 
+@stage(fragment)
+fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
+  var uv:vec2<f32>=vec2<f32>(position.xy/Resolution);
+  if (distance(uv,vec2<f32>(0.5,0.5))<0.5)
+  {
+      return textureSample(t_diffuse, s_diffuse, position.xy/Resolution);
+  }
+  else
+  {
+      return vec4<f32>(0.0,0.0,0.0,1.0);
+  }
+}
+-----------------------------------------------------------------------------------------------------
 
+@group(0) @binding(0) var<uniform> Time : f32;
+@group(0) @binding(1) var<uniform> Resolution : vec2<f32>;
+@group(0) @binding(2) var<uniform> Mouse : vec4<f32>;
+@group(0) @binding(3) var t_diffuse: texture_2d<f32>;
+@group(0) @binding(4) var s_diffuse: sampler;
 
+@stage(fragment)
+fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
+  var uv:vec2<f32>=vec2<f32>(position.xy/Resolution);
+  var n:f32=100.0;
+  var d:f32=n*abs(sin(Time*0.1));
+  d=d+(Resolution.x-d)*step(n-(30.0),d);
+  return textureSample(t_diffuse, s_diffuse, floor(uv*d)/d);
+
+}
+--------------------------------------------------------------------------------------------------------

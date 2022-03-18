@@ -6,6 +6,10 @@
     <title>shader toy example</title>
     <!-- Bootstrap -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+        <!-- jQuery  -->
+        <script src="https://fastly.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>
+        <!-- load bootstrap -->
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
     <style>
         body { margin: 0; background-color: rgba(110, 109, 109, 0.432) }
         .emscripten {
@@ -34,6 +38,10 @@
           left: 60%;
           width: 40%;
         }
+        .popover
+        {
+          max-width: 600px;
+        }
     </style>
   </head>
   <body>
@@ -58,8 +66,9 @@
     </nav>
     <div class="container">
       <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
-      <form action="compile" method="post">
+      
       <div class="textbox">
+        <form action="compile" method="post">
         <p>
         <textarea id="story" name="story" rows="24" cols="60">
 @group(0) @binding(0) var<uniform> Time : f32;
@@ -73,12 +82,89 @@ fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
 }
       </textarea>
     </p>
-      <button type="submit" class="btn btn-primary" >Compile</button>
-      </div>
+    <input type="hidden" name="texture1" id="texture1" value="black.jpg">
+    <input type="hidden" name="texture2" id="texture2" value="black.jpg">
+    <input type="hidden" name="texture3" id="texture3" value="black.jpg">
+    <input type="hidden" name="texture4" id="texture4" value="black.jpg">
+    <button type="submit" class="btn btn-primary"  >Compile</button>
     </form>
+    
+    <br>
+    <br>
+    <button id="popover1" type="button" class="btn btn-default" title="Texture 1" trigger="click"
+        data-container="body" data-toggle="popover1" data-placement="top" 
+        >
+      texture_1
+    </button>
+    <button id="popover2" type="button" class="btn btn-default" title="Texture 2"  
+        data-container="body" data-toggle="popover2" data-placement="top" 
+        >
+        texture_2
+    </button>
+    <button id="popover3" type="button" class="btn btn-default" title="Texture 3"  
+        data-container="body" data-toggle="popover3" data-placement="top" 
+        >
+        texture_3
+    </button>
+    <button id="popover4" type="button" class="btn btn-default" title="Texture 4"  
+        data-container="body" data-toggle="popover4" data-placement="top" 
+        >
+        texture_4
+    </button>
+    <br>
+    <img id="img1" src="texture/black.jpg" class="img-thumbnail" width="84" height="84">
+    <img id="img2" src="texture/black.jpg" class="img-thumbnail" width="84" height="84">
+    <img id="img3" src="texture/black.jpg" class="img-thumbnail" width="84" height="84">
+    <img id="img4" src="texture/black.jpg" class="img-thumbnail" width="84" height="84">
     </div>
-
-
+    
+    
+    </div>
+    
+    <script>
+      $(function (){
+          $("[data-toggle='popover1']").popover(
+            { html: true,
+              content: function() {
+                return content("\"texture1\"","\"img1\"");
+              }
+            }
+          );
+          $("[data-toggle='popover2']").popover(
+            { html: true,
+              content: function() {
+                return content("\"texture2\"","\"img2\"");
+              }
+            }
+          );
+          $("[data-toggle='popover3']").popover(
+            { html: true,
+              content: function() {
+                return content("\"texture3\"","\"img3\"");
+              }
+            }
+          );
+          $("[data-toggle='popover4']").popover(
+            { html: true,
+              content: function() {
+                return content("\"texture4\"","\"img4\"");
+              }
+            }
+          );
+      });
+      function  content(texturenum,imgnum)  {    
+      var  code="<a href='#' onclick='click_texture(texturenum,imgnum,\"London.jpg\")'><img src='texture/London.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"happytree.jpg\")'><img src='texture/happytree.jpg' class='img-thumbnail' width='84' height='84'> </a>"
+      code=code.replace(/texturenum/g,texturenum).replace(/imgnum/g,imgnum);
+      var  data  =  $(code); 
+      return  data;  
+      } 
+      function click_texture(texture,image,image_name)
+      {
+        document.getElementById(texture).value=image_name;
+        document.getElementById(image).src="texture/"+image_name;
+        document.getElementById("popover"+image[3]).click();
+      }
+    </script>
     <script type='text/javascript'>
       var Module;
       (async () => {
@@ -126,9 +212,6 @@ fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
       }
       })();
     </script>
-    <!-- jQuery  -->
-    <script src="https://fastly.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>
-    <!-- load bootstrap -->
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+
   </body>
 </html>

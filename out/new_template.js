@@ -129,6 +129,7 @@ var objAssign = Object.assign;
       function assert(check, msg) {
         if (!check) throw msg + new Error().stack;
       }
+Module['FS_createPath']("/", "texture", true, true);
 
       /** @constructor */
       function DataRequest(start, end, audio) {
@@ -204,7 +205,7 @@ var objAssign = Object.assign;
     }
 
     }
-    loadPackage({"files": [{"filename": "/happytree.jpg", "start": 0, "end": 28134}], "remote_package_size": 28134, "package_uuid": "87702b24-e4f8-43f9-a04a-9b1ac244ad78"});
+    loadPackage({"files": [{"filename": "/texture/happytree.jpg", "start": 0, "end": 28134}, {"filename": "/texture/London.jpg", "start": 28134, "end": 209680}, {"filename": "/texture/black.jpg", "start": 209680, "end": 215070}], "remote_package_size": 215070, "package_uuid": "23e48d99-6367-491a-8371-5450526123ee"});
 
   })();
 

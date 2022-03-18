@@ -35,6 +35,14 @@ app.get('/signup', (req, res) => {
   res.render(__dirname+"/signup.html")
 })
 app.post('/compile', (req, res) => {
+    texture1_code=""
+    texture2_code=""
+    texture3_code=""
+    texture4_code=""
+    if(req.body.texture1!="")
+    {
+      texture1_code="std::string texture1_path=\"texture/"+ req.body.texture1+"\";"
+    }
     fragment_code=req.body.story
     fragment_code="static char const triangle_frag_wgsl[] = R\"("+fragment_code+")\"; // fragment shader end"
     fs.readFile('/Users/jdg/Documents/GitHub/shadertoy-webgpu/main.cpp',function(err,data){
@@ -42,6 +50,10 @@ app.post('/compile', (req, res) => {
         else
         {
             code=data.toString().replace(/static char const triangle_frag_wgsl[\s\S]*?\/\/ fragment shader end/,fragment_code)
+            if (texture1_code!="")
+            {
+              code=code.replace(/std::string texture1_path=.*?;/,texture1_code)
+            }
             fs.writeFile('/Users/jdg/Documents/GitHub/shadertoy-webgpu/main.cpp',code,function(err){
               if(err) throw err;
               cmd.run("cd /Users/jdg/Documents/GitHub/shadertoy-webgpu && make",function(err,data)
@@ -49,7 +61,7 @@ app.post('/compile', (req, res) => {
                   if(err) throw err;
                   else
                   {
-                      res.render(__dirname+"/new_template.html",{wgsl_code:req.body.story})
+                      res.render(__dirname+"/new_template.html",{wgsl_code:req.body.story,texture1:req.body.texture1,texture2:req.body.texture2,texture3:req.body.texture3,texture4:req.body.texture4})
                   }
               })
           })

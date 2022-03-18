@@ -17,7 +17,7 @@ EMS += -s ALLOW_MEMORY_GROWTH=1
 EMS += -s DISABLE_EXCEPTION_CATCHING=1 -s EXIT_RUNTIME=1
 EMS += -s ASSERTIONS=0 -s FILESYSTEM=1 -s --use-preload-plugins
 EMS += -s USE_SDL=2 -s USE_LIBJPEG=1 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS='["bmp","png","jpg"]'
-LDFLAGS = --no-heap-copy --preload-file happytree.jpg
+LDFLAGS = --no-heap-copy --preload-file texture/happytree.jpg --preload-file texture/London.jpg --preload-file texture/black.jpg
 
 ##---------------------------------------------------------------------
 ## FINAL BUILD FLAGS

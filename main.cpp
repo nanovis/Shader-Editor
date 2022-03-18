@@ -18,9 +18,10 @@
 WGPUDevice device;
 WGPUQueue queue;
 WGPUSwapChain swapchain;
-unsigned char* img=new unsigned char[256*256*4];
+unsigned char* img;
 int imgw=0,imgh=0;
 WGPURenderPipeline pipeline;
+std::string texture1_path="texture/London.jpg";
 WGPUBuffer vertBuf; // vertex buffer with triangle position and colours
 WGPUBuffer indxBuf; // index buffer
 WGPUBuffer timeBuf; // uniform buffer (containing the rotation angle)
@@ -63,43 +64,17 @@ static char const triangle_vert_wgsl[] = R"(
 static char const triangle_frag_wgsl[] = R"(@group(0) @binding(0) var<uniform> Time : f32;
 @group(0) @binding(1) var<uniform> Resolution : vec2<f32>;
 @group(0) @binding(2) var<uniform> Mouse : vec4<f32>;
+@group(0) @binding(3) var t_diffuse: texture_2d<f32>;
+@group(0) @binding(4) var s_diffuse: sampler;
+
 @stage(fragment)
 fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
-  var glsl_position:vec2<f32>=vec2<f32>(position.x,Resolution.y-position.y);
-  var normalized_dot:vec3<f32>=normalize(vec3<f32>((glsl_position.xy-Resolution.xy*0.55)/Resolution.x,0.1));
-  var sized:vec3<f32>=vec3<f32>(7.0);
-  var foreground:vec3<f32>=vec3<f32>(7.0);
-  var fracted_normalized_dot:vec3<f32>=vec3<f32>(2.0);
-  var camera:vec3<f32>=vec3<f32>(0.0);
-  var background:vec3<f32>=normalized_dot;
-  var light:vec3<f32>=vec3<f32>(1.0,3.0,0.0);
-  camera.x=0.99;
-  camera.z=Time*8.0;
-  camera.y=3.2*cos(camera.x*camera.z);
-  camera.x=camera.x-sin(Time)+3.0;
-  for(var depth: f32 = 0.80; depth< 21.0; depth=depth+0.95) {
-  camera=camera+normalized_dot*depth*0.09;
-  foreground = camera;
-  fracted_normalized_dot=fract(foreground);
-  sized = floor( foreground )*0.4;
-  sized.y=sized.y+1.0;
-  if ((cos(sized.z) + sin(sized.x)) > sized.y){
-  var flag:f32=fracted_normalized_dot.y-(0.04*cos((foreground.x+foreground.z)*10.0));
-  if (flag>0.5)
-  {
-    background = light/depth;
-  }
-  else
-  {
-    background =(fracted_normalized_dot.x*light.yxz)/depth;
-  }
-    break;
-  }
-}
-  return vec4<f32>(background,10.8);
-}
-
-      )"; // fragment shader end
+  var uv:vec2<f32>=vec2<f32>(position.xy/Resolution);
+  var n:f32=100.0;
+  var d:f32=n*abs(sin(Time*0.1));
+  d=d+(Resolution.x-d)*step(n-(80.0),d);
+  return textureSample(t_diffuse, s_diffuse, floor(uv*d)/d);
+})"; // fragment shader end
 
 /*
 [[group(0),binding(0)]] var<uniform> Time : f32;
@@ -454,12 +429,12 @@ static bool redraw() {
 
 	return true;
 }
-void image_init()
+void image_init(std::string image_path)
 {
 		SDL_Surface *image;
 		int flags=IMG_INIT_JPG|IMG_INIT_PNG;
 		int initted=IMG_Init(flags);
-		image=IMG_Load("happytree.jpg");
+		image=IMG_Load((char*)image_path.data());
 		imgw=image->w;
 		imgh=image->h;
 		img=new unsigned char[imgw * imgh*4];
@@ -484,7 +459,7 @@ void image_init()
 
 
 extern "C" int __main__(int /*argc*/, char* /*argv*/[]) {
-	image_init();
+	image_init(texture1_path);
 	if (window::Handle wHnd = window::create()) {
 		if ((device = webgpu::create(wHnd))) {
 			queue = wgpuDeviceGetQueue(device);
