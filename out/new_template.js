@@ -205,7 +205,7 @@ Module['FS_createPath']("/", "texture", true, true);
     }
 
     }
-    loadPackage({"files": [{"filename": "/texture/happytree.jpg", "start": 0, "end": 28134}, {"filename": "/texture/London.jpg", "start": 28134, "end": 209680}, {"filename": "/texture/black.jpg", "start": 209680, "end": 215070}], "remote_package_size": 215070, "package_uuid": "23e48d99-6367-491a-8371-5450526123ee"});
+    loadPackage({"files": [{"filename": "/texture/happytree.jpg", "start": 0, "end": 28134}, {"filename": "/texture/London.jpg", "start": 28134, "end": 209680}, {"filename": "/texture/black.jpg", "start": 209680, "end": 215070}], "remote_package_size": 215070, "package_uuid": "68fe8144-bb01-4e5e-9391-a944f4f05833"});
 
   })();
 
@@ -1624,6 +1624,7 @@ var ASM_CONSTS = {
 };
 function glue_preint(){ var entry = __glue_main_; if (entry) { if (navigator["gpu"]) { navigator["gpu"]["requestAdapter"]().then(function (adapter) { adapter["requestDevice"]().then( function (device) { Module["preinitializedWebGPUDevice"] = device; entry(); }); }, function () { console.error("No WebGPU adapter; not starting"); }); } else { console.error("No support for WebGPU; not starting"); } } else { console.error("Entry point not found; unable to start"); } }
 function jsprint(x,y){ console.log(x,y); }
+function say(str){ console.log( UTF8ToString(str)); }
 
 
 
@@ -6475,6 +6476,7 @@ var asmLibraryArg = {
   "invoke_viii": invoke_viii,
   "invoke_viiii": invoke_viiii,
   "jsprint": jsprint,
+  "say": say,
   "setTempRet0": _setTempRet0,
   "wgpuBindGroupLayoutRelease": _wgpuBindGroupLayoutRelease,
   "wgpuCommandBufferRelease": _wgpuCommandBufferRelease,

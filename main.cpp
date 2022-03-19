@@ -18,24 +18,30 @@
 WGPUDevice device;
 WGPUQueue queue;
 WGPUSwapChain swapchain;
-unsigned char* img;
-int imgw=0,imgh=0;
+
 WGPURenderPipeline pipeline;
-std::string texture1_path="texture/London.jpg";
+
+
 WGPUBuffer vertBuf; // vertex buffer with triangle position and colours
 WGPUBuffer indxBuf; // index buffer
 WGPUBuffer timeBuf; // uniform buffer (containing the rotation angle)
 WGPUBuffer resolutionBuf;  //uniform buffer
 WGPUBuffer mouseBuf;
 WGPUBindGroup bindGroup;
+WGPUBindGroup texturebindGroup;  //bindgroup for textures
 
-WGPUTexture tex; // Texture
+unsigned char* img_1;
+unsigned char* img_2;
+unsigned char* img_3;
+unsigned char* img_4;
+int imgw_1=0,imgh_1=0,imgw_2=0,imgh_2=0,imgw_3=0,imgh_3=0,imgw_4=0,imgh_4=0;
+WGPUTexture tex1,tex2,tex3,tex4; // Texture
 WGPUSampler samplerTex;
-WGPUTextureView texView;
-WGPUExtent3D texSize = {};
-WGPUTextureDescriptor texDesc = {};
-WGPUTextureDataLayout texDataLayout = {};
-WGPUImageCopyTexture texCopy = {};
+WGPUTextureView texView1,texView2,texView3,texView4;
+WGPUExtent3D texSize1 = {},texSize2 = {},texSize3 = {},texSize4 = {};
+WGPUTextureDescriptor texDesc1 = {},texDesc2 = {},texDesc3 = {},texDesc4 = {};
+WGPUTextureDataLayout texDataLayout1 = {},texDataLayout2 = {},texDataLayout3 = {},texDataLayout4 = {};
+WGPUImageCopyTexture texCopy1 = {},texCopy2 = {},texCopy3 = {},texCopy4 = {};
 glm::vec4 mouselocation=glm::vec4(2.0f,3.0f,0.0f,0.0f);
 
 
@@ -64,16 +70,17 @@ static char const triangle_vert_wgsl[] = R"(
 static char const triangle_frag_wgsl[] = R"(@group(0) @binding(0) var<uniform> Time : f32;
 @group(0) @binding(1) var<uniform> Resolution : vec2<f32>;
 @group(0) @binding(2) var<uniform> Mouse : vec4<f32>;
-@group(0) @binding(3) var t_diffuse: texture_2d<f32>;
-@group(0) @binding(4) var s_diffuse: sampler;
+@group(1) @binding(3) var t_diffuse: texture_2d<f32>;
+@group(1) @binding(4) var s_diffuse: sampler;
 
 @stage(fragment)
 fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
   var uv:vec2<f32>=vec2<f32>(position.xy/Resolution);
   var n:f32=100.0;
   var d:f32=n*abs(sin(Time*0.1));
-  d=d+(Resolution.x-d)*step(n-(80.0),d);
+  d=d+(Resolution.x-d)*step(n-(30.0),d);
   return textureSample(t_diffuse, s_diffuse, floor(uv*d)/d);
+
 })"; // fragment shader end
 
 /*
@@ -115,7 +122,7 @@ static WGPUBuffer createBuffer(const void* data, size_t size, WGPUBufferUsage us
 
 
 
-static WGPUTexture createTexture(unsigned char* data, unsigned int w, unsigned int h) {
+static WGPUTexture createTexture(unsigned char* data, unsigned int w, unsigned int h,WGPUExtent3D &texSize, WGPUTextureDescriptor &texDesc, WGPUTextureDataLayout &texDataLayout ,WGPUImageCopyTexture &texCopy) {
 
 
 	texSize.depthOrArrayLayers = 1;
@@ -134,7 +141,6 @@ static WGPUTexture createTexture(unsigned char* data, unsigned int w, unsigned i
 	texDataLayout.bytesPerRow = 4 * w;
 	texDataLayout.rowsPerImage = h;
 	texCopy.texture = wgpuDeviceCreateTexture(device, &texDesc);
-	wgpuQueueWriteTexture(queue, &texCopy, data, w * h*4, &texDataLayout, &texSize);
 	return texCopy.texture;
 }
 
@@ -167,13 +173,31 @@ static void createPipelineAndBuffers() {
 	mouselEntry.visibility = WGPUShaderStage_Fragment;
 	mouselEntry.buffer = buf;
 
-	tex = createTexture(img, imgw, imgh);
+
+	WGPUBindGroupLayoutEntry* allBgLayoutEntries = new WGPUBindGroupLayoutEntry[5];
+	allBgLayoutEntries[0] = timelEntry;
+	allBgLayoutEntries[1] = resolutionlEntry;
+	allBgLayoutEntries[2] = mouselEntry;
+
+	WGPUBindGroupLayoutDescriptor bglDesc = {};
+	bglDesc.entryCount = 3;  
+	bglDesc.entries = allBgLayoutEntries;
+	WGPUBindGroupLayout bindGroupLayout = wgpuDeviceCreateBindGroupLayout(device, &bglDesc);
+
+	tex1 = createTexture(img_1, imgw_1, imgh_1,texSize1,texDesc1,texDataLayout1,texCopy1);
+	tex2 = createTexture(img_2, imgw_2, imgh_2,texSize2,texDesc2,texDataLayout2,texCopy2);
+	tex3 = createTexture(img_3, imgw_3, imgh_3,texSize3,texDesc3,texDataLayout3,texCopy3);
+	tex4 = createTexture(img_4, imgw_4, imgh_4,texSize4,texDesc4,texDataLayout4,texCopy4);
+
 	WGPUTextureViewDescriptor texViewDesc = {};
 	texViewDesc.dimension = WGPUTextureViewDimension_2D;
 	texViewDesc.format = WGPUTextureFormat_RGBA8Unorm;
 	texViewDesc.mipLevelCount=1;
 	texViewDesc.arrayLayerCount=1;
-	texView = wgpuTextureCreateView(tex, &texViewDesc);
+	texView1 = wgpuTextureCreateView(tex1, &texViewDesc);
+	texView2 = wgpuTextureCreateView(tex2, &texViewDesc);
+	texView3 = wgpuTextureCreateView(tex3, &texViewDesc);
+	texView4 = wgpuTextureCreateView(tex4, &texViewDesc);
 
 	WGPUSamplerDescriptor samplerDesc = {};
 	samplerDesc.addressModeU = WGPUAddressMode_ClampToEdge;
@@ -197,35 +221,52 @@ static void createPipelineAndBuffers() {
 	texLayout.viewDimension = WGPUTextureViewDimension_2D;//here
 	texLayout.multisampled = false;
 
-	WGPUBindGroupLayoutEntry bglTexEntry = {};
-	bglTexEntry.binding = 3;
-	bglTexEntry.visibility = WGPUShaderStage_Fragment;
-	bglTexEntry.texture = texLayout;
+	WGPUBindGroupLayoutEntry bglTexEntry_1 = {};
+	bglTexEntry_1.binding = 0;
+	bglTexEntry_1.visibility = WGPUShaderStage_Fragment;
+	bglTexEntry_1.texture = texLayout;
+
+	WGPUBindGroupLayoutEntry bglTexEntry_2 = {};
+	bglTexEntry_2.binding = 1;
+	bglTexEntry_2.visibility = WGPUShaderStage_Fragment;
+	bglTexEntry_2.texture = texLayout;
+
+	WGPUBindGroupLayoutEntry bglTexEntry_3 = {};
+	bglTexEntry_3.binding = 2;
+	bglTexEntry_3.visibility = WGPUShaderStage_Fragment;
+	bglTexEntry_3.texture = texLayout;
+
+	WGPUBindGroupLayoutEntry bglTexEntry_4 = {};
+	bglTexEntry_4.binding = 3;
+	bglTexEntry_4.visibility = WGPUShaderStage_Fragment;
+	bglTexEntry_4.texture = texLayout;
 
 	WGPUBindGroupLayoutEntry bglSamplerEntry = {};
 	bglSamplerEntry.binding = 4;
 	bglSamplerEntry.visibility = WGPUShaderStage_Fragment;
 	bglSamplerEntry.sampler = samplerLayout;
 
-	WGPUBindGroupLayoutEntry* allBgLayoutEntries = new WGPUBindGroupLayoutEntry[5];
-	allBgLayoutEntries[0] = timelEntry;
-	allBgLayoutEntries[1] = resolutionlEntry;
-	allBgLayoutEntries[2] = mouselEntry;
-	allBgLayoutEntries[3] = bglTexEntry;
-	allBgLayoutEntries[4] = bglSamplerEntry;
 
-	WGPUBindGroupLayoutDescriptor bglDesc = {};
-	bglDesc.entryCount = 5;  
-	bglDesc.entries = allBgLayoutEntries;
-	WGPUBindGroupLayout bindGroupLayout = wgpuDeviceCreateBindGroupLayout(device, &bglDesc);
+	WGPUBindGroupLayoutEntry* textureBgLayoutEntries = new WGPUBindGroupLayoutEntry[5];
+	textureBgLayoutEntries[0] = bglTexEntry_1;
+	textureBgLayoutEntries[1] = bglTexEntry_2;
+	textureBgLayoutEntries[2] = bglTexEntry_3;
+	textureBgLayoutEntries[3] = bglTexEntry_4;
+	textureBgLayoutEntries[4] = bglSamplerEntry;
+
+	WGPUBindGroupLayoutDescriptor texturebglDesc = {};
+	texturebglDesc.entryCount = 5;  
+	texturebglDesc.entries = textureBgLayoutEntries;
+	WGPUBindGroupLayout texturebindGroupLayout = wgpuDeviceCreateBindGroupLayout(device, &texturebglDesc);
 	
-	WGPUBindGroupLayout* bindGroupLayouts= new WGPUBindGroupLayout[0];
+	WGPUBindGroupLayout* bindGroupLayouts= new WGPUBindGroupLayout[2];
 	bindGroupLayouts[0]=bindGroupLayout;
+	bindGroupLayouts[1]=texturebindGroupLayout;
 
 
 	// pipeline layout (used by the render pipeline, released after its creation)
 	WGPUPipelineLayoutDescriptor layoutDesc = {};
-	layoutDesc.bindGroupLayoutCount = 1;
+	layoutDesc.bindGroupLayoutCount = 2;
 	layoutDesc.bindGroupLayouts = bindGroupLayouts;
 	WGPUPipelineLayout pipelineLayout = wgpuDeviceCreatePipelineLayout(device, &layoutDesc);
 
@@ -329,33 +370,61 @@ static void createPipelineAndBuffers() {
 	mouseEntry.buffer = mouseBuf;
 	mouseEntry.size = sizeof(mouselocation);
 
-	WGPUBindGroupEntry bgTexEntry = {};
-	bgTexEntry.binding = 3;
-	bgTexEntry.textureView = texView;
+
+
+	WGPUBindGroupEntry* uniformBgEntries = new WGPUBindGroupEntry[3];
+	uniformBgEntries[0] = timeEntry;
+	uniformBgEntries[1] = resolutionEntry;
+	uniformBgEntries[2] = mouseEntry;
+
+	WGPUBindGroupDescriptor uniformbgDesc = {};
+	uniformbgDesc.layout = bindGroupLayout;
+	uniformbgDesc.entryCount = 3;   
+	uniformbgDesc.entries = uniformBgEntries;
+
+	bindGroup = wgpuDeviceCreateBindGroup(device, &uniformbgDesc);
+
+	WGPUBindGroupEntry bgTexEntry_1 = {};
+	bgTexEntry_1.binding = 0;
+	bgTexEntry_1.textureView = texView1;
+	WGPUBindGroupEntry bgTexEntry_2 = {};
+	bgTexEntry_2.binding = 1;
+	bgTexEntry_2.textureView = texView2;
+	WGPUBindGroupEntry bgTexEntry_3 = {};
+	bgTexEntry_3.binding = 2;
+	bgTexEntry_3.textureView = texView3;
+	WGPUBindGroupEntry bgTexEntry_4 = {};
+	bgTexEntry_4.binding = 3;
+	bgTexEntry_4.textureView = texView4;
 
 	WGPUBindGroupEntry bgSamplerEntry = {};
 	bgSamplerEntry.binding = 4;
 	bgSamplerEntry.sampler = samplerTex;
 
-	WGPUBindGroupEntry* allBgEntries = new WGPUBindGroupEntry[5];
-	allBgEntries[0] = timeEntry;
-	allBgEntries[1] = resolutionEntry;
-	allBgEntries[2] = mouseEntry;
-	allBgEntries[3] = bgTexEntry;
-	allBgEntries[4] = bgSamplerEntry;
+	WGPUBindGroupEntry* textureBgEntries = new WGPUBindGroupEntry[5];
+	textureBgEntries[0] = bgTexEntry_1;
+	textureBgEntries[1] = bgTexEntry_2;
+	textureBgEntries[2] = bgTexEntry_3;
+	textureBgEntries[3] = bgTexEntry_4;
+	textureBgEntries[4] = bgSamplerEntry;
 
-	WGPUBindGroupDescriptor bgDesc = {};
-	bgDesc.layout = bindGroupLayout;
-	bgDesc.entryCount = 5;   
-	bgDesc.entries = allBgEntries;
+	WGPUBindGroupDescriptor texturebgDesc = {};
+	texturebgDesc.layout = texturebindGroupLayout;//
+	texturebgDesc.entryCount = 5;   
+	texturebgDesc.entries = textureBgEntries;
 
-	bindGroup = wgpuDeviceCreateBindGroup(device, &bgDesc);
+	texturebindGroup = wgpuDeviceCreateBindGroup(device, &texturebgDesc);
+
 
 	// last bit of clean-up
 	wgpuBindGroupLayoutRelease(bindGroupLayout);
+	wgpuBindGroupLayoutRelease(texturebindGroupLayout);
 }
 EM_JS(void, jsprint, ( float x,float y), {
   console.log(x,y);
+});
+EM_JS(void, say, (const char* str), {
+  console.log( UTF8ToString(str));
 });
 EM_BOOL mouse_callback(int eventType, const EmscriptenMouseEvent *e, void *userData)
 {
@@ -402,15 +471,19 @@ static bool redraw() {
 
 	// update the time 
 	endTime = clock();
-	runtime = (float)(endTime - startTime) / (CLOCKS_PER_SEC*2);
+	runtime = (float)(endTime - startTime) / (CLOCKS_PER_SEC);
 	
 	wgpuQueueWriteBuffer(queue, timeBuf,0, &runtime, sizeof(runtime));
 	wgpuQueueWriteBuffer(queue, resolutionBuf,0, &resolution, sizeof(resolution));
 	wgpuQueueWriteBuffer(queue, mouseBuf,0, &mouselocation, sizeof(mouselocation));
-	wgpuQueueWriteTexture(queue, &texCopy, img, imgh * imgw * 4, &texDataLayout, &texSize);
+	wgpuQueueWriteTexture(queue, &texCopy1, img_1, imgh_1 * imgw_1 * 4, &texDataLayout1, &texSize1);
+	wgpuQueueWriteTexture(queue, &texCopy2, img_2, imgh_2 * imgw_2 * 4, &texDataLayout2, &texSize2);
+	wgpuQueueWriteTexture(queue, &texCopy3, img_3, imgh_3 * imgw_3 * 4, &texDataLayout3, &texSize3);
+	wgpuQueueWriteTexture(queue, &texCopy4, img_4, imgh_4 * imgw_4 * 4, &texDataLayout4, &texSize4);
 	// draw the triangle (comment these five lines to simply clear the screen)
 	wgpuRenderPassEncoderSetPipeline(pass, pipeline);
 	wgpuRenderPassEncoderSetBindGroup(pass, 0, bindGroup, 0, 0);
+	wgpuRenderPassEncoderSetBindGroup(pass, 1, texturebindGroup, 0, 0);
 	wgpuRenderPassEncoderSetVertexBuffer(pass, 0, vertBuf, 0, WGPU_WHOLE_SIZE);
 	wgpuRenderPassEncoderSetIndexBuffer(pass, indxBuf, WGPUIndexFormat_Uint16, 0, WGPU_WHOLE_SIZE);
 	wgpuRenderPassEncoderDrawIndexed(pass, 6, 1, 0, 0, 0);
@@ -429,16 +502,8 @@ static bool redraw() {
 
 	return true;
 }
-void image_init(std::string image_path)
+void load_images(SDL_Surface *image, int imgw,int imgh,unsigned char*& img )
 {
-		SDL_Surface *image;
-		int flags=IMG_INIT_JPG|IMG_INIT_PNG;
-		int initted=IMG_Init(flags);
-		image=IMG_Load((char*)image_path.data());
-		imgw=image->w;
-		imgh=image->h;
-		img=new unsigned char[imgw * imgh*4];
-		SDL_LockSurface(image);
 		Uint8 r,g,b;
 		Uint32* pixel = (Uint32*)image->pixels;
 		for (int i=0;i<imgh;i++)
@@ -453,13 +518,46 @@ void image_init(std::string image_path)
 				img[idx + 3] = 255;
 			}
 		}
-		SDL_UnlockSurface(image);
-		IMG_Quit();
+}
+void image_init()
+{		
+		SDL_Surface *image;
+		image=IMG_Load("texture/London.jpg");//texture1
+		imgw_1=image->w;
+		imgh_1=image->h;
+		img_1=new unsigned char[imgw_1 * imgh_1*4];
+		load_images(image,imgw_1,imgh_1,img_1);
+
+		image=IMG_Load("texture/happytree.jpg");//texture2
+		imgw_2=image->w;
+		imgh_2=image->h;
+		img_2=new unsigned char[imgw_2 * imgh_2*4];
+		load_images(image,imgw_2,imgh_2,img_2);
+
+		image=IMG_Load("texture/London.jpg");//texture3
+		imgw_3=image->w;
+		imgh_3=image->h;
+		img_3=new unsigned char[imgw_3 * imgh_3*4];
+		load_images(image,imgw_3,imgh_3,img_3);
+
+		image=IMG_Load("texture/London.jpg");//texture4
+		imgw_4=image->w;
+		imgh_4=image->h;
+
+		img_4=new unsigned char[imgw_4 * imgh_4*4];
+		load_images(image,imgw_4,imgh_4,img_4);
+		jsprint(imgw_1,imgh_1);
+		jsprint(imgw_2,imgh_2);
+		jsprint(imgw_3,imgh_3);
+		jsprint(imgw_4,imgh_4);
+
 }
 
 
 extern "C" int __main__(int /*argc*/, char* /*argv*/[]) {
-	image_init(texture1_path);
+	int flags=IMG_INIT_JPG|IMG_INIT_PNG;
+	int initted=IMG_Init(flags);
+	image_init();
 	if (window::Handle wHnd = window::create()) {
 		if ((device = webgpu::create(wHnd))) {
 			queue = wgpuDeviceGetQueue(device);
@@ -470,6 +568,7 @@ extern "C" int __main__(int /*argc*/, char* /*argv*/[]) {
 			window::loop(wHnd, redraw);
 		#ifndef __EMSCRIPTEN__
 			wgpuBindGroupRelease(bindGroup);
+			wgpuBindGroupRelease(texturebindGroup);
 			wgpuBufferRelease(resolutionBuf);
 			wgpuBufferRelease(timeBuf);
 			wgpuBufferRelease(mouseBuf);

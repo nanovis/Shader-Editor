@@ -18,22 +18,32 @@
 WGPUDevice device;
 WGPUQueue queue;
 WGPUSwapChain swapchain;
-unsigned char* img=new unsigned char[256*256*4];
-int imgw=0,imgh=0;
+
 WGPURenderPipeline pipeline;
+
+
 WGPUBuffer vertBuf; // vertex buffer with triangle position and colours
 WGPUBuffer indxBuf; // index buffer
 WGPUBuffer timeBuf; // uniform buffer (containing the rotation angle)
 WGPUBuffer resolutionBuf;  //uniform buffer
+WGPUBuffer mouseBuf;
 WGPUBindGroup bindGroup;
+WGPUBindGroup texturebindGroup;  //bindgroup for textures
 
-WGPUTexture tex; // Texture
+unsigned char* img_1,img_2,img_3,img_4;
+int imgw_1=0,imgh_1=0,imgw_2=0,imgh_2=0,imgw_3=0,imgh_3=0,imgw_4=0,imgh_4=0;
+std::string texture1_path="texture/London.jpg";
+std::string texture2_path="texture/black.jpg";
+std::string texture3_path="texture/black.jpg";
+std::string texture4_path="texture/black.jpg";
+WGPUTexture tex1,tex2,tex3,tex4; // Texture
 WGPUSampler samplerTex;
-WGPUTextureView texView;
-WGPUExtent3D texSize = {};
-WGPUTextureDescriptor texDesc = {};
-WGPUTextureDataLayout texDataLayout = {};
-WGPUImageCopyTexture texCopy = {};
+WGPUTextureView texView1,texView2,texView3,texView4;
+WGPUExtent3D texSize1 = {},texSize2 = {},texSize3 = {},texSize4 = {};
+WGPUTextureDescriptor texDesc1 = {},texDesc2 = {},texDesc3 = {},texDesc4 = {};
+WGPUTextureDataLayout texDataLayout1 = {},texDataLayout2 = {},texDataLayout3 = {},texDataLayout4 = {};
+WGPUImageCopyTexture texCopy1 = {},texCopy2 = {},texCopy3 = {},texCopy4 = {};
+glm::vec4 mouselocation=glm::vec4(2.0f,3.0f,0.0f,0.0f);
 
 
 /**
@@ -45,12 +55,12 @@ glm::vec2 resolution=glm::vec2(800.0f,600.0f);
 
 static char const triangle_vert_wgsl[] = R"(
 	struct VertexIn {
-		[[location(0)]] aPos : vec2<f32>;
+		@location(0) aPos : vec2<f32>;
 	};
 	struct VertexOut {
-		[[builtin(position)]] Position : vec4<f32>;
+		@builtin(position) Position : vec4<f32>;
 	};
-	[[stage(vertex)]]
+	@stage(vertex)
 	fn main(input : VertexIn) -> VertexOut {
 		var output : VertexOut;
 		output.Position = vec4<f32>(input.aPos,0.0, 1.0);
@@ -58,8 +68,33 @@ static char const triangle_vert_wgsl[] = R"(
 	}
 )";
 
-static char const triangle_frag_wgsl[] = R"([[group(0),binding(0)]] var<uniform> Time : f32;[[group(0),binding(1)]] var<uniform> Resolution : vec2<f32>;[[stage(fragment)]]fn main([[builtin(position)]] position: vec4<f32>) -> [[location(0)]] vec4<f32> {var uv: vec3<f32> =vec3<f32>(position.xyx/Resolution.xyx);var col:vec3<f32> =0.5f+vec3<f32> ( 0.5*cos(uv+Time+vec3<f32>(0.0,2.0,4.0)));return vec4<f32>(col, 1.0);})"; // fragment shader end
+static char const triangle_frag_wgsl[] = R"(@group(0) @binding(0) var<uniform> Time : f32;
+@group(0) @binding(1) var<uniform> Resolution : vec2<f32>;
+@group(0) @binding(2) var<uniform> Mouse : vec4<f32>;
+@group(1) @binding(0) var t_diffuse: texture_2d<f32>;
+@group(1) @binding(1) var s_diffuse: sampler;
 
+@stage(fragment)
+fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
+  var uv:vec2<f32>=vec2<f32>(position.xy/Resolution);
+  var n:f32=100.0;
+  var d:f32=n*abs(sin(Time*0.1));
+  d=d+(Resolution.x-d)*step(n-(30.0),d);
+  return textureSample(t_diffuse, s_diffuse, floor(uv*d)/d);
+
+})"; // fragment shader end
+
+/*
+[[group(0),binding(0)]] var<uniform> Time : f32;
+[[group(0),binding(1)]] var<uniform> Resolution : vec2<f32>;
+[[group(0),binding(2)]] var<uniform> Mouse : vec4<f32>;
+[[stage(fragment)]]
+fn main([[builtin(position)]] position: vec4<f32>) -> [[location(0)]] vec4<f32> {
+  var uv: vec3<f32> =vec3<f32>(position.xyx/Resolution.xyx);
+  var col:vec3<f32> =0.5f+vec3<f32> ( 0.5*cos(uv+Time+vec3<f32>(0.0,2.0,4.0)));
+  return vec4<f32>(col, 1.0);
+}
+*/
 static WGPUShaderModule createShader(const char* const code, const char* label = nullptr) {
 	WGPUShaderModuleWGSLDescriptor wgsl = {};
 	wgsl.chain.sType = WGPUSType_ShaderModuleWGSLDescriptor;
@@ -88,7 +123,7 @@ static WGPUBuffer createBuffer(const void* data, size_t size, WGPUBufferUsage us
 
 
 
-static WGPUTexture createTexture(unsigned char* data, unsigned int w, unsigned int h) {
+static WGPUTexture createTexture(unsigned char* data, unsigned int w, unsigned int h,WGPUExtent3D &texSize, WGPUTextureDescriptor &texDesc, WGPUTextureDataLayout &texDataLayout ,WGPUImageCopyTexture &texCopy) {
 
 
 	texSize.depthOrArrayLayers = 1;
@@ -107,7 +142,6 @@ static WGPUTexture createTexture(unsigned char* data, unsigned int w, unsigned i
 	texDataLayout.bytesPerRow = 4 * w;
 	texDataLayout.rowsPerImage = h;
 	texCopy.texture = wgpuDeviceCreateTexture(device, &texDesc);
-	wgpuQueueWriteTexture(queue, &texCopy, data, w * h*4, &texDataLayout, &texSize);
 	return texCopy.texture;
 }
 
@@ -135,13 +169,29 @@ static void createPipelineAndBuffers() {
 	resolutionlEntry.visibility = WGPUShaderStage_Fragment;
 	resolutionlEntry.buffer = buf;
 
-	tex = createTexture(img, imgw, imgh);
+	WGPUBindGroupLayoutEntry mouselEntry = {};
+	mouselEntry.binding = 2;
+	mouselEntry.visibility = WGPUShaderStage_Fragment;
+	mouselEntry.buffer = buf;
+
+
+	WGPUBindGroupLayoutEntry* allBgLayoutEntries = new WGPUBindGroupLayoutEntry[5];
+	allBgLayoutEntries[0] = timelEntry;
+	allBgLayoutEntries[1] = resolutionlEntry;
+	allBgLayoutEntries[2] = mouselEntry;
+
+	WGPUBindGroupLayoutDescriptor bglDesc = {};
+	bglDesc.entryCount = 3;  
+	bglDesc.entries = allBgLayoutEntries;
+	WGPUBindGroupLayout bindGroupLayout = wgpuDeviceCreateBindGroupLayout(device, &bglDesc);
+
+	tex1 = createTexture(img_1, imgw_1, imgh_1,texSize1,texDesc1,texDataLayout1,texCopy1);
 	WGPUTextureViewDescriptor texViewDesc = {};
 	texViewDesc.dimension = WGPUTextureViewDimension_2D;
 	texViewDesc.format = WGPUTextureFormat_RGBA8Unorm;
 	texViewDesc.mipLevelCount=1;
 	texViewDesc.arrayLayerCount=1;
-	texView = wgpuTextureCreateView(tex, &texViewDesc);
+	texView1 = wgpuTextureCreateView(tex1, &texViewDesc);
 
 	WGPUSamplerDescriptor samplerDesc = {};
 	samplerDesc.addressModeU = WGPUAddressMode_ClampToEdge;
@@ -166,33 +216,33 @@ static void createPipelineAndBuffers() {
 	texLayout.multisampled = false;
 
 	WGPUBindGroupLayoutEntry bglTexEntry = {};
-	bglTexEntry.binding = 2;
+	bglTexEntry.binding = 0;
 	bglTexEntry.visibility = WGPUShaderStage_Fragment;
 	bglTexEntry.texture = texLayout;
 
 	WGPUBindGroupLayoutEntry bglSamplerEntry = {};
-	bglSamplerEntry.binding = 3;
+	bglSamplerEntry.binding = 1;
 	bglSamplerEntry.visibility = WGPUShaderStage_Fragment;
 	bglSamplerEntry.sampler = samplerLayout;
 
-	WGPUBindGroupLayoutEntry* allBgLayoutEntries = new WGPUBindGroupLayoutEntry[4];
-	allBgLayoutEntries[0] = timelEntry;
-	allBgLayoutEntries[1] = resolutionlEntry;
-	allBgLayoutEntries[2] = bglTexEntry;
-	allBgLayoutEntries[3] = bglSamplerEntry;
 
-	WGPUBindGroupLayoutDescriptor bglDesc = {};
-	bglDesc.entryCount = 4;  
-	bglDesc.entries = allBgLayoutEntries;
-	WGPUBindGroupLayout bindGroupLayout = wgpuDeviceCreateBindGroupLayout(device, &bglDesc);
+	WGPUBindGroupLayoutEntry* textureBgLayoutEntries = new WGPUBindGroupLayoutEntry[2];
+	textureBgLayoutEntries[0] = bglTexEntry;
+	textureBgLayoutEntries[1] = bglSamplerEntry;
+
+	WGPUBindGroupLayoutDescriptor texturebglDesc = {};
+	texturebglDesc.entryCount = 2;  
+	texturebglDesc.entries = textureBgLayoutEntries;
+	WGPUBindGroupLayout texturebindGroupLayout = wgpuDeviceCreateBindGroupLayout(device, &texturebglDesc);
 	
-	WGPUBindGroupLayout* bindGroupLayouts= new WGPUBindGroupLayout[0];
+	WGPUBindGroupLayout* bindGroupLayouts= new WGPUBindGroupLayout[2];
 	bindGroupLayouts[0]=bindGroupLayout;
+	bindGroupLayouts[1]=texturebindGroupLayout;
 
 
 	// pipeline layout (used by the render pipeline, released after its creation)
 	WGPUPipelineLayoutDescriptor layoutDesc = {};
-	layoutDesc.bindGroupLayoutCount = 1;
+	layoutDesc.bindGroupLayoutCount = 2;
 	layoutDesc.bindGroupLayouts = bindGroupLayouts;
 	WGPUPipelineLayout pipelineLayout = wgpuDeviceCreatePipelineLayout(device, &layoutDesc);
 
@@ -278,6 +328,7 @@ static void createPipelineAndBuffers() {
 
 	timeBuf = createBuffer(&runtime, sizeof(runtime), WGPUBufferUsage_Uniform);
 	resolutionBuf = createBuffer(&resolution, sizeof(resolution), WGPUBufferUsage_Uniform);
+	mouseBuf = createBuffer(&mouselocation, sizeof(mouselocation), WGPUBufferUsage_Uniform);
 	WGPUBindGroupEntry timeEntry = {};
 	timeEntry.binding = 0;
 	timeEntry.buffer = timeBuf;
@@ -290,31 +341,77 @@ static void createPipelineAndBuffers() {
 	//bgEntry.offset = 0;
 	resolutionEntry.size = sizeof(resolution);
 
+	WGPUBindGroupEntry mouseEntry = {};
+	mouseEntry.binding = 2;
+	mouseEntry.buffer = mouseBuf;
+	mouseEntry.size = sizeof(mouselocation);
+
+
+
+	WGPUBindGroupEntry* uniformBgEntries = new WGPUBindGroupEntry[3];
+	uniformBgEntries[0] = timeEntry;
+	uniformBgEntries[1] = resolutionEntry;
+	uniformBgEntries[2] = mouseEntry;
+
+	WGPUBindGroupDescriptor uniformbgDesc = {};
+	uniformbgDesc.layout = bindGroupLayout;
+	uniformbgDesc.entryCount = 3;   
+	uniformbgDesc.entries = uniformBgEntries;
+
+	bindGroup = wgpuDeviceCreateBindGroup(device, &uniformbgDesc);
+
 	WGPUBindGroupEntry bgTexEntry = {};
-	bgTexEntry.binding = 2;
-	bgTexEntry.textureView = texView;
+	bgTexEntry.binding = 0;
+	bgTexEntry.textureView = texView1;
 
 	WGPUBindGroupEntry bgSamplerEntry = {};
-	bgSamplerEntry.binding = 3;
+	bgSamplerEntry.binding = 1;
 	bgSamplerEntry.sampler = samplerTex;
 
-	WGPUBindGroupEntry* allBgEntries = new WGPUBindGroupEntry[4];
-	allBgEntries[0] = timeEntry;
-	allBgEntries[1] = resolutionEntry;
-	allBgEntries[2] = bgTexEntry;
-	allBgEntries[3] = bgSamplerEntry;
+	WGPUBindGroupEntry* textureBgEntries = new WGPUBindGroupEntry[2];
+	textureBgEntries[0] = bgTexEntry;
+	textureBgEntries[1] = bgSamplerEntry;
 
-	WGPUBindGroupDescriptor bgDesc = {};
-	bgDesc.layout = bindGroupLayout;
-	bgDesc.entryCount = 4;   
-	bgDesc.entries = allBgEntries;
+	WGPUBindGroupDescriptor texturebgDesc = {};
+	texturebgDesc.layout = texturebindGroupLayout;//
+	texturebgDesc.entryCount = 2;   
+	texturebgDesc.entries = textureBgEntries;
 
-	bindGroup = wgpuDeviceCreateBindGroup(device, &bgDesc);
+	texturebindGroup = wgpuDeviceCreateBindGroup(device, &texturebgDesc);
+
 
 	// last bit of clean-up
 	wgpuBindGroupLayoutRelease(bindGroupLayout);
+	wgpuBindGroupLayoutRelease(texturebindGroupLayout);
+}
+EM_JS(void, jsprint, ( float x,float y), {
+  console.log(x,y);
+});
+EM_BOOL mouse_callback(int eventType, const EmscriptenMouseEvent *e, void *userData)
+{
+  /*printf("%s, screen: (%ld,%ld), client: (%ld,%ld),%s%s%s%s button: %hu, buttons: %hu, movement: (%ld,%ld), canvas: (%ld,%ld), timestamp: %lf\n",
+    emscripten_event_type_to_string(eventType), e->screenX, e->screenY, e->clientX, e->clientY,
+    e->ctrlKey ? " CTRL" : "", e->shiftKey ? " SHIFT" : "", e->altKey ? " ALT" : "", e->metaKey ? " META" : "", 
+    e->button, e->buttons, e->movementX, e->movementY, e->canvasX, e->canvasY,
+    e->timestamp);*/
+	mouselocation[0]=e->clientX;
+	mouselocation[1]=e->clientY;
+  return 0;
+}
+EM_BOOL mouse_click_callback(int eventType, const EmscriptenMouseEvent *e, void *userData)
+{
+  /*printf("%s, screen: (%ld,%ld), client: (%ld,%ld),%s%s%s%s button: %hu, buttons: %hu, movement: (%ld,%ld), canvas: (%ld,%ld), timestamp: %lf\n",
+    emscripten_event_type_to_string(eventType), e->screenX, e->screenY, e->clientX, e->clientY,
+    e->ctrlKey ? " CTRL" : "", e->shiftKey ? " SHIFT" : "", e->altKey ? " ALT" : "", e->metaKey ? " META" : "", 
+    e->button, e->buttons, e->movementX, e->movementY, e->canvasX, e->canvasY,
+    e->timestamp);*/
+	mouselocation[2]=e->clientX;
+	mouselocation[3]=e->clientY;
+  return 0;
 }
 static bool redraw() {
+	EMSCRIPTEN_RESULT ret = emscripten_set_mousemove_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, mouse_callback);
+	ret = emscripten_set_click_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, mouse_click_callback);
 	WGPUTextureView backBufView = wgpuSwapChainGetCurrentTextureView(swapchain);			// create textureView
 
 	WGPURenderPassColorAttachment colorDesc = {};
@@ -335,14 +432,16 @@ static bool redraw() {
 
 	// update the time 
 	endTime = clock();
-	runtime = (float)(endTime - startTime) / CLOCKS_PER_SEC;
+	runtime = (float)(endTime - startTime) / (CLOCKS_PER_SEC);
 	
 	wgpuQueueWriteBuffer(queue, timeBuf,0, &runtime, sizeof(runtime));
 	wgpuQueueWriteBuffer(queue, resolutionBuf,0, &resolution, sizeof(resolution));
-	wgpuQueueWriteTexture(queue, &texCopy, img, imgh * imgw * 4, &texDataLayout, &texSize);
+	wgpuQueueWriteBuffer(queue, mouseBuf,0, &mouselocation, sizeof(mouselocation));
+	wgpuQueueWriteTexture(queue, &texCopy1, img_1, imgh_1 * imgw_1 * 4, &texDataLayout1, &texSize1);
 	// draw the triangle (comment these five lines to simply clear the screen)
 	wgpuRenderPassEncoderSetPipeline(pass, pipeline);
 	wgpuRenderPassEncoderSetBindGroup(pass, 0, bindGroup, 0, 0);
+	wgpuRenderPassEncoderSetBindGroup(pass, 1, texturebindGroup, 0, 0);
 	wgpuRenderPassEncoderSetVertexBuffer(pass, 0, vertBuf, 0, WGPU_WHOLE_SIZE);
 	wgpuRenderPassEncoderSetIndexBuffer(pass, indxBuf, WGPUIndexFormat_Uint16, 0, WGPU_WHOLE_SIZE);
 	wgpuRenderPassEncoderDrawIndexed(pass, 6, 1, 0, 0, 0);
@@ -361,12 +460,12 @@ static bool redraw() {
 
 	return true;
 }
-void image_init()
+void image_init(std::string image_path,unsigned char*& img, int &imgw, int &imgh)
 {
 		SDL_Surface *image;
 		int flags=IMG_INIT_JPG|IMG_INIT_PNG;
 		int initted=IMG_Init(flags);
-		image=IMG_Load("happytree.jpg");
+		image=IMG_Load((char*)image_path.data());
 		imgw=image->w;
 		imgh=image->h;
 		img=new unsigned char[imgw * imgh*4];
@@ -391,7 +490,7 @@ void image_init()
 
 
 extern "C" int __main__(int /*argc*/, char* /*argv*/[]) {
-	image_init();
+	image_init(texture1_path,img_1,imgw_1,imgh_1);
 	if (window::Handle wHnd = window::create()) {
 		if ((device = webgpu::create(wHnd))) {
 			queue = wgpuDeviceGetQueue(device);
@@ -402,8 +501,10 @@ extern "C" int __main__(int /*argc*/, char* /*argv*/[]) {
 			window::loop(wHnd, redraw);
 		#ifndef __EMSCRIPTEN__
 			wgpuBindGroupRelease(bindGroup);
+			wgpuBindGroupRelease(texturebindGroup);
 			wgpuBufferRelease(resolutionBuf);
 			wgpuBufferRelease(timeBuf);
+			wgpuBufferRelease(mouseBuf);
 			wgpuBufferRelease(indxBuf);
 			wgpuBufferRelease(vertBuf);
 			wgpuRenderPipelineRelease(pipeline);

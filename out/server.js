@@ -41,7 +41,19 @@ app.post('/compile', (req, res) => {
     texture4_code=""
     if(req.body.texture1!="")
     {
-      texture1_code="std::string texture1_path=\"texture/"+ req.body.texture1+"\";"
+      texture1_code="image=IMG_Load(\"texture/"+ req.body.texture1+"\");//texture1"
+    }
+    if(req.body.texture2!="")
+    {
+      texture2_code="image=IMG_Load(\"texture/"+ req.body.texture2+"\");//texture2"
+    }
+    if(req.body.texture3!="")
+    {
+      texture3_code="image=IMG_Load(\"texture/"+ req.body.texture3+"\");//texture3"
+    }
+    if(req.body.texture4!="")
+    {
+      texture4_code="image=IMG_Load(\"texture/"+ req.body.texture4+"\");//texture4"
     }
     fragment_code=req.body.story
     fragment_code="static char const triangle_frag_wgsl[] = R\"("+fragment_code+")\"; // fragment shader end"
@@ -52,7 +64,19 @@ app.post('/compile', (req, res) => {
             code=data.toString().replace(/static char const triangle_frag_wgsl[\s\S]*?\/\/ fragment shader end/,fragment_code)
             if (texture1_code!="")
             {
-              code=code.replace(/std::string texture1_path=.*?;/,texture1_code)
+              code=code.replace(/image=IMG_Load.*?\/\/texture1/,texture1_code)
+            }
+            if (texture2_code!="")
+            {
+              code=code.replace(/image=IMG_Load.*?\/\/texture2/,texture2_code)
+            }
+            if (texture3_code!="")
+            {
+              code=code.replace(/image=IMG_Load.*?\/\/texture3/,texture3_code)
+            }
+            if (texture4_code!="")
+            {
+              code=code.replace(/image=IMG_Load.*?\/\/texture4/,texture4_code)
             }
             fs.writeFile('/Users/jdg/Documents/GitHub/shadertoy-webgpu/main.cpp',code,function(err){
               if(err) throw err;

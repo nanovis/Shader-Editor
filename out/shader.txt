@@ -141,8 +141,8 @@ fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
 @group(0) @binding(0) var<uniform> Time : f32;
 @group(0) @binding(1) var<uniform> Resolution : vec2<f32>;
 @group(0) @binding(2) var<uniform> Mouse : vec4<f32>;
-@group(0) @binding(3) var t_diffuse: texture_2d<f32>;
-@group(0) @binding(4) var s_diffuse: sampler;
+@group(1) @binding(0) var t_diffuse: texture_2d<f32>;
+@group(1) @binding(1) var s_diffuse: sampler;
 
 @stage(fragment)
 fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
@@ -161,8 +161,8 @@ fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
 @group(0) @binding(0) var<uniform> Time : f32;
 @group(0) @binding(1) var<uniform> Resolution : vec2<f32>;
 @group(0) @binding(2) var<uniform> Mouse : vec4<f32>;
-@group(0) @binding(3) var t_diffuse: texture_2d<f32>;
-@group(0) @binding(4) var s_diffuse: sampler;
+@group(1) @binding(0) var t_diffuse: texture_2d<f32>;
+@group(1) @binding(4) var s_diffuse: sampler;
 
 @stage(fragment)
 fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
