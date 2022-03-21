@@ -27,6 +27,8 @@ WGPUBuffer indxBuf; // index buffer
 WGPUBuffer timeBuf; // uniform buffer (containing the rotation angle)
 WGPUBuffer resolutionBuf;  //uniform buffer
 WGPUBuffer mouseBuf;
+WGPUBuffer date1Buf;
+WGPUBuffer date2Buf;
 WGPUBindGroup bindGroup;
 WGPUBindGroup texturebindGroup;  //bindgroup for textures
 
@@ -43,6 +45,8 @@ WGPUTextureDescriptor texDesc1 = {},texDesc2 = {},texDesc3 = {},texDesc4 = {};
 WGPUTextureDataLayout texDataLayout1 = {},texDataLayout2 = {},texDataLayout3 = {},texDataLayout4 = {};
 WGPUImageCopyTexture texCopy1 = {},texCopy2 = {},texCopy3 = {},texCopy4 = {};
 glm::vec4 mouselocation=glm::vec4(2.0f,3.0f,0.0f,0.0f);
+int date1[3];
+int date2[3];
 
 
 /**
@@ -70,17 +74,47 @@ static char const triangle_vert_wgsl[] = R"(
 static char const triangle_frag_wgsl[] = R"(@group(0) @binding(0) var<uniform> Time : f32;
 @group(0) @binding(1) var<uniform> Resolution : vec2<f32>;
 @group(0) @binding(2) var<uniform> Mouse : vec4<f32>;
-@group(1) @binding(3) var t_diffuse: texture_2d<f32>;
-@group(1) @binding(4) var s_diffuse: sampler;
-
+@group(0) @binding(3) var<uniform> Date1 : vec3<i32>;
+@group(0) @binding(4) var<uniform> Date2 : vec3<i32>;
+@group(1) @binding(0) var texture1: texture_2d<f32>;
+@group(1) @binding(1) var texture2: texture_2d<f32>;
+@group(1) @binding(2) var texture3: texture_2d<f32>;
+@group(1) @binding(3) var texture4: texture_2d<f32>;
+@group(1) @binding(4) var sampler_: sampler;
 @stage(fragment)
 fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
-  var uv:vec2<f32>=vec2<f32>(position.xy/Resolution);
-  var n:f32=100.0;
-  var d:f32=n*abs(sin(Time*0.1));
-  d=d+(Resolution.x-d)*step(n-(30.0),d);
-  return textureSample(t_diffuse, s_diffuse, floor(uv*d)/d);
-
+  var glsl_position:vec2<f32>=vec2<f32>(position.x,Resolution.y-position.y);
+  var normalized_dot:vec3<f32>=normalize(vec3<f32>((glsl_position.xy-Resolution.xy*0.55)/Resolution.x,0.1));
+  var sized:vec3<f32>=vec3<f32>(7.0);
+  var foreground:vec3<f32>=vec3<f32>(14.0);
+  var fracted_normalized_dot:vec3<f32>=vec3<f32>(8.0);
+  var camera:vec3<f32>=vec3<f32>(0.0);
+  var background:vec3<f32>=normalized_dot;
+  var light:vec3<f32>=vec3<f32>(1.0,2.5,0.0);
+  camera.x=0.99;
+  camera.z=Time*9.0;
+  camera.y=1.3*cos(camera.x*camera.z);
+  camera.x=camera.x-sin(Time)+3.0;
+  for(var depth: f32 = 0.00; depth< 21.0; depth=depth+0.05) {
+  camera=camera+normalized_dot*depth*0.09;
+  foreground = camera;
+  fracted_normalized_dot=fract(foreground);
+  sized = floor( foreground )*0.4;
+  sized.y=sized.y+3.0;
+  if ((cos(sized.z) + sin(sized.x)) > sized.y){
+  var flag:f32=fracted_normalized_dot.y-(0.04*cos((foreground.x+foreground.z)*40.0));
+  if (flag>0.5)
+  {
+    background = light/depth;
+  }
+  else
+  {
+   background =(fracted_normalized_dot.x*light.yxz)/depth;
+  }
+    break;
+  }
+}
+  return vec4<f32>(background,9.9);
 })"; // fragment shader end
 
 /*
@@ -173,14 +207,26 @@ static void createPipelineAndBuffers() {
 	mouselEntry.visibility = WGPUShaderStage_Fragment;
 	mouselEntry.buffer = buf;
 
+	WGPUBindGroupLayoutEntry date1lEntry = {};
+	date1lEntry.binding = 3;
+	date1lEntry.visibility = WGPUShaderStage_Fragment;
+	date1lEntry.buffer = buf;
+
+	WGPUBindGroupLayoutEntry date2lEntry = {};
+	date2lEntry.binding = 4;
+	date2lEntry.visibility = WGPUShaderStage_Fragment;
+	date2lEntry.buffer = buf;
+
 
 	WGPUBindGroupLayoutEntry* allBgLayoutEntries = new WGPUBindGroupLayoutEntry[5];
 	allBgLayoutEntries[0] = timelEntry;
 	allBgLayoutEntries[1] = resolutionlEntry;
 	allBgLayoutEntries[2] = mouselEntry;
+	allBgLayoutEntries[3] = date1lEntry;
+	allBgLayoutEntries[4] = date2lEntry;
 
 	WGPUBindGroupLayoutDescriptor bglDesc = {};
-	bglDesc.entryCount = 3;  
+	bglDesc.entryCount = 5;  
 	bglDesc.entries = allBgLayoutEntries;
 	WGPUBindGroupLayout bindGroupLayout = wgpuDeviceCreateBindGroupLayout(device, &bglDesc);
 
@@ -353,6 +399,8 @@ static void createPipelineAndBuffers() {
 	timeBuf = createBuffer(&runtime, sizeof(runtime), WGPUBufferUsage_Uniform);
 	resolutionBuf = createBuffer(&resolution, sizeof(resolution), WGPUBufferUsage_Uniform);
 	mouseBuf = createBuffer(&mouselocation, sizeof(mouselocation), WGPUBufferUsage_Uniform);
+	date1Buf = createBuffer(&date1, sizeof(date1), WGPUBufferUsage_Uniform);
+	date2Buf = createBuffer(&date2, sizeof(date2), WGPUBufferUsage_Uniform);
 	WGPUBindGroupEntry timeEntry = {};
 	timeEntry.binding = 0;
 	timeEntry.buffer = timeBuf;
@@ -370,16 +418,26 @@ static void createPipelineAndBuffers() {
 	mouseEntry.buffer = mouseBuf;
 	mouseEntry.size = sizeof(mouselocation);
 
+	WGPUBindGroupEntry date1Entry = {};
+	date1Entry.binding = 3;
+	date1Entry.buffer = date1Buf;
+	date1Entry.size = sizeof(date1);
 
+	WGPUBindGroupEntry date2Entry = {};
+	date2Entry.binding = 4;
+	date2Entry.buffer = date2Buf;
+	date2Entry.size = sizeof(date2);
 
-	WGPUBindGroupEntry* uniformBgEntries = new WGPUBindGroupEntry[3];
+	WGPUBindGroupEntry* uniformBgEntries = new WGPUBindGroupEntry[5];
 	uniformBgEntries[0] = timeEntry;
 	uniformBgEntries[1] = resolutionEntry;
 	uniformBgEntries[2] = mouseEntry;
+	uniformBgEntries[3] = date1Entry;
+	uniformBgEntries[4] = date2Entry;
 
 	WGPUBindGroupDescriptor uniformbgDesc = {};
 	uniformbgDesc.layout = bindGroupLayout;
-	uniformbgDesc.entryCount = 3;   
+	uniformbgDesc.entryCount = 5;   
 	uniformbgDesc.entries = uniformBgEntries;
 
 	bindGroup = wgpuDeviceCreateBindGroup(device, &uniformbgDesc);
@@ -472,10 +530,24 @@ static bool redraw() {
 	// update the time 
 	endTime = clock();
 	runtime = (float)(endTime - startTime) / (CLOCKS_PER_SEC);
+
+	//update the date
+
+	time_t now = time(0);
+	tm *ltm = localtime(&now);
+	date1[0]=1900+ ltm->tm_year;
+	date1[1]=1+ ltm->tm_mon;
+	date1[2]=ltm->tm_mday;
+
+	date2[0]=ltm->tm_hour;
+	date2[1]=ltm->tm_min;
+	date2[2]=ltm->tm_sec;
 	
 	wgpuQueueWriteBuffer(queue, timeBuf,0, &runtime, sizeof(runtime));
 	wgpuQueueWriteBuffer(queue, resolutionBuf,0, &resolution, sizeof(resolution));
 	wgpuQueueWriteBuffer(queue, mouseBuf,0, &mouselocation, sizeof(mouselocation));
+	wgpuQueueWriteBuffer(queue, date1Buf,0, &date1, sizeof(date1));
+	wgpuQueueWriteBuffer(queue, date2Buf,0, &date2, sizeof(date2));
 	wgpuQueueWriteTexture(queue, &texCopy1, img_1, imgh_1 * imgw_1 * 4, &texDataLayout1, &texSize1);
 	wgpuQueueWriteTexture(queue, &texCopy2, img_2, imgh_2 * imgw_2 * 4, &texDataLayout2, &texSize2);
 	wgpuQueueWriteTexture(queue, &texCopy3, img_3, imgh_3 * imgw_3 * 4, &texDataLayout3, &texSize3);
@@ -522,34 +594,30 @@ void load_images(SDL_Surface *image, int imgw,int imgh,unsigned char*& img )
 void image_init()
 {		
 		SDL_Surface *image;
-		image=IMG_Load("texture/London.jpg");//texture1
+		image=IMG_Load("texture/black.jpg");//texture1
 		imgw_1=image->w;
 		imgh_1=image->h;
 		img_1=new unsigned char[imgw_1 * imgh_1*4];
 		load_images(image,imgw_1,imgh_1,img_1);
 
-		image=IMG_Load("texture/happytree.jpg");//texture2
+		image=IMG_Load("texture/black.jpg");//texture2
 		imgw_2=image->w;
 		imgh_2=image->h;
 		img_2=new unsigned char[imgw_2 * imgh_2*4];
 		load_images(image,imgw_2,imgh_2,img_2);
 
-		image=IMG_Load("texture/London.jpg");//texture3
+		image=IMG_Load("texture/black.jpg");//texture3
 		imgw_3=image->w;
 		imgh_3=image->h;
 		img_3=new unsigned char[imgw_3 * imgh_3*4];
 		load_images(image,imgw_3,imgh_3,img_3);
 
-		image=IMG_Load("texture/London.jpg");//texture4
+		image=IMG_Load("texture/black.jpg");//texture4
 		imgw_4=image->w;
 		imgh_4=image->h;
 
 		img_4=new unsigned char[imgw_4 * imgh_4*4];
 		load_images(image,imgw_4,imgh_4,img_4);
-		jsprint(imgw_1,imgh_1);
-		jsprint(imgw_2,imgh_2);
-		jsprint(imgw_3,imgh_3);
-		jsprint(imgw_4,imgh_4);
 
 }
 
@@ -571,6 +639,7 @@ extern "C" int __main__(int /*argc*/, char* /*argv*/[]) {
 			wgpuBindGroupRelease(texturebindGroup);
 			wgpuBufferRelease(resolutionBuf);
 			wgpuBufferRelease(timeBuf);
+			wgpuBufferRelease(dateBuf);
 			wgpuBufferRelease(mouseBuf);
 			wgpuBufferRelease(indxBuf);
 			wgpuBufferRelease(vertBuf);

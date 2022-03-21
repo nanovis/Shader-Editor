@@ -14,7 +14,7 @@
         body { margin: 0; background-color: rgba(110, 109, 109, 0.432) }
         .emscripten {
             position: absolute;
-            top: 10%;
+            top: 15%;
             left: 3%;
             margin: 0px;
             border: 0;
@@ -34,13 +34,24 @@
         .textbox
         {
           position: absolute;
-          top: 10%;
+          top: 15%;
           left: 60%;
           width: 40%;
         }
         .popover
         {
           max-width: 600px;
+        }
+        .description
+        {
+          position: relative;
+          width: 60%;
+          height: 5%;
+          background-color: white;
+        }
+        .display_desc
+        {
+          display: none;
         }
     </style>
   </head>
@@ -68,12 +79,22 @@
       <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
       
       <div class="textbox">
+        <div class="description" onclick="toggle('display_desc')">
+          <span class="glyphicon glyphicon-menu-down" aria-hidden="true" >Input</span>
+          <p class="display_desc" id="display_desc">
+            uniform Time : f32; //shader playback time (in seconds) <br> 
+            uniform Resolution : vec3&lt;f32&gt;; // viewport resolution <br> 
+            uniform Mouse : vec4&lt;f32&gt;; // mouse pixel coords. xy: current, zw: click <br> 
+            uniform Date1 : vec3&lt;i32&gt;; // year, month, day <br> 
+            uniform Date2 : vec3&lt;i32&gt;; // hour, minute, second <br> 
+            var texture1..4: texture_2d&lt;f32&gt;; // input textures <br> 
+            var sampler_: sampler; // input sampler <br>
+
+          </p>
+        </div>
         <form action="compile" method="post">
         <p>
-        <textarea id="story" name="story" rows="24" cols="60">
-@group(0) @binding(0) var<uniform> Time : f32;
-@group(0) @binding(1) var<uniform> Resolution : vec2<f32>;
-@group(0) @binding(2) var<uniform> Mouse : vec4<f32>;
+        <textarea id="story" name="story" rows="16" cols="60">
 @stage(fragment)
 fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
   var uv: vec3<f32> =vec3<f32>(position.xyx/Resolution.xyx);
@@ -117,8 +138,6 @@ fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
     <img id="img3" src="texture/black.jpg" class="img-thumbnail" width="84" height="84">
     <img id="img4" src="texture/black.jpg" class="img-thumbnail" width="84" height="84">
     </div>
-    
-    
     </div>
     
     <script>
@@ -153,7 +172,7 @@ fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
           );
       });
       function  content(texturenum,imgnum)  {    
-      var  code="<a href='#' onclick='click_texture(texturenum,imgnum,\"London.jpg\")'><img src='texture/London.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"happytree.jpg\")'><img src='texture/happytree.jpg' class='img-thumbnail' width='84' height='84'> </a>"
+      var  code="<a href='#' onclick='click_texture(texturenum,imgnum,\"London.jpg\")'><img src='texture/London.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"happytree.jpg\")'><img src='texture/happytree.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"stock.jpg\")'><img src='texture/stock.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"wall.jpg\")'><img src='texture/wall.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"black.jpg\")'><img src='texture/black.jpg' class='img-thumbnail' width='84' height='84'> </a>"
       code=code.replace(/texturenum/g,texturenum).replace(/imgnum/g,imgnum);
       var  data  =  $(code); 
       return  data;  
@@ -161,8 +180,18 @@ fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
       function click_texture(texture,image,image_name)
       {
         document.getElementById(texture).value=image_name;
-        document.getElementById(image).src="texture/"+image_name;
+        document.getElementById(image).src="texture/"+image_name
         document.getElementById("popover"+image[3]).click();
+      }
+      function toggle(targetid){
+      if (document.getElementById){
+        target=document.getElementById(targetid);
+            if (target.style.display=="block"){
+                target.style.display="none";
+            } else {
+                target.style.display="block";
+            }
+      }
       }
     </script>
     <script type='text/javascript'>

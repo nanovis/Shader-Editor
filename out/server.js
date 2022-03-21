@@ -9,8 +9,10 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use(express.static(__dirname))
 app.use(express.static(".."))
+app.use(express.static(__dirname+"/view"))
 app.set('view engine', 'html');
 app.engine('html', hbs.__express);
+
 app.get('/', (req, res) => {
 
   res.render('index.html')
@@ -55,7 +57,8 @@ app.post('/compile', (req, res) => {
     {
       texture4_code="image=IMG_Load(\"texture/"+ req.body.texture4+"\");//texture4"
     }
-    fragment_code=req.body.story
+    description="@group(0) @binding(0) var<uniform> Time : f32;\n@group(0) @binding(1) var<uniform> Resolution : vec2<f32>;\n@group(0) @binding(2) var<uniform> Mouse : vec4<f32>;\n@group(0) @binding(3) var<uniform> Date1 : vec3<i32>;\n@group(0) @binding(4) var<uniform> Date2 : vec3<i32>;\n@group(1) @binding(0) var texture1: texture_2d<f32>;\n@group(1) @binding(1) var texture2: texture_2d<f32>;\n@group(1) @binding(2) var texture3: texture_2d<f32>;\n@group(1) @binding(3) var texture4: texture_2d<f32>;\n@group(1) @binding(4) var sampler_: sampler;\n"
+    fragment_code=description+req.body.story
     fragment_code="static char const triangle_frag_wgsl[] = R\"("+fragment_code+")\"; // fragment shader end"
     fs.readFile('/Users/jdg/Documents/GitHub/shadertoy-webgpu/main.cpp',function(err,data){
         if(err) throw err;
@@ -92,10 +95,29 @@ app.post('/compile', (req, res) => {
         }
     })
   })
+app.get('/view/*', (req, res) => {
+    fs.readFile(__dirname+'/view.json','utf8',function (err, _data) {
+      if(err) console.log(err);
+
+      var view=JSON.parse(_data);
+
+      var returndata
+      for (var index in view)
+      {
+        if (view[index].name==req.path)
+        {
+          returndata=view[index]
+        }
+      }
+      res.render(__dirname+"/view/template.html",returndata)
+  })
+
+  })
 app.use(function(request, response) {
   response.writeHead(404, { "Content-Type": "text/plain" });
   response.end("404 error!\n");
 })
+
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })

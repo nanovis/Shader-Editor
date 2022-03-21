@@ -39,8 +39,8 @@ var objAssign = Object.assign;
         // web worker
         PACKAGE_PATH = encodeURIComponent(location.pathname.toString().substring(0, location.pathname.toString().lastIndexOf('/')) + '/');
       }
-      var PACKAGE_NAME = 'out/new_template.data';
-      var REMOTE_PACKAGE_BASE = 'new_template.data';
+      var PACKAGE_NAME = 'out/view/mc.data';
+      var REMOTE_PACKAGE_BASE = 'mc.data';
       if (typeof Module['locateFilePackage'] === 'function' && !Module['locateFile']) {
         Module['locateFile'] = Module['locateFilePackage'];
         err('warning: you defined Module.locateFilePackage, that has been renamed to Module.locateFile (using your locateFilePackage for now)');
@@ -181,10 +181,10 @@ Module['FS_createPath']("/", "texture", true, true);
           var files = metadata['files'];
           for (var i = 0; i < files.length; ++i) {
             DataRequest.prototype.requests[files[i].filename].onload();
-          }          Module['removeRunDependency']('datafile_out/new_template.data');
+          }          Module['removeRunDependency']('datafile_out/view/mc.data');
 
       };
-      Module['addRunDependency']('datafile_out/new_template.data');
+      Module['addRunDependency']('datafile_out/view/mc.data');
 
       if (!Module.preloadResults) Module.preloadResults = {};
 
@@ -205,7 +205,7 @@ Module['FS_createPath']("/", "texture", true, true);
     }
 
     }
-    loadPackage({"files": [{"filename": "/texture/happytree.jpg", "start": 0, "end": 28134}, {"filename": "/texture/London.jpg", "start": 28134, "end": 209680}, {"filename": "/texture/black.jpg", "start": 209680, "end": 215070}, {"filename": "/texture/wall.jpg", "start": 215070, "end": 237324}, {"filename": "/texture/stock.jpg", "start": 237324, "end": 247851}], "remote_package_size": 247851, "package_uuid": "33793f5b-53a1-41ba-aa48-fceffed929f3"});
+    loadPackage({"files": [{"filename": "/texture/happytree.jpg", "start": 0, "end": 28134}, {"filename": "/texture/London.jpg", "start": 28134, "end": 209680}, {"filename": "/texture/black.jpg", "start": 209680, "end": 215070}, {"filename": "/texture/wall.jpg", "start": 215070, "end": 237324}, {"filename": "/texture/stock.jpg", "start": 237324, "end": 247851}], "remote_package_size": 247851, "package_uuid": "4a0c3a39-9133-499f-809a-fd5ad555ca98"});
 
   })();
 
@@ -1467,7 +1467,7 @@ function isFileURI(filename) {
 
 // end include: URIUtils.js
 var wasmBinaryFile;
-  wasmBinaryFile = 'new_template.wasm';
+  wasmBinaryFile = 'mc.wasm';
   if (!isDataURI(wasmBinaryFile)) {
     wasmBinaryFile = locateFile(wasmBinaryFile);
   }

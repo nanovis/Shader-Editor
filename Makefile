@@ -4,6 +4,7 @@ INC_DIR = inc
 SRC_DIR = src
 WEB_DIR = out
 EXE=out/new_template.js
+#EXE=out/view/mc.js
 EMS_DIR = $(SRC_DIR)/ems
 SOURCES = main.cpp $(SRC_DIR)/Camera.cpp $(SRC_DIR)/CameraController.cpp $(EMS_DIR)/glue.cpp $(EMS_DIR)/webgpu.cpp $(EMS_DIR)/window.cpp
 OBJS = $(addsuffix .o, $(basename $(notdir $(SOURCES))))
@@ -17,7 +18,7 @@ EMS += -s ALLOW_MEMORY_GROWTH=1
 EMS += -s DISABLE_EXCEPTION_CATCHING=1 -s EXIT_RUNTIME=1
 EMS += -s ASSERTIONS=0 -s FILESYSTEM=1 -s --use-preload-plugins
 EMS += -s USE_SDL=2 -s USE_LIBJPEG=1 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS='["bmp","png","jpg"]'
-LDFLAGS = --no-heap-copy --preload-file texture/happytree.jpg --preload-file texture/London.jpg --preload-file texture/black.jpg
+LDFLAGS = --no-heap-copy --preload-file texture/happytree.jpg --preload-file texture/London.jpg --preload-file texture/black.jpg --preload-file texture/wall.jpg --preload-file texture/stock.jpg
 
 ##---------------------------------------------------------------------
 ## FINAL BUILD FLAGS
