@@ -60,7 +60,7 @@ app.post('/compile', (req, res) => {
     description="@group(0) @binding(0) var<uniform> Time : f32;\n@group(0) @binding(1) var<uniform> Resolution : vec2<f32>;\n@group(0) @binding(2) var<uniform> Mouse : vec4<f32>;\n@group(0) @binding(3) var<uniform> Date1 : vec3<i32>;\n@group(0) @binding(4) var<uniform> Date2 : vec3<i32>;\n@group(1) @binding(0) var texture1: texture_2d<f32>;\n@group(1) @binding(1) var texture2: texture_2d<f32>;\n@group(1) @binding(2) var texture3: texture_2d<f32>;\n@group(1) @binding(3) var texture4: texture_2d<f32>;\n@group(1) @binding(4) var sampler_: sampler;\n"
     fragment_code=description+req.body.story
     fragment_code="static char const triangle_frag_wgsl[] = R\"("+fragment_code+")\"; // fragment shader end"
-    fs.readFile('/Users/jdg/Documents/GitHub/shadertoy-webgpu/main.cpp',function(err,data){
+    fs.readFile(__dirname+'/../main.cpp',function(err,data){
         if(err) throw err;
         else
         {
@@ -81,9 +81,9 @@ app.post('/compile', (req, res) => {
             {
               code=code.replace(/image=IMG_Load.*?\/\/texture4/,texture4_code)
             }
-            fs.writeFile('/Users/jdg/Documents/GitHub/shadertoy-webgpu/main.cpp',code,function(err){
+            fs.writeFile(__dirname+'/../main.cpp',code,function(err){
               if(err) throw err;
-              cmd.run("cd /Users/jdg/Documents/GitHub/shadertoy-webgpu && make",function(err,data)
+              cmd.run("cd "+__dirname+"/../"+" && make",function(err,data)
               {
                   if(err) throw err;
                   else

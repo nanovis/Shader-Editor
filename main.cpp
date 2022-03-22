@@ -48,6 +48,7 @@ glm::vec4 mouselocation=glm::vec4(2.0f,3.0f,0.0f,0.0f);
 int date1[3];
 int date2[3];
 
+int mouseflag=0;
 
 /**
  * Current rotation angle (in degrees, updated per frame).
@@ -83,39 +84,11 @@ static char const triangle_frag_wgsl[] = R"(@group(0) @binding(0) var<uniform> T
 @group(1) @binding(4) var sampler_: sampler;
 @stage(fragment)
 fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
-  var glsl_position:vec2<f32>=vec2<f32>(position.x,Resolution.y-position.y);
-  var normalized_dot:vec3<f32>=normalize(vec3<f32>((glsl_position.xy-Resolution.xy*0.55)/Resolution.x,0.1));
-  var sized:vec3<f32>=vec3<f32>(7.0);
-  var foreground:vec3<f32>=vec3<f32>(14.0);
-  var fracted_normalized_dot:vec3<f32>=vec3<f32>(8.0);
-  var camera:vec3<f32>=vec3<f32>(0.0);
-  var background:vec3<f32>=normalized_dot;
-  var light:vec3<f32>=vec3<f32>(1.0,2.5,0.0);
-  camera.x=0.99;
-  camera.z=Time*9.0;
-  camera.y=1.3*cos(camera.x*camera.z);
-  camera.x=camera.x-sin(Time)+3.0;
-  for(var depth: f32 = 0.00; depth< 21.0; depth=depth+0.05) {
-  camera=camera+normalized_dot*depth*0.09;
-  foreground = camera;
-  fracted_normalized_dot=fract(foreground);
-  sized = floor( foreground )*0.4;
-  sized.y=sized.y+3.0;
-  if ((cos(sized.z) + sin(sized.x)) > sized.y){
-  var flag:f32=fracted_normalized_dot.y-(0.04*cos((foreground.x+foreground.z)*40.0));
-  if (flag>0.5)
-  {
-    background = light/depth;
-  }
-  else
-  {
-   background =(fracted_normalized_dot.x*light.yxz)/depth;
-  }
-    break;
-  }
+  var uv: vec3<f32> =vec3<f32>(position.xyx/Resolution.xyx);
+  var col:vec3<f32> =0.5f+vec3<f32> ( 0.5*cos(uv+vec3<f32>(0.0,2.0,4.0)));
+  return vec4<f32>(col, 1.0);
 }
-  return vec4<f32>(background,9.9);
-})"; // fragment shader end
+      )"; // fragment shader end
 
 /*
 [[group(0),binding(0)]] var<uniform> Time : f32;
@@ -507,8 +480,13 @@ EM_BOOL mouse_click_callback(int eventType, const EmscriptenMouseEvent *e, void 
   return 0;
 }
 static bool redraw() {
-	EMSCRIPTEN_RESULT ret = emscripten_set_mousemove_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, mouse_callback);
-	ret = emscripten_set_click_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, mouse_click_callback);
+	if (mouseflag%10==0)
+	{
+		EMSCRIPTEN_RESULT ret = emscripten_set_mousemove_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, mouse_callback);
+		ret = emscripten_set_click_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, mouse_click_callback);
+		mouseflag++;
+	}
+
 	WGPUTextureView backBufView = wgpuSwapChainGetCurrentTextureView(swapchain);			// create textureView
 
 	WGPURenderPassColorAttachment colorDesc = {};
