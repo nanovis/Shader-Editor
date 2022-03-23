@@ -13,6 +13,14 @@ app.use(express.static(__dirname+"/view"))
 app.set('view engine', 'html');
 app.engine('html', hbs.__express);
 
+app.all('*', function(req, res, next) {
+  res.setHeader('Access-Control-Allow-Origin','*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST'); 
+  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type, Authorization'); 
+  // res.setHeader("Content-Type", "application/json;charset=utf-8");
+  next();
+})
+
 app.get('/', (req, res) => {
 
   res.render('index.html')
