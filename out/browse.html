@@ -9,25 +9,6 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
     <style>
         body { margin: 0; background-color: rgba(110, 109, 109, 0.432) }
-        .emscripten {
-            position: absolute;
-            top: 10%;
-            left: 3%;
-            margin: 0px;
-            border: 0;
-            width: 45%;
-            height: 50%;
-            overflow: hidden;
-            display: block;
-            image-rendering: optimizeSpeed;
-            image-rendering: -moz-crisp-edges;
-            image-rendering: -o-crisp-edges;
-            image-rendering: -webkit-optimize-contrast;
-            image-rendering: optimize-contrast;
-            image-rendering: crisp-edges;
-            image-rendering: pixelated;
-            -ms-interpolation-mode: nearest-neighbor;
-        }
     </style>
   </head>
   <body>
@@ -54,34 +35,29 @@
     <div class="row">
       <div class="col-sm-6 col-md-3">
           <a href="/view/fire" class="thumbnail">
-              <img src="/view/fire.png"
-                   alt="shader" width="360",height="270">
+            <iframe src="view/fire_canvas.html" height="270" width="100%" style="border:none;" href="/view/fire" autoplay="0"></iframe>
           </a>
       </div>
       <div class="col-sm-6 col-md-3">
           <a href="/view/mc" class="thumbnail">
-              <img src="/view/mc.png"
-                   alt="shader" width="360",height="270">
+            <iframe src="view/mc_canvas.html" height="270" width="100%" style="border:none;" loading="lazy"></iframe>
           </a>
       </div>
       <div class="col-sm-6 col-md-3">
           <a href="/view/simpletexture" class="thumbnail">
-              <img src="/view/simple.png"
-                   alt="shader" width="360",height="270">
+            <iframe src="view/simple_canvas.html" height="270" width="100%" style="border:none;" href="/view/fire"></iframe>
           </a>
       </div>
       <div class="col-sm-6 col-md-3">
           <a href="view/dynamic" class="thumbnail">
-              <img src="/view/dynamic.png"
-                   alt="shader" width="360",height="270">
+            <iframe src="view/dynamic_canvas.html" height="270" width="100%" style="border:none;" href="/view/fire"></iframe>
           </a>
       </div>
     </div>
     <div class="row">
       <div class="col-sm-6 col-md-3">
           <a href="/view/sample" class="thumbnail">
-              <img src="/view/sample.png"
-                   alt="shader" width="360",height="270">
+            <iframe src="view/sample_canvas.html" height="270" width="100%" style="border:none;" href="/view/fire"></iframe>
           </a>
       </div>
 

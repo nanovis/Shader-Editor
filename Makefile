@@ -3,6 +3,7 @@ CXX = em++
 INC_DIR = inc
 SRC_DIR = src
 WEB_DIR = out
+#EXE=out/new.js
 EXE=out/new_template.js
 #EXE=out/view/sample.js
 EMS_DIR = $(SRC_DIR)/ems

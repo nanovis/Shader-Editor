@@ -22,8 +22,7 @@ app.all('*', function(req, res, next) {
 })
 
 app.get('/', (req, res) => {
-
-  res.render('index.html')
+  res.render(__dirname+"/browse.html")
 })
 app.get('/new', (req, res) => {
 

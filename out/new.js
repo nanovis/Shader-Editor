@@ -129,6 +129,7 @@ var objAssign = Object.assign;
       function assert(check, msg) {
         if (!check) throw msg + new Error().stack;
       }
+Module['FS_createPath']("/", "texture", true, true);
 
       /** @constructor */
       function DataRequest(start, end, audio) {
@@ -204,7 +205,7 @@ var objAssign = Object.assign;
     }
 
     }
-    loadPackage({"files": [{"filename": "/happytree.jpg", "start": 0, "end": 28134}], "remote_package_size": 28134, "package_uuid": "d4a26350-bc98-4895-9f81-629875ef966e"});
+    loadPackage({"files": [{"filename": "/texture/happytree.jpg", "start": 0, "end": 28134}, {"filename": "/texture/London.jpg", "start": 28134, "end": 209680}, {"filename": "/texture/black.jpg", "start": 209680, "end": 215070}, {"filename": "/texture/wall.jpg", "start": 215070, "end": 237324}, {"filename": "/texture/stock.jpg", "start": 237324, "end": 247851}], "remote_package_size": 247851, "package_uuid": "8144d233-a08f-421b-8539-081b9c7d4f97"});
 
   })();
 
@@ -1623,6 +1624,7 @@ var ASM_CONSTS = {
 };
 function glue_preint(){ var entry = __glue_main_; if (entry) { if (navigator["gpu"]) { navigator["gpu"]["requestAdapter"]().then(function (adapter) { adapter["requestDevice"]().then( function (device) { Module["preinitializedWebGPUDevice"] = device; entry(); }); }, function () { console.error("No WebGPU adapter; not starting"); }); } else { console.error("No support for WebGPU; not starting"); } } else { console.error("Entry point not found; unable to start"); } }
 function jsprint(x,y){ console.log(x,y); }
+function say(str){ console.log( UTF8ToString(str)); }
 
 
 
@@ -4942,6 +4944,73 @@ function jsprint(x,y){ console.log(x,y); }
 
   function __emscripten_throw_longjmp() { throw 'longjmp'; }
 
+  function __localtime_js(time, tmPtr) {
+      var date = new Date(HEAP32[((time)>>2)]*1000);
+      HEAP32[((tmPtr)>>2)] = date.getSeconds();
+      HEAP32[(((tmPtr)+(4))>>2)] = date.getMinutes();
+      HEAP32[(((tmPtr)+(8))>>2)] = date.getHours();
+      HEAP32[(((tmPtr)+(12))>>2)] = date.getDate();
+      HEAP32[(((tmPtr)+(16))>>2)] = date.getMonth();
+      HEAP32[(((tmPtr)+(20))>>2)] = date.getFullYear()-1900;
+      HEAP32[(((tmPtr)+(24))>>2)] = date.getDay();
+  
+      var start = new Date(date.getFullYear(), 0, 1);
+      var yday = ((date.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))|0;
+      HEAP32[(((tmPtr)+(28))>>2)] = yday;
+      HEAP32[(((tmPtr)+(36))>>2)] = -(date.getTimezoneOffset() * 60);
+  
+      // Attention: DST is in December in South, and some regions don't have DST at all.
+      var summerOffset = new Date(date.getFullYear(), 6, 1).getTimezoneOffset();
+      var winterOffset = start.getTimezoneOffset();
+      var dst = (summerOffset != winterOffset && date.getTimezoneOffset() == Math.min(winterOffset, summerOffset))|0;
+      HEAP32[(((tmPtr)+(32))>>2)] = dst;
+    }
+
+  function _tzset_impl(timezone, daylight, tzname) {
+      var currentYear = new Date().getFullYear();
+      var winter = new Date(currentYear, 0, 1);
+      var summer = new Date(currentYear, 6, 1);
+      var winterOffset = winter.getTimezoneOffset();
+      var summerOffset = summer.getTimezoneOffset();
+  
+      // Local standard timezone offset. Local standard time is not adjusted for daylight savings.
+      // This code uses the fact that getTimezoneOffset returns a greater value during Standard Time versus Daylight Saving Time (DST).
+      // Thus it determines the expected output during Standard Time, and it compares whether the output of the given date the same (Standard) or less (DST).
+      var stdTimezoneOffset = Math.max(winterOffset, summerOffset);
+  
+      // timezone is specified as seconds west of UTC ("The external variable
+      // `timezone` shall be set to the difference, in seconds, between
+      // Coordinated Universal Time (UTC) and local standard time."), the same
+      // as returned by stdTimezoneOffset.
+      // See http://pubs.opengroup.org/onlinepubs/009695399/functions/tzset.html
+      HEAP32[((timezone)>>2)] = stdTimezoneOffset * 60;
+  
+      HEAP32[((daylight)>>2)] = Number(winterOffset != summerOffset);
+  
+      function extractZone(date) {
+        var match = date.toTimeString().match(/\(([A-Za-z ]+)\)$/);
+        return match ? match[1] : "GMT";
+      };
+      var winterName = extractZone(winter);
+      var summerName = extractZone(summer);
+      var winterNamePtr = allocateUTF8(winterName);
+      var summerNamePtr = allocateUTF8(summerName);
+      if (summerOffset < winterOffset) {
+        // Northern hemisphere
+        HEAP32[((tzname)>>2)] = winterNamePtr;
+        HEAP32[(((tzname)+(4))>>2)] = summerNamePtr;
+      } else {
+        HEAP32[((tzname)>>2)] = summerNamePtr;
+        HEAP32[(((tzname)+(4))>>2)] = winterNamePtr;
+      }
+    }
+  function __tzset_js(timezone, daylight, tzname) {
+      // TODO: Use (malleable) environment variables instead of system settings.
+      if (__tzset_js.called) return;
+      __tzset_js.called = true;
+      _tzset_impl(timezone, daylight, tzname);
+    }
+
   function _abort() {
       abort('');
     }
@@ -5502,6 +5571,15 @@ function jsprint(x,y){ console.log(x,y); }
 
   function _setTempRet0(val) {
       setTempRet0(val);
+    }
+
+  function _time(ptr) {
+      ;
+      var ret = (Date.now()/1000)|0;
+      if (ptr) {
+        HEAP32[((ptr)>>2)] = ret;
+      }
+      return ret;
     }
 
   function _wgpuBindGroupLayoutRelease(id) {
@@ -6437,6 +6515,8 @@ var asmLibraryArg = {
   "__syscall_ioctl": ___syscall_ioctl,
   "__syscall_open": ___syscall_open,
   "_emscripten_throw_longjmp": __emscripten_throw_longjmp,
+  "_localtime_js": __localtime_js,
+  "_tzset_js": __tzset_js,
   "abort": _abort,
   "clock": _clock,
   "emscripten_get_now": _emscripten_get_now,
@@ -6474,7 +6554,9 @@ var asmLibraryArg = {
   "invoke_viii": invoke_viii,
   "invoke_viiii": invoke_viiii,
   "jsprint": jsprint,
+  "say": say,
   "setTempRet0": _setTempRet0,
+  "time": _time,
   "wgpuBindGroupLayoutRelease": _wgpuBindGroupLayoutRelease,
   "wgpuCommandBufferRelease": _wgpuCommandBufferRelease,
   "wgpuCommandEncoderBeginRenderPass": _wgpuCommandEncoderBeginRenderPass,
