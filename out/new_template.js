@@ -205,7 +205,7 @@ Module['FS_createPath']("/", "texture", true, true);
     }
 
     }
-    loadPackage({"files": [{"filename": "/texture/happytree.jpg", "start": 0, "end": 28134}, {"filename": "/texture/London.jpg", "start": 28134, "end": 209680}, {"filename": "/texture/black.jpg", "start": 209680, "end": 215070}, {"filename": "/texture/wall.jpg", "start": 215070, "end": 237324}, {"filename": "/texture/stock.jpg", "start": 237324, "end": 247851}], "remote_package_size": 247851, "package_uuid": "4226140e-99a8-4568-b761-e9ceddeab355"});
+    loadPackage({"files": [{"filename": "/texture/happytree.jpg", "start": 0, "end": 28134}, {"filename": "/texture/London.jpg", "start": 28134, "end": 209680}, {"filename": "/texture/black.jpg", "start": 209680, "end": 215070}, {"filename": "/texture/wall.jpg", "start": 215070, "end": 237324}, {"filename": "/texture/stock.jpg", "start": 237324, "end": 247851}], "remote_package_size": 247851, "package_uuid": "ead66fb6-d153-4872-898f-1b6066ff864b"});
 
   })();
 

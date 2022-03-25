@@ -7,15 +7,19 @@
     <title>shader editor</title>
     <!-- Bootstrap -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
-        <!-- jQuery  -->
-        <script src="https://fastly.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>
-        <!-- load bootstrap -->
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+    <!-- jQuery  -->
+    <script src="https://fastly.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>
+    <!-- load bootstrap -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="CodeMirror/lib/codemirror.css">
+    <script src="CodeMirror/lib/codemirror.js"></script>
+    <link rel=stylesheet href="CodeMirror/theme/eclipse.css">
+    <script src="CodeMirror/addon/edit/matchbrackets.js"></script> 
     <style>
         body { margin: 0; background-color: rgba(110, 109, 109, 0.432) }
         .emscripten {
             position: absolute;
-            top: 15%;
+            top: 10%;
             left: 3%;
             margin: 0px;
             border: 0;
@@ -35,9 +39,16 @@
         .textbox
         {
           position: absolute;
-          top: 15%;
-          left: 60%;
+          top: 10%;
+          left: 55%;
           width: 40%;
+        }
+        .CodeMirror
+        {
+          border:1px solid black;
+          font-size:13px;
+          width:100%;
+          height:500px
         }
         .popover
         {
@@ -46,7 +57,7 @@
         .description
         {
           position: relative;
-          width: 60%;
+          width: 100%;
           height: 5%;
           background-color: white;
         }
@@ -94,7 +105,7 @@
         </div>
         <form action="compile" method="post">
         <p>
-        <textarea id="story" name="story" rows="16" cols="60">{{wgsl_code}}</textarea>
+        <textarea id="code" name="code" >{{wgsl_code}}</textarea>
     </p>
     <input type="hidden" name="texture1" id="texture1" value={{texture1}}>
     <input type="hidden" name="texture2" id="texture2" value={{texture2}}>
@@ -188,6 +199,13 @@
             }
       }}
     </script>
+    <script type="text/javascript">
+      var editor=CodeMirror.fromTextArea(document.getElementById("code"),{
+                  lineNumbers:true,
+                  theme:"eclipse",
+                  matchBrackets:true
+          });
+  </script>  
     <script type='text/javascript'>
       var Module;
       (async () => {
