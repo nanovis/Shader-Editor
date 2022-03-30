@@ -129,7 +129,8 @@ var objAssign = Object.assign;
       function assert(check, msg) {
         if (!check) throw msg + new Error().stack;
       }
-Module['FS_createPath']("/", "texture", true, true);
+Module['FS_createPath']("/", "out", true, true);
+Module['FS_createPath']("/out", "texture", true, true);
 
       /** @constructor */
       function DataRequest(start, end, audio) {
@@ -205,7 +206,7 @@ Module['FS_createPath']("/", "texture", true, true);
     }
 
     }
-    loadPackage({"files": [{"filename": "/texture/happytree.jpg", "start": 0, "end": 28134}, {"filename": "/texture/London.jpg", "start": 28134, "end": 209680}, {"filename": "/texture/black.jpg", "start": 209680, "end": 215070}, {"filename": "/texture/wall.jpg", "start": 215070, "end": 237324}, {"filename": "/texture/stock.jpg", "start": 237324, "end": 247851}], "remote_package_size": 247851, "package_uuid": "ead66fb6-d153-4872-898f-1b6066ff864b"});
+    loadPackage({"files": [{"filename": "/out/texture/.DS_Store", "start": 0, "end": 6148}, {"filename": "/out/texture/London.jpg", "start": 6148, "end": 187694}, {"filename": "/out/texture/stock.jpg", "start": 187694, "end": 198221}, {"filename": "/out/texture/black.jpg", "start": 198221, "end": 203611}, {"filename": "/out/texture/happytree.jpg", "start": 203611, "end": 231745}, {"filename": "/out/texture/wall.jpg", "start": 231745, "end": 253999}], "remote_package_size": 253999, "package_uuid": "a9fb8c5c-ae7f-4b3b-b4ef-00e9f46cf646"});
 
   })();
 

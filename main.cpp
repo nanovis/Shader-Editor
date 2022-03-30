@@ -84,11 +84,16 @@ static char const triangle_frag_wgsl[] = R"(@group(0) @binding(0) var<uniform> T
 @group(1) @binding(4) var sampler_: sampler;
 @stage(fragment)
 fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
-  var uv: vec3<f32> =vec3<f32>(position.xyx/Resolution.xyx);
-  var col:vec3<f32> =0.5f+vec3<f32> ( 0.5*cos(uv+Time+vec3<f32>(0.0,2.0,4.0)));
-  return vec4<f32>(col, 1.0);
-}
-          )"; // fragment shader end
+  var uv:vec2<f32>=vec2<f32>(position.xy/Resolution);
+  if (distance(uv,vec2<f32>(0.5,0.5))<0.5)
+  {
+      return textureSample(texture1, sampler_, position.xy/Resolution);
+  }
+  else
+  {
+      return vec4<f32>(0.0,0.0,0.0,1.0);
+  }
+})"; // fragment shader end
 
 /*
 [[group(0),binding(0)]] var<uniform> Time : f32;
@@ -572,25 +577,25 @@ void load_images(SDL_Surface *image, int imgw,int imgh,unsigned char*& img )
 void image_init()
 {		
 		SDL_Surface *image;
-		image=IMG_Load("texture/black.jpg");//texture1
+		image=IMG_Load("out/texture/happytree.jpg");//texture1
 		imgw_1=image->w;
 		imgh_1=image->h;
 		img_1=new unsigned char[imgw_1 * imgh_1*4];
 		load_images(image,imgw_1,imgh_1,img_1);
 
-		image=IMG_Load("texture/black.jpg");//texture2
+		image=IMG_Load("out/texture/black.jpg");//texture2
 		imgw_2=image->w;
 		imgh_2=image->h;
 		img_2=new unsigned char[imgw_2 * imgh_2*4];
 		load_images(image,imgw_2,imgh_2,img_2);
 
-		image=IMG_Load("texture/black.jpg");//texture3
+		image=IMG_Load("out/texture/black.jpg");//texture3
 		imgw_3=image->w;
 		imgh_3=image->h;
 		img_3=new unsigned char[imgw_3 * imgh_3*4];
 		load_images(image,imgw_3,imgh_3,img_3);
 
-		image=IMG_Load("texture/black.jpg");//texture4
+		image=IMG_Load("out/texture/black.jpg");//texture4
 		imgw_4=image->w;
 		imgh_4=image->h;
 

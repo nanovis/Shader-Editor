@@ -178,8 +178,17 @@
             }
           );
       });
+      function htmlDecode (text){
+      var temp = document.createElement("div");
+      temp.innerHTML = text;
+      var output = temp.innerText || temp.textContent;
+        temp = null;
+        return output;
+      }
+
       function  content(texturenum,imgnum)  {    
-      var  code="<a href='#' onclick='click_texture(texturenum,imgnum,\"London.jpg\")'><img src='../texture/London.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"happytree.jpg\")'><img src='../texture/happytree.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"stock.jpg\")'><img src='../texture/stock.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"wall.jpg\")'><img src='../texture/wall.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"black.jpg\")'><img src='../texture/black.jpg' class='img-thumbnail' width='84' height='84'> </a>"
+      var  code="{{data.texture_code}}"
+      code=htmlDecode(code)
       code=code.replace(/texturenum/g,texturenum).replace(/imgnum/g,imgnum);
       var  data  =  $(code); 
       return  data;  

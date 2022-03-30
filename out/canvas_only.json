@@ -1,0 +1,47 @@
+[
+	{
+     "name":"/canvas_only/fire",
+     "data":{
+      "redirect":"/view/fire",
+	 "jsname":"fire.js"
+     }
+	},
+	{     
+        "name":"/canvas_only/mc",
+        "data":{
+         "redirect":"/view/mc",
+        "jsname":"mc.js"
+        }
+	},
+	{
+        "name":"/canvas_only/simpletexture",
+        "data":{
+         "redirect":"/view/simpletexture",
+        "jsname":"simpletexture.js"
+        }
+
+	},
+	{
+        "name":"/canvas_only/dynamic",
+        "data":{
+         "redirect":"/view/dynamic",
+        "jsname":"dynamic.js"
+        }
+	},
+	{
+        "name":"/canvas_only/sample",
+        "data":{
+         "redirect":"/view/sample",
+        "jsname":"sample.js"
+        }
+	}
+
+]
+
+
+
+
+
+
+
+

@@ -150,6 +150,16 @@ fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
     <img id="img2" src="texture/black.jpg" class="img-thumbnail" width="84" height="84">
     <img id="img3" src="texture/black.jpg" class="img-thumbnail" width="84" height="84">
     <img id="img4" src="texture/black.jpg" class="img-thumbnail" width="84" height="84">
+    
+    <form action="/file_upload" method="post" enctype="multipart/form-data">
+      <div class="form-group">
+        <label for="image">Upload Texture</label>
+        <input type="file" class="form-control-file" id="image" name="image" accpet=".jpg .png">
+        <br>
+        <button type="submit" class="btn btn-primary">Upload</button>
+      </div>
+    </form>
+
     </div>
     </div>
     
@@ -184,12 +194,23 @@ fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
             }
           );
       });
+
+      function htmlDecode (text){
+      var temp = document.createElement("div");
+      temp.innerHTML = text;
+      var output = temp.innerText || temp.textContent;
+        temp = null;
+        return output;
+      }
+
       function  content(texturenum,imgnum)  {    
-      var  code="<a href='#' onclick='click_texture(texturenum,imgnum,\"London.jpg\")'><img src='texture/London.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"happytree.jpg\")'><img src='texture/happytree.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"stock.jpg\")'><img src='texture/stock.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"wall.jpg\")'><img src='texture/wall.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"black.jpg\")'><img src='texture/black.jpg' class='img-thumbnail' width='84' height='84'> </a>"
+      var  code="{{texture_code}}"
+      code=htmlDecode(code)
       code=code.replace(/texturenum/g,texturenum).replace(/imgnum/g,imgnum);
       var  data  =  $(code); 
       return  data;  
       } 
+
       function click_texture(texture,image,image_name)
       {
         document.getElementById(texture).value=image_name;
