@@ -54,7 +54,56 @@
       </div>
     </nav>
 
+<input type="file" name="image" onchange="upload(this)">
+<br>
+<br>
+<br>
+<br>
 
+  <div class="form-group">
+    <label for="image">Upload Texture</label>
+    <input type="file" class="form-control-file" id="image" name="image" accpet=".jpg .png">
+    <br>
+    <button  class="btn btn-primary" onclick="upload()">Upload</button>
+  </div>
+
+<script>
+  function isAssetTypeAnImage(ext) {
+  return (['png', 'jpg', 'jpeg', 'bmp'].indexOf(ext.toLowerCase()) !== -1)
+  }
+  function upload(){
+      el=document.getElementById("image")
+      var files = el.files[0]
+      var index= files.name.lastIndexOf(".");
+      var ext = files.name.substr(index+1);
+      //console.log(files.name)
+      var formDate = new FormData()
+      formDate.set("image",files)
+      if (files!= undefined)
+      {
+        if(isAssetTypeAnImage(ext)==true)
+        {$.ajax({
+          url: '/file_upload',
+          data: formDate,
+          type: 'post',
+          contentType: false,
+          processData: false,
+          success: function(res){
+              //console.log(res);
+              alert("upload successfully.")
+          }
+        })}
+        else
+        {
+          alert("Now we just support .png .jpg .jpeg .bmp")
+        }
+      }
+      else
+      {
+        alert("please select an image.")
+      }
+  }
+</script>
 
   </body>
 </html>

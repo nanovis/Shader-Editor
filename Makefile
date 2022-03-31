@@ -57,4 +57,7 @@ $(EXE): $(OBJS) $(WEB_DIR)
 clean:
 ##rm -f $(EXE) $(OBJS) $(WEB_DIR)/index.js $(WEB_DIR)/new_template.wasm $(WEB_DIR)/new_template.wasm.pre
 	rm -f $(OBJS)
+	rm -f out/temp/*
+	rm -rf out/texture
+	cp  -r texture out/
 	find . -name ‘.DS_Store’ -type f -delete

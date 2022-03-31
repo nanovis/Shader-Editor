@@ -66,6 +66,20 @@
         {
           display: none;
         }
+        .texture_image
+        {
+          position: absolute;
+          top: 100%;
+          left: 0%;
+          width: 70%;
+        }
+        .form-group
+        {
+          position: absolute;
+          top: 100%;
+          left: 70%;
+          width: 40%;
+        }
     </style>
   </head>
   <body>
@@ -121,10 +135,11 @@ fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
     <input type="hidden" name="texture3" id="texture3" value="black.jpg">
     <input type="hidden" name="texture4" id="texture4" value="black.jpg">
     <button type="submit" class="btn btn-primary"  >Compile</button>
-    </form>
+        </form>
     
     <br>
     <br>
+    <div class="texture_image">
     <button id="popover1" type="button" class="btn btn-default" title="Texture 1" trigger="click"
         data-container="body" data-toggle="popover1" data-placement="top" 
         >
@@ -150,15 +165,13 @@ fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
     <img id="img2" src="texture/black.jpg" class="img-thumbnail" width="84" height="84">
     <img id="img3" src="texture/black.jpg" class="img-thumbnail" width="84" height="84">
     <img id="img4" src="texture/black.jpg" class="img-thumbnail" width="84" height="84">
-    
-    <form action="/file_upload" method="post" enctype="multipart/form-data">
-      <div class="form-group">
-        <label for="image">Upload Texture</label>
-        <input type="file" class="form-control-file" id="image" name="image" accpet=".jpg .png">
-        <br>
-        <button type="submit" class="btn btn-primary">Upload</button>
-      </div>
-    </form>
+    </div>
+    <div class="form-group">
+      <label for="image">Upload Texture</label>
+      <input type="file" class="form-control-file" id="image" name="image" accpet=".jpg .png">
+      <br>
+      <button  class="btn btn-primary" onclick="upload()">Upload</button>
+    </div>
 
     </div>
     </div>
@@ -202,10 +215,12 @@ fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
         temp = null;
         return output;
       }
-
-      function  content(texturenum,imgnum)  {    
-      var  code="{{texture_code}}"
-      code=htmlDecode(code)
+      var global_popover_code="{{texture_code}}"
+      var whether_decode=true
+      function  content(texturenum,imgnum)  { 
+      var  code=global_popover_code
+      if(whether_decode)
+      {code=htmlDecode(code)}
       code=code.replace(/texturenum/g,texturenum).replace(/imgnum/g,imgnum);
       var  data  =  $(code); 
       return  data;  
@@ -228,6 +243,45 @@ fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
             }
       }
       }
+      function isAssetTypeAnImage(ext) {
+  return (['png', 'jpg', 'jpeg', 'bmp'].indexOf(ext.toLowerCase()) !== -1)
+  }
+  function upload(){
+      el=document.getElementById("image")
+      var files = el.files[0]
+      if (files!= undefined)
+      {
+      var index= files.name.lastIndexOf(".");
+      var ext = files.name.substr(index+1);
+      }
+      //console.log(files.name)
+      var formDate = new FormData()
+      formDate.set("image",files)
+      if (files!= undefined)
+      {
+        if(isAssetTypeAnImage(ext)==true)
+        {$.ajax({
+          url: '/file_upload',
+          data: formDate,
+          type: 'post',
+          contentType: false,
+          processData: false,
+          success: function(res){
+              global_popover_code=res;
+              whether_decode=false
+              alert("upload successfully.")
+          }
+        })}
+        else
+        {
+          alert("Now we just support .png .jpg .jpeg .bmp")
+        }
+      }
+      else
+      {
+        alert("please select an image.")
+      }
+  } 
     </script>
     <script type="text/javascript">
       var editor=CodeMirror.fromTextArea(document.getElementById("code"),{

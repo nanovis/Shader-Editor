@@ -606,7 +606,7 @@ void image_init()
 
 
 extern "C" int __main__(int /*argc*/, char* /*argv*/[]) {
-	int flags=IMG_INIT_JPG|IMG_INIT_PNG;
+	int flags=IMG_INIT_JPG|IMG_INIT_PNG|IMG_INIT_TIF;
 	int initted=IMG_Init(flags);
 	image_init();
 	if (window::Handle wHnd = window::create()) {

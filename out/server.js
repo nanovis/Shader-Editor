@@ -145,7 +145,7 @@ app.get('/view/*', (req, res) => {
                };
             console.log(response)
             texture_code+="<a href='#' onclick='click_texture(texturenum,imgnum,\""+req.files[0].originalname+"\")'><img src='texture/"+req.files[0].originalname+ "' class='img-thumbnail' width='84' height='84'> </a>"
-            res.send("upload successfully.")
+            res.send(texture_code)
            }
         });
     });
