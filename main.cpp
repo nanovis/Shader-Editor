@@ -84,16 +84,11 @@ static char const triangle_frag_wgsl[] = R"(@group(0) @binding(0) var<uniform> T
 @group(1) @binding(4) var sampler_: sampler;
 @stage(fragment)
 fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
-  var uv:vec2<f32>=vec2<f32>(position.xy/Resolution);
-  if (distance(uv,vec2<f32>(0.5,0.5))<0.5)
-  {
-      return textureSample(texture1, sampler_, position.xy/Resolution);
-  }
-  else
-  {
-      return vec4<f32>(0.0,0.0,0.0,1.0);
-  }
-})"; // fragment shader end
+  var uv: vec3<f32> =vec3<f32>(position.xyx/Resolution.xyx);
+  var col:vec3<f32> =0.5f+vec3<f32> ( 0.5*cos(uv+vec3<f32>(0.0,2.0,4.0)));
+  return vec4<f32>(col, 1.0);
+}
+          )"; // fragment shader end
 
 /*
 [[group(0),binding(0)]] var<uniform> Time : f32;
@@ -577,7 +572,7 @@ void load_images(SDL_Surface *image, int imgw,int imgh,unsigned char*& img )
 void image_init()
 {		
 		SDL_Surface *image;
-		image=IMG_Load("out/texture/happytree.jpg");//texture1
+		image=IMG_Load("out/texture/black.jpg");//texture1
 		imgw_1=image->w;
 		imgh_1=image->h;
 		img_1=new unsigned char[imgw_1 * imgh_1*4];

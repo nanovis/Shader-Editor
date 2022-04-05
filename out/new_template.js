@@ -206,7 +206,7 @@ Module['FS_createPath']("/out", "texture", true, true);
     }
 
     }
-    loadPackage({"files": [{"filename": "/out/texture/mc.png", "start": 0, "end": 875334}, {"filename": "/out/texture/.DS_Store", "start": 875334, "end": 881482}, {"filename": "/out/texture/London.jpg", "start": 881482, "end": 1063028}, {"filename": "/out/texture/stock.jpg", "start": 1063028, "end": 1073555}, {"filename": "/out/texture/black.jpg", "start": 1073555, "end": 1078945}, {"filename": "/out/texture/happytree.jpg", "start": 1078945, "end": 1107079}, {"filename": "/out/texture/sample.png", "start": 1107079, "end": 1936207}, {"filename": "/out/texture/wall.jpg", "start": 1936207, "end": 1958461}, {"filename": "/out/texture/D.png", "start": 1958461, "end": 1960516}], "remote_package_size": 1960516, "package_uuid": "c418c13c-23cc-4e3f-a178-e90012141f16"});
+    loadPackage({"files": [{"filename": "/out/texture/.DS_Store", "start": 0, "end": 6148}, {"filename": "/out/texture/London.jpg", "start": 6148, "end": 187694}, {"filename": "/out/texture/stock.jpg", "start": 187694, "end": 198221}, {"filename": "/out/texture/black.jpg", "start": 198221, "end": 203611}, {"filename": "/out/texture/happytree.jpg", "start": 203611, "end": 231745}, {"filename": "/out/texture/wall.jpg", "start": 231745, "end": 253999}], "remote_package_size": 253999, "package_uuid": "a1da1ee1-8f96-40ac-8d2e-a14ea1eba0fc"});
 
   })();
 
