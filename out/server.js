@@ -4,11 +4,19 @@ var router=require('./router/routes')
 var multer = require('multer')
 var bodyParser=require("body-parser")
 var hbs = require('hbs')
+const { check, validationResult } = require('express-validator');
+var session = require('express-session')
 
 var app = express()
 var port = 8080
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
+app.use(session({
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: true }
+}));
 app.use(express.static(__dirname))
 app.use(express.static(".."))
 app.use(express.static(__dirname+"/view"))
@@ -31,6 +39,7 @@ app.get('/signup', (req, res) => {
 app.post('/compile',router.compile)
 app.get('/view/*', router.view)
 app.post('/file_upload', router.file_upload)
+app.post('/signinsubmit',[check('email').isEmail(),check('pwd').isLength({ min: 6,max:16 })],users.signinsubmit)
 
 app.use(function(request, response) {
   response.writeHead(404, { "Content-Type": "text/plain" });

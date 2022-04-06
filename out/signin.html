@@ -59,12 +59,12 @@
     </nav>
 
     <div class="signin">
-        <form class="form-signin">
+        <form class="form-signin" action="/signinsubmit" method="post">
             <h2 class="form-signin-heading">Please sign in</h2>
-            <label for="inputEmail" >Email address</label>
-            <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required="" autofocus="">
-            <label for="inputPassword" >Password</label>
-            <input type="password" id="inputPassword" class="form-control" placeholder="Password" required="">
+            <label for="email" >Email address</label>
+            <input type="email" id="email" name="email" class="form-control" placeholder="Email address" required="">
+            <label for="pwd" >Password</label>
+            <input type="password" id="pwd" name="pwd" class="form-control" placeholder="Password" required="">
             <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
           </form>
           <p>Not have account?<a href="/signup">create account</a></p>
