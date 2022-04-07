@@ -25,6 +25,7 @@ exports.signinsubmit=function(req,res)
             else
             {
                 req.session.username=result[0].username
+                req.session.email=result[0].email
                 res.redirect("/")
                 //res.render(__dirname+"/../browse.html",{username:req.session.username})
             }
@@ -45,7 +46,7 @@ exports.signupsubmit=function(req,res)
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
         var dbo = db.db("shadereditor");
-        var inform = {"username":req.body.username,"email":req.body.email,"pwd":req.body.pwd,"repeatpwd":req.body.repeatpwd,"created":Date.now()}; 
+        var inform = {"username":req.body.username,"email":req.body.email,"pwd":req.body.pwd,"created":Date.now()}; 
         dbo.collection("user").find({"email":req.body.email}).toArray(function(err, result) {
             if (err) throw err;
             if(result.length!=0)
@@ -54,9 +55,9 @@ exports.signupsubmit=function(req,res)
             }
             else
             {
-                dbo.collection("user").insertOne(inform, function(err, res) {
+                dbo.collection("user").insertOne(inform, function(err, result) {
                     if (err) throw err;
-                    res.send("register successfully ")
+                    res.send("register successfully");
                     db.close();
                 });
             }
@@ -76,4 +77,51 @@ exports.signin=function(req,res)
 exports.signup=function(req,res)
 {
     res.render(__dirname+"/../signup.html")
+};
+exports.changepassword=function(req,res)
+{
+    if(req.body.newpwd!=req.body.repeatpwd)
+    {
+        res.send("new password and repeat new password don't match")
+    }
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("shadereditor");
+        var inform = {"email":req.body.email,"username":req.session.username,"pwd":req.body.oldpwd}; 
+        var updateStr = {$set: { "pwd" : req.body.newpwd }};
+        dbo.collection("user").find(inform).toArray(function(err, result) {
+            if (err) throw err;
+            if(result.length==0)
+            {
+                res.send("Don't find the user")
+            }
+            else
+            {
+                dbo.collection("user").updateOne(inform, updateStr, function(err, result) {
+                    if (err) throw err;
+                    res.send("change success");
+                    db.close();
+                });
+            }
+        });
+    });
+};
+
+exports.deleteuser=function(req,res)
+{
+    if (req.body.email!=req.session.email)
+    {
+        res.send("The emal address does not match!")
+    }
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("shadereditor");
+        var inform = {"email":req.body.email,"username":req.session.username}; 
+        dbo.collection("user").deleteOne(inform, function(err, result) {
+            if (err) throw err;
+            db.close();
+            req.session.destroy(function (err) {})
+            res.redirect("/")
+        });
+    });
 };

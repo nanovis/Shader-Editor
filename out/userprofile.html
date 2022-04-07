@@ -12,24 +12,18 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
     <style>
         body { margin: 0; background-color: rgba(110, 109, 109, 0.432) }
-        .emscripten {
+
+        .changepassword
+        {
             position: absolute;
             top: 15%;
             left: 3%;
-            margin: 0px;
-            border: 0;
-            width: 45%;
-            height: 50%;
-            overflow: hidden;
-            display: block;
-            image-rendering: optimizeSpeed;
-            image-rendering: -moz-crisp-edges;
-            image-rendering: -o-crisp-edges;
-            image-rendering: -webkit-optimize-contrast;
-            image-rendering: optimize-contrast;
-            image-rendering: crisp-edges;
-            image-rendering: pixelated;
-            -ms-interpolation-mode: nearest-neighbor;
+        }
+        .deleteuser
+        {
+            position: absolute;
+            top: 15%;
+            left: 30%;
         }
     </style>
   </head>
@@ -64,6 +58,32 @@
         document.getElementById("welcome").innerText="Welcome,{{username}}";
       }
     </script>
+
+    <div class="changepassword">
+        <form class="form-signin" action="/changepassword" method="post">
+            <h2 class="form-signin-heading">Change Password</h2>
+            <label for="email" >Email address</label>
+            <input type="email" id="email" name="email" class="form-control" placeholder="Email address" required="">
+            <label for="oldpwd" >Old Password</label>
+            <input type="password" id="oldpwd" name="oldpwd" class="form-control" placeholder="Old Password" required="">
+            <label for="pwd" >New Password</label>
+            <input type="password" id="newpwd" name="newpwd" class="form-control" placeholder="New Password" required="">
+            <label for="repeatpwd" >Repeat New Password</label>
+            <input type="password" id="repeatpwd" name="repeatpwd" class="form-control" placeholder="Repeat New Password" required="">
+            <br>
+            <button class="btn btn-lg btn-primary btn-block" type="submit">Change</button>
+        </form>
+    </div>
+
+    <div class="deleteuser">
+        <form class="form-signin" action="/deleteuser" method="post">
+            <h2 class="form-signin-heading">Delete User</h2>
+            <label for="email" >Confirm Email address</label>
+            <input type="email" id="email" name="email" class="form-control" placeholder="Email address" required="">
+            <br>
+            <button class="btn btn-lg btn-primary btn-block" type="submit">Delete</button>
+          </form>
+    </div>
 
 
 

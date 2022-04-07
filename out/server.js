@@ -38,7 +38,8 @@ app.post('/file_upload', router.file_upload)
 app.post('/signinsubmit',[check('email').isEmail(),check('pwd').isLength({ min: 6,max:16 })],users.signinsubmit)
 app.post('/signupsubmit',[check('email').isEmail(),check('pwd').isLength({ min: 6,max:16 }),check('repeatpwd').isLength({ min: 6,max:16 }),check('pwd').custom((value, { req }) => value == req.body.repeatpwd)],users.signupsubmit)
 app.get('/logout', users.logout)
-
+app.post('/changepassword',users.changepassword)
+app.post('/deleteuser',users.deleteuser)
 app.use(function(request, response) {
   response.writeHead(404, { "Content-Type": "text/plain" });
   response.end("404 error!\n");
