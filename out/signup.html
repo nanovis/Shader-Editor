@@ -59,16 +59,16 @@
     </nav>
 
     <div class="signup">
-        <form class="form-signin">
+        <form class="form-signin" action="/signupsubmit" method="post">
             <h2 class="form-signin-heading">Create Account</h2>
             <label for="username" >Username</label>
-            <input type="username" id="username" class="form-control" placeholder="Username" required="" autofocus="">
-            <label for="inputEmail">Email address</label>
-            <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required="" autofocus="">
-            <label for="inputPassword">Password</label>
-            <input type="password" id="inputPassword" class="form-control" placeholder="Password" required="">
-            <label for="repeatPassword">Repeate password</label>
-            <input type="password" id="repeatPassword" class="form-control" placeholder="Repeat password" required="">
+            <input type="username" name="username" id="username" class="form-control" placeholder="Username" required="" autofocus="">
+            <label for="email">Email address</label>
+            <input type="email" name="email" id="email" class="form-control" placeholder="Email address" required="" autofocus="">
+            <label for="pwd">Password</label>
+            <input type="password" name="pwd" id="pwd" class="form-control" placeholder="Password" required="">
+            <label for="repeatpwd">Repeate password</label>
+            <input type="password" name="repeatpwd" id="repeatpwd" class="form-control" placeholder="Repeat password" required="">
             <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
           </form>
     </div>

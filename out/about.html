@@ -37,19 +37,30 @@
           <a class="navbar-brand" href="#">Shader Editor</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
-          <ul class="nav navbar-nav">
-            <li><a href="/">Home</a></li>
-            <li><a href="/about">About</a></li>
-            <li><a href="/contact">Contact</a></li>
-          </ul>
-          <ul class="nav navbar-nav navbar-right">
-            <li><a href="/browse">Browse</a></li>
-            <li><a href="/new">New</a></li>
-            <li><a href="/signin">Sign In</a></li>
-          </ul>
+            <ul class="nav navbar-nav">
+                <li><a href="/">Home</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/contact">Contact</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                  <li><a id="welcome"></a></li>
+                <li><a href="/browse">Browse</a></li>
+                <li><a href="/new">New</a></li>
+                <li><a id="signin" href="/signin">Sign In</a></li>
+                </ul>
         </div>
       </div>
     </nav>
+    <script>
+      if("{{username}}".length!=0)
+      {
+        console.log("{{username}}")
+        document.getElementById("signin").href="/logout";
+        document.getElementById("signin").innerText="Log Out";
+        document.getElementById("welcome").href="/userprofile";
+        document.getElementById("welcome").innerText="Welcome,{{username}}";
+      }
+    </script>
     <script src="https://fastly.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>
     <!-- load bootstrap -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>

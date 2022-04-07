@@ -80,13 +80,24 @@
                 <li><a href="/contact">Contact</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
+                  <li><a id="welcome"></a></li>
                 <li><a href="/browse">Browse</a></li>
                 <li><a href="/new">New</a></li>
-                <li><a href="/signin">Sign In</a></li>
+                <li><a id="signin" href="/signin">Sign In</a></li>
                 </ul>
         </div>
       </div>
     </nav>
+    <script>
+      if("{{username}}".length!=0)
+      {
+        console.log("{{username}}")
+        document.getElementById("signin").href="/logout";
+        document.getElementById("signin").innerText="Log Out";
+        document.getElementById("welcome").href="/userprofile";
+        document.getElementById("welcome").innerText="Welcome,{{username}}";
+      }
+    </script>
     <div class="container">
       <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
       

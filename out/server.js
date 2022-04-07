@@ -14,8 +14,7 @@ app.use(bodyParser.json())
 app.use(session({
   secret: 'keyboard cat',
   resave: false,
-  saveUninitialized: true,
-  cookie: { secure: true }
+  saveUninitialized: true
 }));
 app.use(express.static(__dirname))
 app.use(express.static(".."))
@@ -28,18 +27,17 @@ app.use(multer({ dest: __dirname + "/temp/"}).array('image'))
 app.all('*', router.header)
 app.get('/', router.index)
 app.get('/new', router.new)
-app.get('/signin', (req, res) => {
-  res.render(__dirname+"/signin.html")
-})
+app.get('/signin', users.signin)
 app.get('/browse', router.browse)
 app.get('/about', router.about)
-app.get('/signup', (req, res) => {
-  res.render(__dirname+"/signup.html")
-})
+app.get('/signup',users.signup)
 app.post('/compile',router.compile)
 app.get('/view/*', router.view)
+app.get('/userprofile', router.userprofile)
 app.post('/file_upload', router.file_upload)
 app.post('/signinsubmit',[check('email').isEmail(),check('pwd').isLength({ min: 6,max:16 })],users.signinsubmit)
+app.post('/signupsubmit',[check('email').isEmail(),check('pwd').isLength({ min: 6,max:16 }),check('repeatpwd').isLength({ min: 6,max:16 }),check('pwd').custom((value, { req }) => value == req.body.repeatpwd)],users.signupsubmit)
+app.get('/logout', users.logout)
 
 app.use(function(request, response) {
   response.writeHead(404, { "Content-Type": "text/plain" });

@@ -14,19 +14,19 @@ exports.header=function(req,res,next)
 };
 exports.index=function(req,res)
 {
-    res.render(__dirname+"/../browse.html")
+    res.render(__dirname+"/../browse.html",{username:req.session.username})
 };
 exports.new=function(req,res)
 {
-    res.render(__dirname+"/../new.html",{texture_code:texture_code})
+    res.render(__dirname+"/../new.html",{texture_code:texture_code,username:req.session.username})
 };
 exports.browse=function(req,res)
 {
-    res.render(__dirname+"/../browse.html")
+    res.render(__dirname+"/../browse.html",{username:req.session.username})
 };
 exports.about=function(req,res)
 {
-    res.render(__dirname+"/../about.html")
+    res.render(__dirname+"/../about.html",{username:req.session.username})
 };
 exports.compile=function(req,res)
 {
@@ -81,7 +81,7 @@ exports.compile=function(req,res)
                   if(err) throw err;
                   else
                   {
-                      res.render(__dirname+"/../new_template.html",{wgsl_code:req.body.code,texture1:req.body.texture1,texture2:req.body.texture2,texture3:req.body.texture3,texture4:req.body.texture4,texture_code:texture_code})
+                      res.render(__dirname+"/../new_template.html",{wgsl_code:req.body.code,texture1:req.body.texture1,texture2:req.body.texture2,texture3:req.body.texture3,texture4:req.body.texture4,texture_code:texture_code,username:req.session.username})
                   }
               })
           })
@@ -102,6 +102,7 @@ exports.view=function(req,res)
           }
         }
         returndata.data.texture_code=view_texture_code
+        returndata.data.username=req.session.username
         res.render(__dirname+"/../view/template.html",returndata)
     })
 };
@@ -128,4 +129,8 @@ exports.file_upload=function(req,res)
            }
         });
     });
+};
+exports.userprofile=function(req,res)
+{
+  res.render(__dirname+"/../userprofile.html",{username:req.session.username})
 };
