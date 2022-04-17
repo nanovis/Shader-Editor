@@ -206,7 +206,7 @@ Module['FS_createPath']("/out", "texture", true, true);
     }
 
     }
-    loadPackage({"files": [{"filename": "/out/texture/.DS_Store", "start": 0, "end": 6148}, {"filename": "/out/texture/London.jpg", "start": 6148, "end": 187694}, {"filename": "/out/texture/stock.jpg", "start": 187694, "end": 198221}, {"filename": "/out/texture/black.jpg", "start": 198221, "end": 203611}, {"filename": "/out/texture/happytree.jpg", "start": 203611, "end": 231745}, {"filename": "/out/texture/wall.jpg", "start": 231745, "end": 253999}], "remote_package_size": 253999, "package_uuid": "db2ec30f-1abe-4289-932d-17e94357e739"});
+    loadPackage({"files": [{"filename": "/out/texture/.DS_Store", "start": 0, "end": 6148}, {"filename": "/out/texture/London.jpg", "start": 6148, "end": 187694}, {"filename": "/out/texture/stock.jpg", "start": 187694, "end": 198221}, {"filename": "/out/texture/black.jpg", "start": 198221, "end": 203611}, {"filename": "/out/texture/happytree.jpg", "start": 203611, "end": 231745}, {"filename": "/out/texture/wall.jpg", "start": 231745, "end": 253999}], "remote_package_size": 253999, "package_uuid": "bdf35df8-ee16-49f6-8728-2d85820cce3b"});
 
   })();
 

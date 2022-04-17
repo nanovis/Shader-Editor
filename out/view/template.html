@@ -90,13 +90,13 @@
       </div>
     </nav>
     <script>
-      if("{{data.username}}".length!=0)
+      if("{{username}}".length!=0)
       {
         console.log("{{username}}")
         document.getElementById("signin").href="/logout";
         document.getElementById("signin").innerText="Log Out";
         document.getElementById("welcome").href="/userprofile";
-        document.getElementById("welcome").innerText="Welcome,{{data.username}}";
+        document.getElementById("welcome").innerText="Welcome,{{username}}";
       }
     </script>
     <div class="container">
@@ -117,12 +117,12 @@
         </div>
         <form action="/compile" method="post">
         <p>
-        <textarea id="code" name="code">{{data.code}}</textarea>
+        <textarea id="code" name="code">{{code}}</textarea>
     </p>
-    <input type="hidden" name="texture1" id="texture1" value={{data.texture1}}>
-    <input type="hidden" name="texture2" id="texture2" value={{data.texture2}}>
-    <input type="hidden" name="texture3" id="texture3" value={{data.texture3}}>
-    <input type="hidden" name="texture4" id="texture4" value={{data.texture4}}>
+    <input type="hidden" name="texture1" id="texture1" value={{texture1}}>
+    <input type="hidden" name="texture2" id="texture2" value={{texture2}}>
+    <input type="hidden" name="texture3" id="texture3" value={{texture3}}>
+    <input type="hidden" name="texture4" id="texture4" value={{texture4}}>
     <button type="submit" class="btn btn-primary"  >Compile</button>
     </form>
     
@@ -149,10 +149,10 @@
         texture_4
     </button>
     <br>
-    <img id="img1" src="../texture/{{data.texture1}}" class="img-thumbnail" width="84" height="84">
-    <img id="img2" src="../texture/{{data.texture2}}" class="img-thumbnail" width="84" height="84">
-    <img id="img3" src="../texture/{{data.texture3}}" class="img-thumbnail" width="84" height="84">
-    <img id="img4" src="../texture/{{data.texture4}}" class="img-thumbnail" width="84" height="84">
+    <img id="img1" src="../texture/{{texture1}}" class="img-thumbnail" width="84" height="84">
+    <img id="img2" src="../texture/{{texture2}}" class="img-thumbnail" width="84" height="84">
+    <img id="img3" src="../texture/{{texture3}}" class="img-thumbnail" width="84" height="84">
+    <img id="img4" src="../texture/{{texture4}}" class="img-thumbnail" width="84" height="84">
     </div>
     
     
@@ -198,7 +198,7 @@
       }
 
       function  content(texturenum,imgnum)  {    
-      var  code="{{data.texture_code}}"
+      var  code="{{texture_code}}"
       code=htmlDecode(code)
       code=code.replace(/texturenum/g,texturenum).replace(/imgnum/g,imgnum);
       var  data  =  $(code); 
@@ -269,7 +269,7 @@
       {
           const js = document.createElement('script');
           js.async = true;
-          js.src = "{{data.jsname}}";
+          js.src = "{{jsname}}";
           document.body.appendChild(js);
       }
       })();

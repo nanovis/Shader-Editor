@@ -3,14 +3,12 @@ var url = 'mongodb://localhost:27017/';
 
 const { check, validationResult } = require('express-validator');
 
+
+//initialize the database
+
+
 exports.signinsubmit=function(req,res)
 {
-    console.log(req.body.email)
-    console.log(req.body.pwd)
-    const errors = validationResult(req)
-    if (!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() })
-    }
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
         var dbo = db.db("shadereditor");
@@ -20,14 +18,13 @@ exports.signinsubmit=function(req,res)
             db.close();
             if(result.length==0)
             {
-                res.send("Username or password is wrong!")
+                res.render(__dirname+"/../signin.html",{information:"Username or password is wrong!"})
             }
             else
             {
                 req.session.username=result[0].username
                 req.session.email=result[0].email
-                res.redirect("/")
-                //res.render(__dirname+"/../browse.html",{username:req.session.username})
+                res.render(__dirname+"/../browse.html",{information:"Login successful!",username:req.session.username})
             }
         });
     });
@@ -35,30 +32,26 @@ exports.signinsubmit=function(req,res)
 };
 exports.signupsubmit=function(req,res)
 {
-    console.log(req.body.email)
-    console.log(req.body.pwd)
-    console.log(req.body.username)
-    console.log(req.body.repeatpwd)
-    const errors = validationResult(req)
-    if (!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() })
+    if(req.body.pwd!=req.body.repeatpwd)
+    {
+        res.render(__dirname+"/../signup.html",{information:"Please repeat the password correctly."})
     }
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
         var dbo = db.db("shadereditor");
         var inform = {"username":req.body.username,"email":req.body.email,"pwd":req.body.pwd,"created":Date.now()}; 
-        dbo.collection("user").find({"email":req.body.email}).toArray(function(err, result) {
+        dbo.collection("user").find({$or:[{"email":req.body.email},{"username":req.body.username}]}).toArray(function(err, result) {
             if (err) throw err;
             if(result.length!=0)
             {
-                res.send("This email is already taken!")
+                res.render(__dirname+"/../signup.html",{information:"This email or username is already taken!"})
             }
             else
             {
                 dbo.collection("user").insertOne(inform, function(err, result) {
                     if (err) throw err;
-                    res.send("register successfully");
                     db.close();
+                    res.render(__dirname+"/../signup.html",{information:"register successfully"})
                 });
             }
         });
@@ -82,7 +75,8 @@ exports.changepassword=function(req,res)
 {
     if(req.body.newpwd!=req.body.repeatpwd)
     {
-        res.send("new password and repeat new password don't match")
+
+        res.render(__dirname+"/../userprofile.html",{information:"Please repeat the new password correctly."})
     }
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
@@ -93,13 +87,13 @@ exports.changepassword=function(req,res)
             if (err) throw err;
             if(result.length==0)
             {
-                res.send("Don't find the user")
+                res.render(__dirname+"/../userprofile.html",{information:"Email address or the ole password is incorrect."})
             }
             else
             {
                 dbo.collection("user").updateOne(inform, updateStr, function(err, result) {
                     if (err) throw err;
-                    res.send("change success");
+                    res.render(__dirname+"/../userprofile.html",{information:"Change successful."})
                     db.close();
                 });
             }

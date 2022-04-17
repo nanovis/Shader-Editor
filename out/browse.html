@@ -35,12 +35,17 @@
     <script>
       if("{{username}}".length!=0)
       {
-        console.log("{{username}}")
+
         document.getElementById("signin").href="/logout";
         document.getElementById("signin").innerText="Log Out";
         document.getElementById("welcome").href="/userprofile";
         document.getElementById("welcome").innerText="Welcome,{{username}}";
       }
+      if("{{information}}".length!=0)
+      {
+        alert("{{information}}")
+      }
+
     </script>
 
     <div class="row">

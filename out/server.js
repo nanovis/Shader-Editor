@@ -6,6 +6,7 @@ var bodyParser=require("body-parser")
 var hbs = require('hbs')
 const { check, validationResult } = require('express-validator');
 var session = require('express-session')
+const { route } = require('express/lib/application')
 
 var app = express()
 var port = 8080
@@ -35,11 +36,12 @@ app.post('/compile',router.compile)
 app.get('/view/*', router.view)
 app.get('/userprofile', router.userprofile)
 app.post('/file_upload', router.file_upload)
-app.post('/signinsubmit',[check('email').isEmail(),check('pwd').isLength({ min: 6,max:16 })],users.signinsubmit)
-app.post('/signupsubmit',[check('email').isEmail(),check('pwd').isLength({ min: 6,max:16 }),check('repeatpwd').isLength({ min: 6,max:16 }),check('pwd').custom((value, { req }) => value == req.body.repeatpwd)],users.signupsubmit)
+app.post('/signinsubmit',users.signinsubmit)
+app.post('/signupsubmit',users.signupsubmit)
 app.get('/logout', users.logout)
 app.post('/changepassword',users.changepassword)
 app.post('/deleteuser',users.deleteuser)
+app.post('/save_shader',router.saveshader)
 app.use(function(request, response) {
   response.writeHead(404, { "Content-Type": "text/plain" });
   response.end("404 error!\n");

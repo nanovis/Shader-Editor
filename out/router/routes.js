@@ -1,7 +1,8 @@
 var cmd=require('node-cmd')
 var fs = require('fs');
 const { dirname } = require('path');
-
+var MongoClient =require('mongodb').MongoClient;
+var url = 'mongodb://localhost:27017/';
 
 texture_code="<a href='#' onclick='click_texture(texturenum,imgnum,\"London.jpg\")'><img src='texture/London.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"happytree.jpg\")'><img src='texture/happytree.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"stock.jpg\")'><img src='texture/stock.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"wall.jpg\")'><img src='texture/wall.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"black.jpg\")'><img src='texture/black.jpg' class='img-thumbnail' width='84' height='84'> </a>"
 view_texture_code="<a href='#' onclick='click_texture(texturenum,imgnum,\"London.jpg\")'><img src='../texture/London.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"happytree.jpg\")'><img src='../texture/happytree.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"stock.jpg\")'><img src='../texture/stock.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"wall.jpg\")'><img src='../texture/wall.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"black.jpg\")'><img src='../texture/black.jpg' class='img-thumbnail' width='84' height='84'> </a>"
@@ -91,7 +92,7 @@ exports.compile=function(req,res)
 };
 exports.view=function(req,res)
 {
-    fs.readFile(__dirname+'/../view.json','utf8',function (err, _data) {
+    /*fs.readFile(__dirname+'/../view.json','utf8',function (err, _data) {
         if(err) console.log(err);
         var view=JSON.parse(_data);
         var returndata
@@ -105,7 +106,25 @@ exports.view=function(req,res)
         returndata.data.texture_code=view_texture_code
         returndata.data.username=req.session.username
         res.render(__dirname+"/../view/template.html",returndata)
-    })
+    })*/
+    MongoClient.connect(url, function(err, db) {
+      if (err) throw err;
+      var dbo = db.db("shadereditor");
+      dbo.collection("shader").find({path:req.path}).toArray(function(err, result) {
+          if (err) throw err;
+          db.close();
+          var returndata={}
+          returndata.texture_code=view_texture_code
+          returndata.username=req.session.username
+          returndata.code=result[0].code
+          returndata.texture1=result[0].texture1
+          returndata.texture2=result[0].texture2
+          returndata.texture3=result[0].texture3
+          returndata.texture4=result[0].texture4
+          returndata.jsname=result[0].jsname
+          res.render(__dirname+"/../view/template.html",returndata)
+      });
+  });
 };
 exports.file_upload=function(req,res)
 {
@@ -134,4 +153,12 @@ exports.file_upload=function(req,res)
 exports.userprofile=function(req,res)
 {
   res.render(__dirname+"/../userprofile.html",{username:req.session.username})
+};
+exports.saveshader=function(req,res)
+{
+  console.log(req.body.code)
+  console.log(req.body.name)
+  console.log(req.body.status)
+  
+  res.send("a")
 };

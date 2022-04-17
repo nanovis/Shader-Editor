@@ -11,10 +11,6 @@
     <script src="https://fastly.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>
     <!-- load bootstrap -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
-    <link rel=stylesheet href="CodeMirror/lib/codemirror.css">
-    <script src="CodeMirror/lib/codemirror.js"></script>
-    <link rel=stylesheet href="CodeMirror/theme/eclipse.css">
-    <script src="CodeMirror/addon/edit/matchbrackets.js"></script>
 
     <style>
         body { margin: 0; background-color: rgba(110, 109, 109, 0.432) }
@@ -44,13 +40,6 @@
           left: 55%;
           width: 40%;
         }
-        .CodeMirror
-        {
-          border:1px solid black;
-          font-size:13px;
-          width:100%;
-          height:500px
-        }
         .popover
         {
           max-width: 600px;
@@ -73,12 +62,19 @@
           left: 0%;
           width: 70%;
         }
-        .form-group
+        .form-group-texture
         {
           position: absolute;
           top: 100%;
           left: 70%;
           width: 40%;
+        }
+        .save_part
+        {
+          position: absolute;
+          top: 65%;
+          left: 5%;
+          width: 20%; 
         }
     </style>
   </head>
@@ -103,19 +99,26 @@
         </div>
       </div>
     </nav>
-    <script>
-      if("{{username}}".length!=0)
-      {
-        console.log("{{username}}")
-        document.getElementById("signin").href="/logout";
-        document.getElementById("signin").innerText="Log Out";
-        document.getElementById("welcome").href="/userprofile";
-        document.getElementById("welcome").innerText="Welcome,{{username}}";
-      }
-    </script>
+
     <div class="container">
       <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
-      
+      <div class="save_part" id="save_part" >
+      <form name="form_save" >
+        <div class="form-group">
+          <label for="save_name">Name of the shader</label>
+          <input  type="text" class="form-control" id="save_name" >
+        </div>
+        <div class="form-group">
+          <label for="save_select">Example select</label>
+          <select class="form-control" id="save_select">
+            <option>Private</option>
+            <option>Public</option>
+          </select>
+        </div>
+        <button  class="btn btn-primary" onclick="save()">Save</button>
+      </form>
+    </div>
+
       <div class="textbox">
         <div class="description" onclick="toggle('display_desc')">
           <span class="glyphicon glyphicon-menu-down" aria-hidden="true" >Input</span>
@@ -127,12 +130,11 @@
             uniform Date2 : vec3&lt;i32&gt;; // hour, minute, second <br> 
             var texture1..4: texture_2d&lt;f32&gt;; // input textures <br> 
             var sampler_: sampler; // input sampler <br>
-
           </p>
         </div>
         <form action="/compile" method="post">
-        <p>
-          <textarea id="code" name="code">
+        <p name="shader_code">
+          <textarea id="code" name="code" rows="25" cols="100">
 @stage(fragment)
 fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
   var uv: vec3<f32> =vec3<f32>(position.xyx/Resolution.xyx);
@@ -177,7 +179,7 @@ fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
     <img id="img3" src="texture/black.jpg" class="img-thumbnail" width="84" height="84">
     <img id="img4" src="texture/black.jpg" class="img-thumbnail" width="84" height="84">
     </div>
-    <div class="form-group">
+    <div class="form-group-texture">
       <label for="image">Upload Texture</label>
       <input type="file" class="form-control-file" id="image" name="image" accpet=".jpg .png">
       <br>
@@ -248,7 +250,6 @@ fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
         target=document.getElementById(targetid);
             if (target.style.display=="block"){
                 target.style.display="none";
-                console.log(document.getElementById("CodeMirror"));
             } else {
                 target.style.display="block";
             }
@@ -293,15 +294,32 @@ fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
         alert("please select an image.")
       }
   } 
+
+  function save(){
+      var code=document.getElementById("code").value
+      var name=document.getElementById('save_name').value
+      var status=document.getElementById('save_select').value
+      var formDate = new FormData()
+      formDate.set("code",code)
+      formDate.set("name",name)
+      formDate.set("status",status)
+      
+      if (name!= undefined)
+      {
+        $.ajax({
+          url: '/save_shader',
+          data: formDate,
+          type: 'post',
+          contentType: false,
+          processData: false,
+          success: function(res){
+              alert("upload successfully.")
+          }
+        })
+
+      }
+  } 
     </script>
-    <script type="text/javascript">
-      var editor=CodeMirror.fromTextArea(document.getElementById("code"),{
-                  lineNumbers:true,
-                  theme:"eclipse",
-                  matchBrackets:true
-  
-          });
-  </script>
     <script type='text/javascript'>
       var Module;
       (async () => {
@@ -348,6 +366,21 @@ fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
           document.body.appendChild(js);
       }
       })();
+
+
+      if("{{username}}".length!=0)
+      {
+        document.getElementById("signin").href="/logout";
+        document.getElementById("signin").innerText="Log Out";
+        document.getElementById("welcome").href="/userprofile";
+        document.getElementById("welcome").innerText="Welcome,{{username}}";
+        document.getElementById("save_part").hidden=false;
+      }
+      else
+      {
+        document.getElementById("save_part").hidden=true;
+      }
+
     </script>
 
   </body>

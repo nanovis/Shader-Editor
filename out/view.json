@@ -1,5 +1,6 @@
 [
-	{"name":"/view/fire",
+	{
+	"name":"/view/fire",
 	"data":
 	{ 
 		"code":"//refer to https://glslsandbox.com/e#80331.0\n@stage(fragment)\nfn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {\nvar glsl_position:vec2<f32>=vec2<f32>(position.x,Resolution.y-position.y);\nvar uv:vec2<f32>=vec2<f32>((glsl_position-(0.7*Resolution.xy))/Resolution.y);\nvar x:f32=uv.x*3.0;\nvar y:f32=uv.y*4.0;\nvar m:f32= 1.0-(y*9.0)*(12.0+sin(-Time/4.0)*0.6)*0.7+sin(y*3.0+x*2.0-Time*9.0)*sin(y*1.7-x*6.0-Time+sin(x*3.0-y*0.3-Time*2.0)+cos(Time/6.0-y*6.0+x*6.0)/3.0)*69.0;\nreturn vec4<f32>(m*0.016,m*0.008,m*0.001,1.0);\n}",
