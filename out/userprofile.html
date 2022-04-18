@@ -10,7 +10,9 @@
     <script src="https://fastly.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>
     <!-- load bootstrap -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
-    <style>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+        <style>
         body { margin: 0; background-color: rgba(110, 109, 109, 0.432) }
 
         .changepassword
@@ -24,6 +26,13 @@
             position: absolute;
             top: 15%;
             left: 30%;
+        }
+        .show-shaders
+        {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            width: 45%;
         }
     </style>
   </head>
@@ -57,26 +66,51 @@
         document.getElementById("welcome").href="/userprofile";
         document.getElementById("welcome").innerText="Welcome,{{username}}";
       }
-      if("{{information}}".length!=0)
-      {
-        alert("{{information}}")
-      }
-    </script>
 
+    </script>
+    <script type="text/javascript">
+
+      $(document).ready( function () {
+      $('#show').DataTable();
+      } );
+      </script>
+    <div class="show-shaders" >
+      <table id="show">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">Status</th>
+            <th scope="col">Likes</th>
+            <th scope="col">View</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each result}}
+          <tr>
+            <th scope="row">{{id}}</th>
+            <td>{{name}}</td>
+            <td>{{status}}</td>
+            <td>0</td>
+            <td><button><a href="/view_user?user={{user}}&name={{name}}">view</a></button></td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+
+    </div>
     <div class="changepassword">
-        <form class="form-signin" action="/changepassword" method="post">
             <h2 class="form-signin-heading">Change Password</h2>
             <label for="email" >Email address</label>
             <input type="email" id="email" name="email" class="form-control" placeholder="Email address" required="">
             <label for="oldpwd" >Old Password</label>
             <input type="password" id="oldpwd" name="oldpwd" class="form-control" placeholder="Old Password" required="">
-            <label for="pwd" >New Password</label>
+            <label for="newpwd" >New Password</label>
             <input type="password" id="newpwd" name="newpwd" class="form-control" placeholder="New Password" required="">
             <label for="repeatpwd" >Repeat New Password</label>
             <input type="password" id="repeatpwd" name="repeatpwd" class="form-control" placeholder="Repeat New Password" required="">
             <br>
-            <button class="btn btn-lg btn-primary btn-block" type="submit">Change</button>
-        </form>
+            <button class="btn btn-lg btn-primary btn-block" onclick="changepassword()">Change</button>
     </div>
 
     <div class="deleteuser">
@@ -94,8 +128,37 @@
 
 
 <script>
-  
+  function changepassword()
+  {
+      var email=document.getElementById("email").value
+      var oldpwd=document.getElementById("oldpwd").value
+      var newpwd=document.getElementById("newpwd").value
+      var repeatpwd=document.getElementById("repeatpwd").value
+      var formDate = new FormData()
+      formDate.set("email",email)
+      formDate.set("oldpwd",oldpwd)
+      formDate.set("newpwd",newpwd)
+      formDate.set("repeatpwd",repeatpwd)
+      $.ajax({
+        url: '/changepassword',
+        data: formDate,
+        type: 'post',
+        contentType: false,
+        processData: false,
+        success: function(res){
+          if (res=="success")
+          {
+            alert("Change Successful.")
+            window.location.href="/logout"
+          }
+          else
+          {
+            alert(res)
+          }
+        }
+      })
+      
+  } 
 </script>
-
   </body>
 </html>

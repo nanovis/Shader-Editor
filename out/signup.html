@@ -59,7 +59,7 @@
     </nav>
 
     <div class="signup">
-        <form class="form-signin" action="/signupsubmit" method="post">
+
             <h2 class="form-signin-heading">Create Account</h2>
             <label for="username" >Username</label>
             <input type="username" name="username" id="username" class="form-control" placeholder="Username" required="" autofocus="">
@@ -69,8 +69,8 @@
             <input type="password" name="pwd" id="pwd" class="form-control" placeholder="Password" required="">
             <label for="repeatpwd">Repeate password</label>
             <input type="password" name="repeatpwd" id="repeatpwd" class="form-control" placeholder="Repeat password" required="">
-            <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
-          </form>
+            <button class="btn btn-lg btn-primary btn-block" onclick="signupsubmit()">Sign in</button>
+
     </div>
 
     <script type='text/javascript'>
@@ -119,10 +119,35 @@
           document.body.appendChild(js);
       }
       })();
-      if("{{information}}".length!=0)
-      {
-        alert("{{information}}")
-      }
+    function signupsubmit(){
+      var email=document.getElementById("email").value
+      var pwd=document.getElementById('pwd').value
+      var username=document.getElementById('username').value
+      var repeatpwd=document.getElementById('repeatpwd').value
+      var formDate = new FormData()
+      formDate.set("email",email)
+      formDate.set("pwd",pwd)
+      formDate.set("repeatpwd",repeatpwd)
+      formDate.set("username",username)
+      $.ajax({
+        url: '/signupsubmit',
+        data: formDate,
+        type: 'post',
+        contentType: false,
+        processData: false,
+        success: function(res){
+          if(res=="success")
+          {
+            alert("Register Successful!")
+            window.location.href="/"
+          }
+          else
+          {
+            alert(res)
+          }
+        }
+      })    
+      } 
     </script>
     <!-- jQuery  -->
     <script src="https://fastly.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>

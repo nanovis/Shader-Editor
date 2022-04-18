@@ -103,7 +103,7 @@
     <div class="container">
       <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
       <div class="save_part" id="save_part" >
-      <form name="form_save" >
+
         <div class="form-group">
           <label for="save_name">Name of the shader</label>
           <input  type="text" class="form-control" id="save_name" >
@@ -116,7 +116,6 @@
           </select>
         </div>
         <button  class="btn btn-primary" onclick="save()">Save</button>
-      </form>
     </div>
 
       <div class="textbox">
@@ -302,6 +301,10 @@ fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
       var formDate = new FormData()
       formDate.set("code",code)
       formDate.set("name",name)
+      formDate.set("texture1",document.getElementById("texture1").value)
+      formDate.set("texture2",document.getElementById("texture2").value)
+      formDate.set("texture3",document.getElementById("texture3").value)
+      formDate.set("texture4",document.getElementById("texture4").value)
       formDate.set("status",status)
       
       if (name!= undefined)
@@ -313,7 +316,8 @@ fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
           contentType: false,
           processData: false,
           success: function(res){
-              alert("upload successfully.")
+              console.log(res)
+              alert(res)
           }
         })
 

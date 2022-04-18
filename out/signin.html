@@ -66,16 +66,13 @@
     </nav>
 
     <div class="signin">
-        <form class="form-signin" action="/signinsubmit" method="post">
             <h2 class="form-signin-heading">Please sign in</h2>
             <label for="email" >Email address</label>
             <input type="email" id="email" name="email" class="form-control" placeholder="Email address" required="">
             <label for="pwd" >Password</label>
             <input type="password" id="pwd" name="pwd" class="form-control" placeholder="Password" required="">
-            <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
-          </form>
+            <button class="btn btn-lg btn-primary btn-block" onclick="signinsubmit()">Sign in</button>
           <p>Not have account?<a href="/signup">create account</a></p>
-
     </div>
 
     <script type='text/javascript'>
@@ -124,10 +121,34 @@
           document.body.appendChild(js);
       }
       })();
-      if("{{information}}".length!=0)
-      {
-        alert("{{information}}")
-      }
+
+    
+  function signinsubmit(){
+      var email=document.getElementById("email").value
+      var pwd=document.getElementById('pwd').value
+      var formDate = new FormData()
+      formDate.set("email",email)
+      formDate.set("pwd",pwd)
+
+      $.ajax({
+        url: '/signinsubmit',
+        data: formDate,
+        type: 'post',
+        contentType: false,
+        processData: false,
+        success: function(res){
+          if(res=="Login")
+          {
+            alert("Login successful!")
+            window.location.href="/"
+          }
+          else
+          {
+            alert(res)
+          }
+        }
+      })    
+      }   
     </script>
     <!-- jQuery  -->
     <script src="https://fastly.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>

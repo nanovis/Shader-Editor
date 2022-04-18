@@ -18,13 +18,13 @@ exports.signinsubmit=function(req,res)
             db.close();
             if(result.length==0)
             {
-                res.render(__dirname+"/../signin.html",{information:"Username or password is wrong!"})
+                res.send("Username or password is wrong!")
             }
             else
             {
                 req.session.username=result[0].username
                 req.session.email=result[0].email
-                res.render(__dirname+"/../browse.html",{information:"Login successful!",username:req.session.username})
+                res.send("Login")
             }
         });
     });
@@ -34,8 +34,10 @@ exports.signupsubmit=function(req,res)
 {
     if(req.body.pwd!=req.body.repeatpwd)
     {
-        res.render(__dirname+"/../signup.html",{information:"Please repeat the password correctly."})
+        res.send("Please repeat the password correctly.")
     }
+    else
+    {
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
         var dbo = db.db("shadereditor");
@@ -44,18 +46,18 @@ exports.signupsubmit=function(req,res)
             if (err) throw err;
             if(result.length!=0)
             {
-                res.render(__dirname+"/../signup.html",{information:"This email or username is already taken!"})
+                res.send("This email or username is already taken!")
             }
             else
             {
                 dbo.collection("user").insertOne(inform, function(err, result) {
                     if (err) throw err;
                     db.close();
-                    res.render(__dirname+"/../signup.html",{information:"register successfully"})
+                    res.send("success")
                 });
             }
         });
-    });
+    });}
 
 };
 exports.logout=function(req,res)
@@ -75,9 +77,10 @@ exports.changepassword=function(req,res)
 {
     if(req.body.newpwd!=req.body.repeatpwd)
     {
-
-        res.render(__dirname+"/../userprofile.html",{information:"Please repeat the new password correctly."})
+        res.send("Please repeat the new password correctly.")
     }
+    else
+    {
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
         var dbo = db.db("shadereditor");
@@ -87,18 +90,18 @@ exports.changepassword=function(req,res)
             if (err) throw err;
             if(result.length==0)
             {
-                res.render(__dirname+"/../userprofile.html",{information:"Email address or the ole password is incorrect."})
+                res.send("Email address or the ole password is incorrect.")
             }
             else
             {
                 dbo.collection("user").updateOne(inform, updateStr, function(err, result) {
                     if (err) throw err;
-                    res.render(__dirname+"/../userprofile.html",{information:"Change successful."})
                     db.close();
+                    res.send("success")
                 });
             }
         });
-    });
+    });}
 };
 
 exports.deleteuser=function(req,res)
@@ -107,6 +110,8 @@ exports.deleteuser=function(req,res)
     {
         res.send("The emal address does not match!")
     }
+    else
+    {
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
         var dbo = db.db("shadereditor");
@@ -117,5 +122,27 @@ exports.deleteuser=function(req,res)
             req.session.destroy(function (err) {})
             res.redirect("/")
         });
-    });
+    });}
+};
+exports.userprofile=function(req,res)
+{
+  if(req.session.username==undefined)
+  {
+    res.send("Please first log in")
+  }
+  else
+  {
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("shadereditor");
+        dbo.collection("shader").find({"user":req.session.username}).sort({"created":1}).toArray(function(err, result) {
+            if (err) throw err;
+            for(var i=0; i < result.length; i++){
+                result[i].id=i+1
+             }
+            res.render(__dirname+"/../userprofile.html",{username:req.session.username,result:result})
+        });
+    })
+  
+  }
 };

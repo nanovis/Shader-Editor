@@ -34,11 +34,20 @@ app.get('/about', router.about)
 app.get('/signup',users.signup)
 app.post('/compile',router.compile)
 app.get('/view/*', router.view)
-app.get('/userprofile', router.userprofile)
+app.get('/userprofile', users.userprofile)
 app.post('/file_upload', router.file_upload)
 app.post('/signinsubmit',users.signinsubmit)
 app.post('/signupsubmit',users.signupsubmit)
 app.get('/logout', users.logout)
+app.param('name', function(req, res, next, name) {
+	req.name = name;
+	next();	
+});
+app.param('user', function(req, res, next, user) {
+	req.user = user;
+	next();	
+});
+app.get('/view_user',router.view_user)
 app.post('/changepassword',users.changepassword)
 app.post('/deleteuser',users.deleteuser)
 app.post('/save_shader',router.saveshader)

@@ -4,7 +4,7 @@ const { dirname } = require('path');
 var MongoClient =require('mongodb').MongoClient;
 var url = 'mongodb://localhost:27017/';
 
-texture_code="<a href='#' onclick='click_texture(texturenum,imgnum,\"London.jpg\")'><img src='texture/London.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"happytree.jpg\")'><img src='texture/happytree.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"stock.jpg\")'><img src='texture/stock.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"wall.jpg\")'><img src='texture/wall.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"black.jpg\")'><img src='texture/black.jpg' class='img-thumbnail' width='84' height='84'> </a>"
+texture_code="<a href='#' onclick='click_texture(texturenum,imgnum,\"London.jpg\")'><img src='/texture/London.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"happytree.jpg\")'><img src='/texture/happytree.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"stock.jpg\")'><img src='/texture/stock.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"wall.jpg\")'><img src='/texture/wall.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"black.jpg\")'><img src='/texture/black.jpg' class='img-thumbnail' width='84' height='84'> </a>"
 view_texture_code="<a href='#' onclick='click_texture(texturenum,imgnum,\"London.jpg\")'><img src='../texture/London.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"happytree.jpg\")'><img src='../texture/happytree.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"stock.jpg\")'><img src='../texture/stock.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"wall.jpg\")'><img src='../texture/wall.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"black.jpg\")'><img src='../texture/black.jpg' class='img-thumbnail' width='84' height='84'> </a>"
 exports.header=function(req,res,next)
 {
@@ -92,21 +92,6 @@ exports.compile=function(req,res)
 };
 exports.view=function(req,res)
 {
-    /*fs.readFile(__dirname+'/../view.json','utf8',function (err, _data) {
-        if(err) console.log(err);
-        var view=JSON.parse(_data);
-        var returndata
-        for (var index in view)
-        {
-          if (view[index].name==req.path)
-          {
-            returndata=view[index]
-          }
-        }
-        returndata.data.texture_code=view_texture_code
-        returndata.data.username=req.session.username
-        res.render(__dirname+"/../view/template.html",returndata)
-    })*/
     MongoClient.connect(url, function(err, db) {
       if (err) throw err;
       var dbo = db.db("shadereditor");
@@ -150,15 +135,119 @@ exports.file_upload=function(req,res)
         });
     });
 };
-exports.userprofile=function(req,res)
-{
-  res.render(__dirname+"/../userprofile.html",{username:req.session.username})
-};
 exports.saveshader=function(req,res)
 {
-  console.log(req.body.code)
-  console.log(req.body.name)
-  console.log(req.body.status)
+  MongoClient.connect(url, function(err, db) {
+    if (err) throw err;
+    var dbo = db.db("shadereditor");
+    if(req.session.username==undefined)
+    {
+      res.send("You should first log in.")
+    }
+    var query = {"user":req.session.username,"name":req.body.name}; 
+    var information={"name":req.body.name,"user":req.session.username,"status":req.body.status,"path":"/view/"+req.body.name,"canvas_only_path":"/canvas_only/"+req.body.name,"code":req.body.code,"jsname":req.body.name+".js","texture1":req.body.texture1,"texture2":req.body.texture2,"texture3":req.body.texture3,"texture4":req.body.texture4,"created":Date.now()}
+    dbo.collection("shader").find(query).toArray(function(err, result) {
+        if (err) throw err;
+        if(result.length!=0)
+        {
+          var updateStr={$set: {"status":req.body.status,"code":req.body.code,"texture1":req.body.texture1,"texture2":req.body.texture2,"texture3":req.body.texture3,"texture4":req.body.texture4}}
+          dbo.collection("shader").updateOne(query, updateStr, function(err, result) {
+            if (err) throw err;
+            db.close();
+            res.send("The shader name is already used. Update Successful.")
+          });
+          
+        }
+        else
+        {
+            dbo.collection("shader").insertOne(information, function(err, result) {
+              if (err) throw err;
+              db.close();
+              res.send("Save Success")
+            });
+        }
+    });
+  })
+};
+exports.view_user=function(req,res)
+{
+  MongoClient.connect(url, function(err, db) {
+    if (err) throw err;
+    var dbo = db.db("shadereditor");
+    dbo.collection("shader").find({user:req.query.user,name:req.query.name}).toArray(function(err, result) {
+        if (err) throw err;
+        db.close();
+        if(result.length==0)
+        {
+          res.send("Nothing find")
+        }
+        else
+        {
+        console.log(result)
+        code=result[0].code
+        texture1=result[0].texture1
+        texture2=result[0].texture2
+        texture3=result[0].texture3
+        texture4=result[0].texture4
+        texture1_code=""
+        texture2_code=""
+        texture3_code=""
+        texture4_code=""
+        if(texture1!="")
+        {
+          texture1_code="image=IMG_Load(\"out/texture/"+ texture1+"\");//texture1"
+        }
+        if(texture2!="")
+        {
+          texture2_code="image=IMG_Load(\"out/texture/"+ texture2+"\");//texture2"
+        }
+        if(texture3!="")
+        {
+          texture3_code="image=IMG_Load(\"out/texture/"+ texture3+"\");//texture3"
+        }
+        if(texture4!="")
+        {
+          texture4_code="image=IMG_Load(\"out/texture/"+ texture4+"\");//texture4"
+        }
+        description="@group(0) @binding(0) var<uniform> Time : f32;\n@group(0) @binding(1) var<uniform> Resolution : vec2<f32>;\n@group(0) @binding(2) var<uniform> Mouse : vec4<f32>;\n@group(0) @binding(3) var<uniform> Date1 : vec3<i32>;\n@group(0) @binding(4) var<uniform> Date2 : vec3<i32>;\n@group(1) @binding(0) var texture1: texture_2d<f32>;\n@group(1) @binding(1) var texture2: texture_2d<f32>;\n@group(1) @binding(2) var texture3: texture_2d<f32>;\n@group(1) @binding(3) var texture4: texture_2d<f32>;\n@group(1) @binding(4) var sampler_: sampler;\n"
+        fragment_code=description+code
+        fragment_code="static char const triangle_frag_wgsl[] = R\"("+fragment_code+")\"; // fragment shader end"
+        fs.readFile(__dirname+'/../../main.cpp',function(err,data){
+            if(err) throw err;
+            else
+            {
+                code=data.toString().replace(/static char const triangle_frag_wgsl[\s\S]*?\/\/ fragment shader end/,fragment_code)
+                if (texture1_code!="")
+                {
+                  code=code.replace(/image=IMG_Load.*?\/\/texture1/,texture1_code)
+                }
+                if (texture2_code!="")
+                {
+                  code=code.replace(/image=IMG_Load.*?\/\/texture2/,texture2_code)
+                }
+                if (texture3_code!="")
+                {
+                  code=code.replace(/image=IMG_Load.*?\/\/texture3/,texture3_code)
+                }
+                if (texture4_code!="")
+                {
+                  code=code.replace(/image=IMG_Load.*?\/\/texture4/,texture4_code)
+                }
+                fs.writeFile(__dirname+'/../../main.cpp',code,function(err){
+                  if(err) throw err;
+                  cmd.run("cd "+__dirname+"/../../"+" && make",function(err,data)
+                  {
+                      if(err) throw err;
+                      else
+                      {
+                          res.render(__dirname+"/../new_template.html",{wgsl_code:result[0].code,texture1:texture1,texture2:texture2,texture3:texture3,texture4:texture4,texture_code:texture_code,username:req.session.username})
+                      }
+                  })
+              })
+            }
+        })
+        }
   
-  res.send("a")
+    });
+  });
 };
