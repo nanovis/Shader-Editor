@@ -206,7 +206,7 @@ Module['FS_createPath']("/out", "texture", true, true);
     }
 
     }
-    loadPackage({"files": [{"filename": "/out/texture/mc.png", "start": 0, "end": 875334}, {"filename": "/out/texture/.DS_Store", "start": 875334, "end": 881482}, {"filename": "/out/texture/London.jpg", "start": 881482, "end": 1063028}, {"filename": "/out/texture/stock.jpg", "start": 1063028, "end": 1073555}, {"filename": "/out/texture/black.jpg", "start": 1073555, "end": 1078945}, {"filename": "/out/texture/happytree.jpg", "start": 1078945, "end": 1107079}, {"filename": "/out/texture/wall.jpg", "start": 1107079, "end": 1129333}], "remote_package_size": 1129333, "package_uuid": "76944139-1457-4cb6-816a-4c5bfe3acd8c"});
+    loadPackage({"files": [{"filename": "/out/texture/mc.png", "start": 0, "end": 875334}, {"filename": "/out/texture/.DS_Store", "start": 875334, "end": 881482}, {"filename": "/out/texture/admin_stock.jpg", "start": 881482, "end": 892009}, {"filename": "/out/texture/jiadonggang_sample.png", "start": 892009, "end": 1721137}, {"filename": "/out/texture/admin_black.jpg", "start": 1721137, "end": 1726527}, {"filename": "/out/texture/admin_London.jpg", "start": 1726527, "end": 1908073}, {"filename": "/out/texture/admin_wall.jpg", "start": 1908073, "end": 1930327}, {"filename": "/out/texture/jiadonggang_mc.png", "start": 1930327, "end": 2805661}, {"filename": "/out/texture/admin_happytree.jpg", "start": 2805661, "end": 2833795}], "remote_package_size": 2833795, "package_uuid": "0f9c018c-0103-4c91-9ecc-847aec1e5db7"});
 
   })();
 

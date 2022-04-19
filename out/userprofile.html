@@ -14,7 +14,21 @@
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
         <style>
         body { margin: 0; background-color: rgba(110, 109, 109, 0.432) }
-
+        .nav-pills
+        {
+          position: absolute;
+          top: 10%;
+          left: 0%;
+          width: 5%;
+          height: 100%;
+        }
+        .tab-content
+        {
+          position: absolute;
+            top: 10%;
+            left: 23%;
+            width: 95%;
+        }
         .changepassword
         {
             position: absolute;
@@ -30,8 +44,15 @@
         .show-shaders
         {
             position: absolute;
-            top: 20%;
-            left: 50%;
+            top: 0%;
+            left: 0%;
+            width: 45%;
+        }
+        .show-textures
+        {
+            position: absolute;
+            top: 0%;
+            left: 0%;
             width: 45%;
         }
     </style>
@@ -66,62 +87,108 @@
         document.getElementById("welcome").href="/userprofile";
         document.getElementById("welcome").innerText="Welcome,{{username}}";
       }
-
-    </script>
-    <script type="text/javascript">
-
       $(document).ready( function () {
       $('#show').DataTable();
+      $('#show-textures').DataTable();
       } );
       </script>
-    <div class="show-shaders" >
-      <table id="show">
-        <thead>
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">Name</th>
-            <th scope="col">Status</th>
-            <th scope="col">Likes</th>
-            <th scope="col">View</th>
-          </tr>
-        </thead>
-        <tbody>
-          {{#each result}}
-          <tr>
-            <th scope="row">{{id}}</th>
-            <td>{{name}}</td>
-            <td>{{status}}</td>
-            <td>0</td>
-            <td><button><a href="/view_user?user={{user}}&name={{name}}">view</a></button></td>
-          </tr>
-          {{/each}}
-        </tbody>
-      </table>
+      <div class="nav-pills">
+        <ul class="nav flex-column">
+          <li class="active"><a data-toggle="tab" href="#home">Shaders</a></li>
+          <li><a data-toggle="tab" href="#menu1">Textures</a></li>
+          <li><a data-toggle="tab" href="#menu2">Account</a></li>
+        </ul>
+      </div>
+    <div class="tab-content">
+      <div id="home" class="tab-pane fade in active">
+        <div class="show-shaders" >
+          <h1>Shaders</h1>
+          <table id="show">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Status</th>
+                <th scope="col">View</th>
+                <th scope="col">Delete</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each shaders}}
+              <tr>
+                <th scope="row">{{id}}</th>
+                <td>{{name}}</td>
+                <td>{{status}}</td>
+                <td><button><a href="/view_user?user={{user}}&name={{name}}">view</a></button></td>
+                <td><button><a href="/deleteshader?user={{user}}&name={{name}}">delete</a></button></td>
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+    
+        </div>
+      </div>
+      <div id="menu1" class="tab-pane fade">
+        <div class="show-textures" >
+          <h1>Textures</h1>
+          <table id="show-textures">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Width</th>
+                <th scope="col">Height</th>
+                <th scope="col">Type</th>
+                <th scope="col">View</th>
+                <th scope="col">Delete</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each textures}}
+              <tr>
+                <th scope="row">{{id}}</th>
+                <td>{{name}}</td>
+                <td>{{width}}</td>
+                <td>{{height}}</td>
+                <td>{{type}}</td>
+                <td><img src="texture/{{user}}_{{name}}" class="img-thumbnail" width="50" height="30"></td>
+                <td><button><a href="/deletetexture?user={{user}}&name={{name}}">Delete</a></button></td>
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+    
+        </div>
+      </div>
+      <div id="menu2" class="tab-pane fade">
+        <div class="changepassword">
+          <h2 class="form-signin-heading">Change Password</h2>
+          <label for="email" >Email address</label>
+          <input type="email" id="email" name="email" class="form-control" placeholder="Email address" required="">
+          <label for="oldpwd" >Old Password</label>
+          <input type="password" id="oldpwd" name="oldpwd" class="form-control" placeholder="Old Password" required="">
+          <label for="newpwd" >New Password</label>
+          <input type="password" id="newpwd" name="newpwd" class="form-control" placeholder="New Password" required="">
+          <label for="repeatpwd" >Repeat New Password</label>
+          <input type="password" id="repeatpwd" name="repeatpwd" class="form-control" placeholder="Repeat New Password" required="">
+          <br>
+          <button class="btn btn-lg btn-primary btn-block" onclick="changepassword()">Change</button>
+  </div>
 
-    </div>
-    <div class="changepassword">
-            <h2 class="form-signin-heading">Change Password</h2>
-            <label for="email" >Email address</label>
-            <input type="email" id="email" name="email" class="form-control" placeholder="Email address" required="">
-            <label for="oldpwd" >Old Password</label>
-            <input type="password" id="oldpwd" name="oldpwd" class="form-control" placeholder="Old Password" required="">
-            <label for="newpwd" >New Password</label>
-            <input type="password" id="newpwd" name="newpwd" class="form-control" placeholder="New Password" required="">
-            <label for="repeatpwd" >Repeat New Password</label>
-            <input type="password" id="repeatpwd" name="repeatpwd" class="form-control" placeholder="Repeat New Password" required="">
-            <br>
-            <button class="btn btn-lg btn-primary btn-block" onclick="changepassword()">Change</button>
-    </div>
+  <div class="deleteuser">
+      <form class="form-signin" action="/deleteuser" method="post">
+          <h2 class="form-signin-heading">Delete User</h2>
+          <label for="email" >Confirm Email address</label>
+          <input type="email" id="email" name="email" class="form-control" placeholder="Email address" required="">
+          <br>
+          <button class="btn btn-lg btn-primary btn-block" type="submit">Delete</button>
+        </form>
+  </div>
+      </div>
+        </div>
+      </div>
 
-    <div class="deleteuser">
-        <form class="form-signin" action="/deleteuser" method="post">
-            <h2 class="form-signin-heading">Delete User</h2>
-            <label for="email" >Confirm Email address</label>
-            <input type="email" id="email" name="email" class="form-control" placeholder="Email address" required="">
-            <br>
-            <button class="btn btn-lg btn-primary btn-block" type="submit">Delete</button>
-          </form>
-    </div>
+
 
 
 

@@ -57,7 +57,8 @@ exports.signupsubmit=function(req,res)
                 });
             }
         });
-    });}
+    });
+}
 
 };
 exports.logout=function(req,res)
@@ -135,14 +136,59 @@ exports.userprofile=function(req,res)
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
         var dbo = db.db("shadereditor");
-        dbo.collection("shader").find({"user":req.session.username}).sort({"created":1}).toArray(function(err, result) {
+        dbo.collection("shader").find({"user":req.session.username}).sort({"created":1}).toArray(function(err, shaders) {
             if (err) throw err;
-            for(var i=0; i < result.length; i++){
-                result[i].id=i+1
+            for(var i=0; i < shaders.length; i++){
+                shaders[i].id=i+1
              }
-            res.render(__dirname+"/../userprofile.html",{username:req.session.username,result:result})
+             dbo.collection("texture").find({"user":req.session.username}).sort({"created":1}).toArray(function(err, textures) {
+                if (err) throw err;
+                for(var i=0; i < textures.length; i++){
+                    textures[i].id=i+1
+                 }
+                    res.render(__dirname+"/../userprofile.html",{username:req.session.username,shaders:shaders,textures:textures})
+             });
         });
-    })
-  
+    });
   }
+};
+exports.deleteshader=function(req,res)
+{
+    if (req.session.username==undefined || req.session.username!=req.query.user)
+    {
+        res.send("Please first login")
+    }
+    else
+    {
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("shadereditor");
+        var inform = {"user":req.session.username,"name":req.query.name}; 
+        dbo.collection("shader").deleteOne(inform, function(err, result) {
+            if (err) throw err;
+            db.close();
+            res.redirect("/userprofile")
+        });
+    });}
+  
+};
+exports.deletetexture=function(req,res)
+{
+    if (req.session.username==undefined || req.session.username!=req.query.user)
+    {
+        res.send("Please first login")
+    }
+    else
+    {
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("shadereditor");
+        var inform = {"user":req.session.username,"name":req.query.name}; 
+        dbo.collection("texture").deleteOne(inform, function(err, result) {
+            if (err) throw err;
+            db.close();
+            res.redirect("/userprofile")
+        });
+    });}
+  
 };

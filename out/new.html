@@ -62,7 +62,7 @@
           left: 0%;
           width: 70%;
         }
-        .form-group-texture
+        .upload_texture
         {
           position: absolute;
           top: 100%;
@@ -103,20 +103,19 @@
     <div class="container">
       <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
       <div class="save_part" id="save_part" >
-
         <div class="form-group">
           <label for="save_name">Name of the shader</label>
           <input  type="text" class="form-control" id="save_name" >
         </div>
         <div class="form-group">
           <label for="save_select">Example select</label>
-          <select class="form-control" id="save_select">
+          <select class="form-control" id="save_select" >
             <option>Private</option>
             <option>Public</option>
           </select>
         </div>
         <button  class="btn btn-primary" onclick="save()">Save</button>
-    </div>
+      </div>
 
       <div class="textbox">
         <div class="description" onclick="toggle('display_desc')">
@@ -133,7 +132,7 @@
         </div>
         <form action="/compile" method="post">
         <p name="shader_code">
-          <textarea id="code" name="code" rows="25" cols="100">
+          <textarea id="code" name="code" rows="25" cols="70">
 @stage(fragment)
 fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
   var uv: vec3<f32> =vec3<f32>(position.xyx/Resolution.xyx);
@@ -142,10 +141,10 @@ fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
 }
           </textarea>
     </p>
-    <input type="hidden" name="texture1" id="texture1" value="black.jpg">
-    <input type="hidden" name="texture2" id="texture2" value="black.jpg">
-    <input type="hidden" name="texture3" id="texture3" value="black.jpg">
-    <input type="hidden" name="texture4" id="texture4" value="black.jpg">
+    <input type="hidden" name="texture1" id="texture1" value="admin_black.jpg">
+    <input type="hidden" name="texture2" id="texture2" value="admin_black.jpg">
+    <input type="hidden" name="texture3" id="texture3" value="admin_black.jpg">
+    <input type="hidden" name="texture4" id="texture4" value="admin_black.jpg">
     <button type="submit" class="btn btn-primary"  >Compile</button>
         </form>
     
@@ -173,18 +172,17 @@ fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
         texture_4
     </button>
     <br>
-    <img id="img1" src="texture/black.jpg" class="img-thumbnail" width="84" height="84">
-    <img id="img2" src="texture/black.jpg" class="img-thumbnail" width="84" height="84">
-    <img id="img3" src="texture/black.jpg" class="img-thumbnail" width="84" height="84">
-    <img id="img4" src="texture/black.jpg" class="img-thumbnail" width="84" height="84">
+    <img id="img1" src="texture/admin_black.jpg" class="img-thumbnail" width="84" height="84">
+    <img id="img2" src="texture/admin_black.jpg" class="img-thumbnail" width="84" height="84">
+    <img id="img3" src="texture/admin_black.jpg" class="img-thumbnail" width="84" height="84">
+    <img id="img4" src="texture/admin_black.jpg" class="img-thumbnail" width="84" height="84">
     </div>
-    <div class="form-group-texture">
+    <div class="upload_texture" id="upload_texture">
       <label for="image">Upload Texture</label>
       <input type="file" class="form-control-file" id="image" name="image" accpet=".jpg .png">
       <br>
       <button  class="btn btn-primary" onclick="upload()">Upload</button>
     </div>
-
     </div>
     </div>
     
@@ -235,6 +233,7 @@ fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
       {code=htmlDecode(code)}
       code=code.replace(/texturenum/g,texturenum).replace(/imgnum/g,imgnum);
       var  data  =  $(code); 
+      console.log(code)
       return  data;  
       } 
 
@@ -278,9 +277,16 @@ fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
           contentType: false,
           processData: false,
           success: function(res){
-              global_popover_code=res;
+              if(res[0]=='fail')
+              {
+                alert(res[1])
+              }
+              else
+              {
+              global_popover_code=res[1];
               whether_decode=false
               alert("upload successfully.")
+              }
           }
         })}
         else
@@ -379,10 +385,12 @@ fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
         document.getElementById("welcome").href="/userprofile";
         document.getElementById("welcome").innerText="Welcome,{{username}}";
         document.getElementById("save_part").hidden=false;
+        document.getElementById("upload_texture").hidden=false;
       }
       else
       {
         document.getElementById("save_part").hidden=true;
+        document.getElementById("upload_texture").hidden=true;
       }
 
     </script>

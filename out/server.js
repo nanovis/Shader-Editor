@@ -39,14 +39,8 @@ app.post('/file_upload', router.file_upload)
 app.post('/signinsubmit',users.signinsubmit)
 app.post('/signupsubmit',users.signupsubmit)
 app.get('/logout', users.logout)
-app.param('name', function(req, res, next, name) {
-	req.name = name;
-	next();	
-});
-app.param('user', function(req, res, next, user) {
-	req.user = user;
-	next();	
-});
+app.get('/deleteshader', users.deleteshader)
+app.get('/deletetexture', users.deletetexture)
 app.get('/view_user',router.view_user)
 app.post('/changepassword',users.changepassword)
 app.post('/deleteuser',users.deleteuser)

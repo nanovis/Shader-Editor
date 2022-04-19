@@ -572,25 +572,25 @@ void load_images(SDL_Surface *image, int imgw,int imgh,unsigned char*& img )
 void image_init()
 {		
 		SDL_Surface *image;
-		image=IMG_Load("out/texture/black.jpg");//texture1
+		image=IMG_Load("out/texture/admin_black.jpg");//texture1
 		imgw_1=image->w;
 		imgh_1=image->h;
 		img_1=new unsigned char[imgw_1 * imgh_1*4];
 		load_images(image,imgw_1,imgh_1,img_1);
 
-		image=IMG_Load("out/texture/black.jpg");//texture2
+		image=IMG_Load("out/texture/admin_black.jpg");//texture2
 		imgw_2=image->w;
 		imgh_2=image->h;
 		img_2=new unsigned char[imgw_2 * imgh_2*4];
 		load_images(image,imgw_2,imgh_2,img_2);
 
-		image=IMG_Load("out/texture/black.jpg");//texture3
+		image=IMG_Load("out/texture/admin_black.jpg");//texture3
 		imgw_3=image->w;
 		imgh_3=image->h;
 		img_3=new unsigned char[imgw_3 * imgh_3*4];
 		load_images(image,imgw_3,imgh_3,img_3);
 
-		image=IMG_Load("out/texture/black.jpg");//texture4
+		image=IMG_Load("out/texture/admin_black.jpg");//texture4
 		imgw_4=image->w;
 		imgh_4=image->h;
 

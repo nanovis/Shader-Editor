@@ -1,11 +1,10 @@
 var cmd=require('node-cmd')
 var fs = require('fs');
+const sizeOf = require('image-size')
 const { dirname } = require('path');
+const req = require('express/lib/request');
 var MongoClient =require('mongodb').MongoClient;
 var url = 'mongodb://localhost:27017/';
-
-texture_code="<a href='#' onclick='click_texture(texturenum,imgnum,\"London.jpg\")'><img src='/texture/London.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"happytree.jpg\")'><img src='/texture/happytree.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"stock.jpg\")'><img src='/texture/stock.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"wall.jpg\")'><img src='/texture/wall.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"black.jpg\")'><img src='/texture/black.jpg' class='img-thumbnail' width='84' height='84'> </a>"
-view_texture_code="<a href='#' onclick='click_texture(texturenum,imgnum,\"London.jpg\")'><img src='../texture/London.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"happytree.jpg\")'><img src='../texture/happytree.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"stock.jpg\")'><img src='../texture/stock.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"wall.jpg\")'><img src='../texture/wall.jpg' class='img-thumbnail' width='84' height='84'> </a><a href='#' onclick='click_texture(texturenum,imgnum,\"black.jpg\")'><img src='../texture/black.jpg' class='img-thumbnail' width='84' height='84'> </a>"
 exports.header=function(req,res,next)
 {
     res.setHeader('Access-Control-Allow-Origin','*')
@@ -19,7 +18,10 @@ exports.index=function(req,res)
 };
 exports.new=function(req,res)
 {
-    res.render(__dirname+"/../new.html",{texture_code:texture_code,username:req.session.username})
+    gettexturecode(req.session.username,function(err,texturecode)
+    {
+      res.render(__dirname+"/../new.html",{texture_code:texturecode,username:req.session.username})
+    });
 };
 exports.browse=function(req,res)
 {
@@ -83,7 +85,11 @@ exports.compile=function(req,res)
                   if(err) throw err;
                   else
                   {
-                      res.render(__dirname+"/../new_template.html",{wgsl_code:req.body.code,texture1:req.body.texture1,texture2:req.body.texture2,texture3:req.body.texture3,texture4:req.body.texture4,texture_code:texture_code,username:req.session.username})
+                    gettexturecode(req.session.username,function(err,texturecode)
+                    {
+                      res.render(__dirname+"/../new_template.html",{wgsl_code:req.body.code,texture1:req.body.texture1,texture2:req.body.texture2,texture3:req.body.texture3,texture4:req.body.texture4,texture_code:texturecode,username:req.session.username})
+                    });
+                      
                   }
               })
           })
@@ -98,25 +104,28 @@ exports.view=function(req,res)
       dbo.collection("shader").find({path:req.path}).toArray(function(err, result) {
           if (err) throw err;
           db.close();
-          var returndata={}
-          returndata.texture_code=view_texture_code
-          returndata.username=req.session.username
-          returndata.code=result[0].code
-          returndata.texture1=result[0].texture1
-          returndata.texture2=result[0].texture2
-          returndata.texture3=result[0].texture3
-          returndata.texture4=result[0].texture4
-          returndata.jsname=result[0].jsname
-          res.render(__dirname+"/../view/template.html",returndata)
+          getviewtexturecode(req.session.username,function(err,texturecode){
+            var returndata={}
+            returndata.texture_code=texturecode
+            returndata.username=req.session.username
+            returndata.code=result[0].code
+            returndata.texture1=result[0].texture1
+            returndata.texture2=result[0].texture2
+            returndata.texture3=result[0].texture3
+            returndata.texture4=result[0].texture4
+            returndata.jsname=result[0].jsname
+            res.render(__dirname+"/../view/template.html",returndata)
+          });
+
       });
   });
 };
 exports.file_upload=function(req,res)
 {
-    console.log(req.files[0]);  // upload file information
-  
-    var des_file = __dirname + "/../texture/" + req.files[0].originalname; //file name
-    console.log(des_file)
+    //console.log(req.files[0]);  // upload file information
+    var savename=req.session.username+"_"+req.files[0].originalname
+    var des_file = __dirname + "/../texture/" + savename; //file name
+    //console.log(des_file)
     fs.readFile( req.files[0].path, function (err, data) {  
          fs.writeFile(des_file, data, function (err) { 
           if( err ){
@@ -128,9 +137,34 @@ exports.file_upload=function(req,res)
                     message:'File uploaded successfully', 
                     filename:req.files[0].originalname
                };
-            console.log(response)
-            texture_code+="<a href='#' onclick='click_texture(texturenum,imgnum,\""+req.files[0].originalname+"\")'><img src='texture/"+req.files[0].originalname+ "' class='img-thumbnail' width='84' height='84'> </a>"
-            res.send(texture_code)
+            //console.log(response)
+            //save texture to database
+            const dimensions = sizeOf(des_file)
+            //console.log(dimensions.width, dimensions.height)
+            MongoClient.connect(url, function(err, db) {
+              if (err) throw err;
+              var dbo = db.db("shadereditor");
+              var inform = {"user":req.session.username,"name":req.files[0].originalname,"width":dimensions.width,"height":dimensions.height,"type":dimensions.type,"created":Date.now()}; 
+              dbo.collection("texture").find({"user":req.session.username,"name":req.files[0].originalname}).toArray(function(err, result) {
+                  if (err) throw err;
+                  if(result.length!=0)
+                  {
+                      res.send(["fail","This texture name is already taken!"])
+                  }
+                  else
+                  {
+                      dbo.collection("texture").insertOne(inform, function(err, result) {
+                          if (err) throw err;
+                          db.close();
+                          gettexturecode(req.session.username,function(err,texturecode)
+                          {
+                            res.send(["success",texturecode])
+                          });
+                          
+                      });
+                  }
+              });
+            });
            }
         });
     });
@@ -183,7 +217,6 @@ exports.view_user=function(req,res)
         }
         else
         {
-        console.log(result)
         code=result[0].code
         texture1=result[0].texture1
         texture2=result[0].texture2
@@ -240,7 +273,11 @@ exports.view_user=function(req,res)
                       if(err) throw err;
                       else
                       {
-                          res.render(__dirname+"/../new_template.html",{wgsl_code:result[0].code,texture1:texture1,texture2:texture2,texture3:texture3,texture4:texture4,texture_code:texture_code,username:req.session.username})
+                        gettexturecode(req.session.username,function(err,texturecode)
+                        {
+                          res.render(__dirname+"/../new_template.html",{wgsl_code:result[0].code,texture1:texture1,texture2:texture2,texture3:texture3,texture4:texture4,texture_code:texturecode,username:req.session.username,shadername:result[0].name})
+                        });
+                          
                       }
                   })
               })
@@ -248,6 +285,55 @@ exports.view_user=function(req,res)
         })
         }
   
+    });
+  });
+};
+function gettexturecode(username,callback)
+{
+  texture_code="";
+  MongoClient.connect(url, function(err, db) {
+    if (err) throw err;
+    var dbo = db.db("shadereditor");
+    if(username!=undefined)
+    {
+      query={$or:[{"user":username},{"user":"admin"}]}
+    }
+    else
+    {
+      query={"user":"admin"}
+    }
+    dbo.collection("texture").find(query).sort({"created":1}).toArray(function(err, result) {
+        if (err) throw err;
+        for(var i=0; i < result.length; i++){
+          savename=result[i].user+"_"+result[i].name
+          texture_code+="<a href='#' onclick='click_texture(texturenum,imgnum,\""+savename+"\")'><img src='texture/"+savename+ "' class='img-thumbnail' width='84' height='84'> </a>"
+       }
+       callback(null,texture_code)
+    });
+  });
+  
+};
+function getviewtexturecode(username,callback)
+{
+  MongoClient.connect(url, function(err, db) {
+    if (err) throw err;
+    var dbo = db.db("shadereditor");
+    texture_code="";
+    if(username!=undefined)
+    {
+      query={$or:[{"user":username},{"user":"admin"}]}
+    }
+    else
+    {
+      query={"user":"admin"}
+    }
+    dbo.collection("texture").find(query).sort({"created":1}).toArray(function(err, result) {
+        if (err) throw err;
+        for(var i=0; i < result.length; i++){
+          savename=result[i].user+"_"+result[i].name
+          texture_code+="<a href='#' onclick='click_texture(texturenum,imgnum,\""+savename+"\")'><img src='../texture/"+savename+ "' class='img-thumbnail' width='84' height='84'> </a>"
+       }
+       callback(null,texture_code)
     });
   });
 };
