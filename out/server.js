@@ -7,7 +7,6 @@ var hbs = require('hbs')
 const { check, validationResult } = require('express-validator');
 var session = require('express-session')
 const { route } = require('express/lib/application')
-
 var app = express()
 var port = 8080
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -17,6 +16,23 @@ app.use(session({
   resave: false,
   saveUninitialized: true
 }));
+
+const tf = require('@tensorflow/tfjs-node')
+const nsfw = require('nsfwjs')
+var fs = require('fs');
+async function fn() {
+  const model = await nsfw.load() // To load a local model, nsfw.load('file://./path/to/model/')
+  // Image must be in tf.tensor3d format
+  // you can convert image to tf.tensor3d with tf.node.decodeImage(Uint8Array,channels)
+  const imageBuffer = await fs.readFileSync(__dirname+'/texture/admin_London.jpg');
+  const image = await tf.node.decodeImage(imageBuffer)
+  const predictions = await model.classify(image)
+  image.dispose() // Tensor memory must be managed explicitly (it is not sufficient to let a tf.Tensor go out of scope for its memory to be released).
+  console.log(predictions)
+}
+fn()
+
+
 app.use(express.static(__dirname))
 app.use(express.static(".."))
 app.use(express.static(__dirname+"/view"))
