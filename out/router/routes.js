@@ -5,6 +5,10 @@ const { dirname } = require('path');
 const req = require('express/lib/request');
 var MongoClient =require('mongodb').MongoClient;
 var url = 'mongodb://localhost:27017/';
+const tf = require('@tensorflow/tfjs-node')
+const nsfw = require('nsfwjs')
+
+
 exports.header=function(req,res,next)
 {
     res.setHeader('Access-Control-Allow-Origin','*')
@@ -122,10 +126,9 @@ exports.view=function(req,res)
 };
 exports.file_upload=function(req,res)
 {
-    //console.log(req.files[0]);  // upload file information
+    
     var savename=req.session.username+"_"+req.files[0].originalname
     var des_file = __dirname + "/../texture/" + savename; //file name
-    //console.log(des_file)
     fs.readFile( req.files[0].path, function (err, data) {  
          fs.writeFile(des_file, data, function (err) { 
           if( err ){
@@ -137,10 +140,10 @@ exports.file_upload=function(req,res)
                     message:'File uploaded successfully', 
                     filename:req.files[0].originalname
                };
-            //console.log(response)
-            //save texture to database
-            const dimensions = sizeOf(des_file)
-            //console.log(dimensions.width, dimensions.height)
+            figurechecking(des_file,function(err,predictions){
+            if(predictions[0].className=='Neutral'|| predictions[0].className=='Drawing')
+            {
+              const dimensions = sizeOf(des_file)
             MongoClient.connect(url, function(err, db) {
               if (err) throw err;
               var dbo = db.db("shadereditor");
@@ -165,6 +168,12 @@ exports.file_upload=function(req,res)
                   }
               });
             });
+            }
+            else
+            {res.send(['fail','This figure doesn\'t pass the content checking'])}
+
+          });
+            
            }
         });
     });
@@ -336,4 +345,14 @@ function getviewtexturecode(username,callback)
        callback(null,texture_code)
     });
   });
+};
+async function figurechecking(path,callback) {
+  const model = await nsfw.load() // To load a local model, nsfw.load('file://./path/to/model/')
+  // Image must be in tf.tensor3d format
+  // you can convert image to tf.tensor3d with tf.node.decodeImage(Uint8Array,channels)
+  const imageBuffer = await fs.readFileSync(path);
+  const image = await tf.node.decodeImage(imageBuffer,3)
+  const predictions = await model.classify(image)
+  image.dispose() // Tensor memory must be managed explicitly (it is not sufficient to let a tf.Tensor go out of scope for its memory to be released).
+  callback(null, predictions)
 };
