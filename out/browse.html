@@ -40,7 +40,7 @@
         document.getElementById("signin").href="/logout";
         document.getElementById("signin").innerText="Log Out";
         document.getElementById("welcome").href="/userprofile";
-        document.getElementById("welcome").innerText="Welcome,{{username}}";
+        document.getElementById("welcome").innerHTML="Welcome,<B><b>{{username}}</b></B>";
       }
       if("{{information}}".length!=0)
       {
