@@ -18,4 +18,11 @@ $ npm install
 $ cd .. && make serve
 # Access http://localhost:8080 on your web browser
 ```
-
+## Todo:
+- Syntax highlighting
+- Compiling error log
+- Database encryption
+- CSS file unify
+- Shader sharing and publishing
+- Register email verification
+- ...
