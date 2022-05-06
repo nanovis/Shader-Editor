@@ -383,7 +383,7 @@ fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
         document.getElementById("signin").href="/logout";
         document.getElementById("signin").innerText="Log Out";
         document.getElementById("welcome").href="/userprofile";
-        document.getElementById("welcome").innerText="Welcome,{{username}}";
+        document.getElementById("welcome").innerHTML="Welcome,<B><b>{{username}}</b></B>";
         document.getElementById("save_part").hidden=false;
         document.getElementById("upload_texture").hidden=false;
       }

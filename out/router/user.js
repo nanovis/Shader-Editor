@@ -1,32 +1,49 @@
 var MongoClient =require('mongodb').MongoClient;
 var url = 'mongodb://localhost:27017/';
+var crypto = require("crypto");
 
 const { check, validationResult } = require('express-validator');
 
 
 //initialize the database
 
+function sha256(initPWD,callback){
+    var sha256 = crypto.createHash('sha256');
+    var password = sha256.update(initPWD).digest('hex');
+    callback(null,password);
+}
+function encrypt(password,callback)
+{
+    sha256(password,function(err,pwd){
+        sha256(pwd+"nanovis",function(err,pwd){
+            callback(null,pwd)
+        });
+    });
+}
 
 exports.signinsubmit=function(req,res)
 {
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
         var dbo = db.db("shadereditor");
-        var whereStr = {"email":req.body.email,"pwd":req.body.pwd}; 
-        dbo.collection("user").find(whereStr).toArray(function(err, result) {
-            if (err) throw err;
-            db.close();
-            if(result.length==0)
-            {
-                res.send("Username or password is wrong!")
-            }
-            else
-            {
-                req.session.username=result[0].username
-                req.session.email=result[0].email
-                res.send("Login")
-            }
+        encrypt(req.body.pwd,function(err,encryptpwd){
+            var whereStr = {"email":req.body.email,"pwd":encryptpwd}; 
+            dbo.collection("user").find(whereStr).toArray(function(err, result) {
+                if (err) throw err;
+                db.close();
+                if(result.length==0)
+                {
+                    res.send("Username or password is wrong!")
+                }
+                else
+                {
+                    req.session.username=result[0].username
+                    req.session.email=result[0].email
+                    res.send("Login")
+                }
+            });
         });
+        
     });
 
 };
@@ -41,8 +58,9 @@ exports.signupsubmit=function(req,res)
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
         var dbo = db.db("shadereditor");
-        var inform = {"username":req.body.username,"email":req.body.email,"pwd":req.body.pwd,"created":Date.now()}; 
-        dbo.collection("user").find({$or:[{"email":req.body.email},{"username":req.body.username}]}).toArray(function(err, result) {
+        encrypt(req.body.pwd,function(err,encryptpwd){
+            var inform = {"username":req.body.username,"email":req.body.email,"pwd":encryptpwd,"created":Date.now()}; 
+            dbo.collection("user").find({$or:[{"email":req.body.email},{"username":req.body.username}]}).toArray(function(err, result) {
             if (err) throw err;
             if(result.length!=0)
             {
@@ -56,7 +74,10 @@ exports.signupsubmit=function(req,res)
                     res.send("success")
                 });
             }
+            });
         });
+
+        
     });
 }
 
@@ -85,23 +106,30 @@ exports.changepassword=function(req,res)
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
         var dbo = db.db("shadereditor");
-        var inform = {"email":req.body.email,"username":req.session.username,"pwd":req.body.oldpwd}; 
-        var updateStr = {$set: { "pwd" : req.body.newpwd }};
-        dbo.collection("user").find(inform).toArray(function(err, result) {
-            if (err) throw err;
-            if(result.length==0)
-            {
-                res.send("Email address or the ole password is incorrect.")
-            }
-            else
-            {
-                dbo.collection("user").updateOne(inform, updateStr, function(err, result) {
-                    if (err) throw err;
-                    db.close();
-                    res.send("success")
-                });
-            }
+        encrypt(req.body.oldpwd,function(err,encryptoldpwd){
+            var inform = {"email":req.body.email,"username":req.session.username,"pwd":encryptoldpwd}; 
+            dbo.collection("user").find(inform).toArray(function(err, result) {
+                if (err) throw err;
+                if(result.length==0)
+                {
+                    res.send("Email address or the ole password is incorrect.")
+                }
+                else
+                {
+                    encrypt(req.body.newpwd,function(err,encryptnewpwd){
+                        var updateStr = {$set: { "pwd" : encryptnewpwd }};
+                        dbo.collection("user").updateOne(inform, updateStr, function(err, result) {
+                            if (err) throw err;
+                            db.close();
+                            res.send("success")
+                        });
+                    });
+                    
+                }
+            });
+
         });
+        
     });}
 };
 
@@ -117,11 +145,19 @@ exports.deleteuser=function(req,res)
         if (err) throw err;
         var dbo = db.db("shadereditor");
         var inform = {"email":req.body.email,"username":req.session.username}; 
+        var inform_ = {"user":req.session.username};
         dbo.collection("user").deleteOne(inform, function(err, result) {
             if (err) throw err;
-            db.close();
-            req.session.destroy(function (err) {})
-            res.redirect("/")
+            dbo.collection("shader").deleteOne(inform_, function(err, result) {
+                if (err) throw err;
+                dbo.collection("texture").deleteOne(inform_, function(err, result) {
+                    if (err) throw err;
+                    db.close();
+                    req.session.destroy(function (err) {})
+                    res.redirect("/")
+                });
+            });
+            
         });
     });}
 };
