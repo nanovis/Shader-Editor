@@ -48,7 +48,7 @@ $(WEB_DIR):
 	mkdir $@
 
 ## python -m SimpleHTTPServer
-serve: all
+serve: 
 	node out/server.js
 
 $(EXE): $(OBJS) $(WEB_DIR)

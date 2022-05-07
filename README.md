@@ -25,4 +25,5 @@ $ cd .. && make serve
 - CSS file unify
 - Shader sharing and publishing
 - Register email verification
+- Brower pages pagination 
 - ...

@@ -1,0 +1,137 @@
+body { margin: 0; background-color: rgba(110, 109, 109, 0.432) }
+.nav-pills
+{
+    position: absolute;
+    top: 10%;
+    left: 0%;
+    width: 5%;
+    height: 100%;
+}
+.tab-content
+{
+    position: absolute;
+    top: 10%;
+    left: 23%;
+    width: 95%;
+}
+.changepassword
+{
+    position: absolute;
+    top: 15%;
+    left: 3%;
+}
+.deleteuser
+{
+    position: absolute;
+    top: 15%;
+    left: 30%;
+}
+.show-shaders
+{
+    position: absolute;
+    top: 0%;
+    left: 0%;
+    width: 45%;
+}
+.show-textures
+{
+    position: absolute;
+    top: 0%;
+    left: 0%;
+    width: 45%;
+}
+.textbox
+{
+  position: absolute;
+  top: 10%;
+  left: 55%;
+  width: 40%;
+}
+.popover
+{
+  max-width: 600px;
+}
+.description
+{
+  position: relative;
+  width: 100%;
+  height: 5%;
+  background-color: white;
+}
+.display_desc
+{
+  display: none;
+}
+.texture_image
+{
+  position: absolute;
+  top: 100%;
+  left: 0%;
+  width: 70%;
+}
+.upload_texture
+{
+  position: absolute;
+  top: 100%;
+  left: 70%;
+  width: 40%;
+}
+.save_part
+{
+  position: absolute;
+  top: 65%;
+  left: 5%;
+  width: 20%; 
+}
+.signin
+{
+    position: absolute;
+    top: 10%;
+    left: 40%;
+    width: 15%;
+}
+.signup
+{
+  position: absolute;
+  top: 10%;
+  left: 40%;
+  width: 15%;
+}
+.emscripten_canvasonly {
+    position: absolute;
+    top: 0%;
+    left: 0%;
+    margin: 0px;
+    border: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    display: block;
+    image-rendering: optimizeSpeed;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -o-crisp-edges;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: optimize-contrast;
+    image-rendering: crisp-edges;
+    image-rendering: pixelated;
+    -ms-interpolation-mode: nearest-neighbor;
+}
+.emscripten {
+    position: absolute;
+    top: 10%;
+    left: 3%;
+    margin: 0px;
+    border: 0;
+    width: 45%;
+    height: 50%;
+    overflow: hidden;
+    display: block;
+    image-rendering: optimizeSpeed;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -o-crisp-edges;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: optimize-contrast;
+    image-rendering: crisp-edges;
+    image-rendering: pixelated;
+    -ms-interpolation-mode: nearest-neighbor;
+}

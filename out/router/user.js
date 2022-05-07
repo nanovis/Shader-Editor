@@ -148,9 +148,9 @@ exports.deleteuser=function(req,res)
         var inform_ = {"user":req.session.username};
         dbo.collection("user").deleteOne(inform, function(err, result) {
             if (err) throw err;
-            dbo.collection("shader").deleteOne(inform_, function(err, result) {
+            dbo.collection("shader").deleteMany(inform_, function(err, result) {
                 if (err) throw err;
-                dbo.collection("texture").deleteOne(inform_, function(err, result) {
+                dbo.collection("texture").deleteMany(inform_, function(err, result) {
                     if (err) throw err;
                     db.close();
                     req.session.destroy(function (err) {})
