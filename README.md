@@ -1,4 +1,4 @@
-# Shadertoy-webgpu
+# Shader Editor
 
 Tested with Chrome Canary and Chromium 100.0.4868.0 with the `--enable-unsafe-webgpu` flag.
 
@@ -21,8 +21,6 @@ $ cd .. && make serve
 ## Todo:
 - Syntax highlighting
 - Compiling error log
-- Database encryption
-- CSS file unify
 - Shader sharing and publishing
 - Register email verification
 - Brower pages pagination 
