@@ -48,7 +48,7 @@ $(WEB_DIR):
 	mkdir $@
 
 ## python -m SimpleHTTPServer
-serve: 
+serve: all
 	node out/server.js
 
 $(EXE): $(OBJS) $(WEB_DIR)
@@ -60,4 +60,5 @@ clean:
 	rm -f out/temp/*
 	rm -rf out/texture
 	cp  -r texture out/
+	rm -rf out/node_modules
 	find . -name ‘.DS_Store’ -type f -delete

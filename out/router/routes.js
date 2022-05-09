@@ -101,12 +101,19 @@ exports.compile=function(req,res)
 };
 exports.view=function(req,res)
 {
+
     MongoClient.connect(url, function(err, db) {
       if (err) throw err;
       var dbo = db.db("shadereditor");
-      dbo.collection("shader").find({"path":req.path}).toArray(function(err, result) {
+      dbo.collection("shader").find({"name":req.query.name,"user":req.query.user}).toArray(function(err, result) {
           if (err) throw err;
           db.close();
+          if (result.length!=0)
+          {
+            if(result[0].status=="private")
+            {
+              res.send("404 error")
+            }
           getviewtexturecode(req.session.username,function(err,texturecode){
             var returndata={}
             returndata.texture_code=texturecode
@@ -117,15 +124,19 @@ exports.view=function(req,res)
             returndata.texture3=result[0].texture3
             returndata.texture4=result[0].texture4
             returndata.jsname=result[0].jsname
-            res.render(__dirname+"/../view/template.html",returndata)
-          });
-
+            if (req.query.canvas==undefined)
+            {res.render(__dirname+"/../view/template.html",returndata)}
+            else
+            {
+              returndata.redirect="/view?name="+req.query.name+"&user="+req.query.user
+              res.render(__dirname+"/../view/canvas.html",returndata)
+            }
+          });}
       });
   });
 };
 exports.file_upload=function(req,res)
 {
-    
     var savename=req.session.username+"_"+req.files[0].originalname
     var des_file = __dirname + "/../texture/" + savename; //file name
     fs.readFile( req.files[0].path, function (err, data) {  
@@ -187,7 +198,7 @@ exports.saveshader=function(req,res)
       res.send("You should first log in.")
     }
     var query = {"user":req.session.username,"name":req.body.name}; 
-    var information={"name":req.body.name,"user":req.session.username,"status":req.body.status,"path":"/view/"+req.body.name,"canvas_only_path":"/canvas_only/"+req.body.name,"code":req.body.code,"jsname":req.body.name+".js","texture1":req.body.texture1,"texture2":req.body.texture2,"texture3":req.body.texture3,"texture4":req.body.texture4,"created":Date.now()}
+    var information={"name":req.body.name,"user":req.session.username,"status":req.body.status,"code":req.body.code,"jsname":req.body.name+".js","texture1":req.body.texture1,"texture2":req.body.texture2,"texture3":req.body.texture3,"texture4":req.body.texture4,"created":Date.now()}
     dbo.collection("shader").find(query).toArray(function(err, result) {
         if (err) throw err;
         if(result.length!=0)
@@ -355,3 +366,4 @@ async function figurechecking(path,callback) {
   image.dispose() // Tensor memory must be managed explicitly (it is not sufficient to let a tf.Tensor go out of scope for its memory to be released).
   callback(null, predictions)
 };
+

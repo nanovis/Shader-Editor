@@ -36,48 +36,36 @@
       </div>
     </nav>
     <script>
-      
-      if("{{username}}".length!=0)
-      {
 
-        document.getElementById("signin").href="/logout";
-        document.getElementById("signin").innerText="Log Out";
-        document.getElementById("welcome").href="/userprofile";
-        document.getElementById("welcome").innerHTML="Welcome,<B><b>{{username}}</b></B>";
-      }
-      if("{{information}}".length!=0)
-      {
-        alert("{{information}}")
-      }
 
     </script>
 
     <div class="row">
       <div class="col-sm-6 col-md-3">
-          <a href="/view?name=fire&user=admin" class="thumbnail">
-            <iframe src="/view?name=fire&user=admin&canvas=1" height="270" width="100%" style="border:none;"  autoplay="0"></iframe>
+          <a href="/view/fire" class="thumbnail">
+            <iframe src="/canvas_only/fire" height="270" width="100%" style="border:none;" ></iframe>
           </a>
       </div>
       <div class="col-sm-6 col-md-3">
-          <a href="/view?name=mc&user=admin" class="thumbnail">
-            <iframe src="/view?name=mc&user=admin&canvas=1" height="270" width="100%" style="border:none;" loading="lazy"></iframe>
+          <a href="/view/mc" class="thumbnail">
+            <iframe src="/canvas_only/mc" height="270" width="100%" style="border:none;" loading="lazy"></iframe>
           </a>
       </div>
       <div class="col-sm-6 col-md-3">
-          <a href="/view?name=simpletexture&user=admin" class="thumbnail">
-            <iframe src="/view?name=simpletexture&user=admin&canvas=1" height="270" width="100%" style="border:none;" ></iframe>
+          <a href="/view/simpletexture" class="thumbnail">
+            <iframe src="/canvas_only/simpletexture" height="270" width="100%" style="border:none;" ></iframe>
           </a>
       </div>
       <div class="col-sm-6 col-md-3">
-          <a href="/view?name=dynamic&user=admin" class="thumbnail">
-            <iframe src="/view?name=dynamic&user=admin&canvas=1" height="270" width="100%" style="border:none;"></iframe>
+          <a href="/view/dynamic" class="thumbnail">
+            <iframe src="/canvas_only/dynamic" height="270" width="100%" style="border:none;"></iframe>
           </a>
       </div>
     </div>
     <div class="row">
       <div class="col-sm-6 col-md-3">
-          <a href="/view?name=sample&user=admin" class="thumbnail">
-            <iframe src="/view?name=sample&user=admin&canvas=1" height="270" width="100%" style="border:none;"></iframe>
+          <a href="/view/sample" class="thumbnail">
+            <iframe src="/canvas_only/sample" height="270" width="100%" style="border:none;"></iframe>
           </a>
       </div>
 

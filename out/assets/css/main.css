@@ -135,3 +135,11 @@ body { margin: 0; background-color: rgba(110, 109, 109, 0.432) }
     image-rendering: pixelated;
     -ms-interpolation-mode: nearest-neighbor;
 }
+.footer
+{
+  position: absolute;
+  top: 100%;
+  left: 0%;
+  width: 100%;
+  height: 20%;
+}
