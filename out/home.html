@@ -36,15 +36,9 @@
       </div>
     </nav>
     <script>
-      if("{{username}}".length!=0)
-      {
-        console.log("{{username}}")
-        document.getElementById("signin").href="/logout";
-        document.getElementById("signin").innerText="Log Out";
-        document.getElementById("welcome").href="/userprofile";
-        document.getElementById("welcome").innerHTML="Welcome,<B><b>{{username}}</b></B>";
-      }
+      var username="{{{username}}}"
     </script>
+    <script src="../assets/js/tool.js" ></script>
 
 <div class="footer">
 <footer class="bg-dark text-center text-white">

@@ -13,7 +13,7 @@
     <script type="text/javascript" charset="utf8" src="./assets/js/jquery.dataTables.js" ></script>
     <!-- Default css, js file -->
     <link rel="stylesheet" type="text/css" href="./assets/css/main.css">
-    <script type="text/javascript" charset="utf8" src="./tool.js" ></script>
+
   </head>
   <body>
     <nav class="navbar navbar-default navbar-static-top" >
@@ -117,88 +117,10 @@
     <script>
       var global_popover_code="{{texture_code}}"
       var whether_decode=true 
-      $(function (){
-          $("[data-toggle='popover1']").popover(
-            { html: true,
-              content: function() {
-                return content("\"texture1\"","\"img1\"");
-              }
-            }
-          );
-          $("[data-toggle='popover2']").popover(
-            { html: true,
-              content: function() {
-                return content("\"texture2\"","\"img2\"");
-              }
-            }
-          );
-          $("[data-toggle='popover3']").popover(
-            { html: true,
-              content: function() {
-                return content("\"texture3\"","\"img3\"");
-              }
-            }
-          );
-          $("[data-toggle='popover4']").popover(
-            { html: true,
-              content: function() {
-                return content("\"texture4\"","\"img4\"");
-              }
-            }
-          );
-      });
-
-      var Module;
-      (async () => {
-        Module = {
-          preRun: [],
-          postRun: [],
-          print: (function() {
-              return function(text) {
-                  text = Array.prototype.slice.call(arguments).join(' ');
-                  console.log(text);
-              };
-          })(),
-          printErr: function(text) {
-              text = Array.prototype.slice.call(arguments).join(' ');
-              console.error(text);
-          },
-          canvas: (function() {
-              var canvas = document.getElementById('canvas');
-  
-              return canvas;
-          })(),
-          setStatus: function(text) {
-              console.log("status: " + text);
-          },
-          monitorRunDependencies: function(left) {
-              // no run dependencies to log
-          }
-        };
-        window.onerror = function() {
-          console.log("onerror: " + event);
-        };
-
-      // Initialize the graphics adapter
+      var jsname="new_template.js"
+      var username="{{{username}}}"
+      if(username.length!=0)
       {
-          const adapter = await navigator.gpu.requestAdapter();
-          const device = await adapter.requestDevice();
-          Module.preinitializedWebGPUDevice = device;
-      }
-
-      {
-          const js = document.createElement('script');
-          js.async = true;
-          js.src = "new_template.js";
-          document.body.appendChild(js);
-      }
-      })();
-      if("{{username}}".length!=0)
-      {
-        document.getElementById("signin").href="/logout";
-        document.getElementById("signin").innerText="Log Out";
-        document.getElementById("welcome").href="/userprofile";
-        document.getElementById("welcome").innerHTML="Welcome,<B><b>{{username}}</b></B>";
         document.getElementById("save_part").hidden=false;
         document.getElementById("upload_texture").hidden=false;
       }
@@ -207,6 +129,8 @@
         document.getElementById("save_part").hidden=true;
         document.getElementById("upload_texture").hidden=true;
       }
+      
+    
     </script>
 <div class="footer">
 <footer class="bg-dark text-center text-white">
@@ -248,4 +172,6 @@
 </footer>   
 </div>
   </body>
+<script type="text/javascript" charset="utf8" src="./assets/js/tool.js" ></script>
+<script type="text/javascript" charset="utf8" src="./assets/js/popover.js" ></script>
 </html>

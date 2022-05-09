@@ -36,19 +36,14 @@
       </div>
     </nav>
     <script>
-      if("{{username}}".length!=0)
-      {
-        console.log("{{username}}")
-        document.getElementById("signin").href="/logout";
-        document.getElementById("signin").innerText="Log Out";
-        document.getElementById("welcome").href="/userprofile";
-        document.getElementById("welcome").innerHTML="Welcome,<B><b>{{username}}</b></B>";
-      }
+      
       $(document).ready( function () {
       $('#show').DataTable();
       $('#show-textures').DataTable();
       } );
+      var username="{{{username}}}"
       </script>
+      <script src="../assets/js/tool.js" ></script>
       <div class="nav-pills">
         <ul class="nav flex-column">
           <li class="active"><a data-toggle="tab" href="#home">Shaders</a></li>

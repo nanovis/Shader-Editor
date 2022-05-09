@@ -36,22 +36,13 @@
       </div>
     </nav>
     <script>
-      
-      if("{{username}}".length!=0)
-      {
-
-        document.getElementById("signin").href="/logout";
-        document.getElementById("signin").innerText="Log Out";
-        document.getElementById("welcome").href="/userprofile";
-        document.getElementById("welcome").innerHTML="Welcome,<B><b>{{username}}</b></B>";
-      }
+      var username="{{{username}}}"
       if("{{information}}".length!=0)
       {
         alert("{{information}}")
       }
-
     </script>
-
+<script src="../assets/js/tool.js" ></script>
     <div class="row">
       <div class="col-sm-6 col-md-3">
           <a href="/view?name=fire&user=admin" class="thumbnail">

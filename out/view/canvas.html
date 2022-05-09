@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="../assets/css/bootstrap.min.css"rel="stylesheet" >
     <script src="../assets/js/jquery.min.js" ></script>
     <script src="../assets/js/bootstrap.min.js" ></script>
-    <script src="../assets/js/test.js" type='text/javascript'></script>
+    <script src="../assets/js/tool.js" ></script>
     <link rel="stylesheet" type="text/css" href="../assets/css/jquery.dataTables.css" rel="stylesheet" >
     <script type="text/javascript" charset="utf8" src="../assets/js/jquery.dataTables.js" ></script>
     <!-- Default css file -->
@@ -21,50 +21,7 @@
         $(function (){
           canvas.addEventListener('click', function() { window.open("{{{redirect}}}");}, false);
         });
-        var Module;
-      (async () => {
-        Module = {
-          preRun: [],
-          postRun: [],
-          print: (function() {
-              return function(text) {
-                  text = Array.prototype.slice.call(arguments).join(' ');
-                  console.log(text);
-              };
-          })(),
-          printErr: function(text) {
-              text = Array.prototype.slice.call(arguments).join(' ');
-              console.error(text);
-          },
-          canvas: (function() {
-              var canvas = document.getElementById('canvas');
-  
-              return canvas;
-          })(),
-          setStatus: function(text) {
-              console.log("status: " + text);
-          },
-          monitorRunDependencies: function(left) {
-              // no run dependencies to log
-          }
-        };
-        window.onerror = function() {
-          console.log("onerror: " + event);
-        };
-
-      // Initialize the graphics adapter
-      {
-          const adapter = await navigator.gpu.requestAdapter();
-          const device = await adapter.requestDevice();
-          Module.preinitializedWebGPUDevice = device;
-      }
-      {
-          const js = document.createElement('script');
-          js.async = true;
-          js.src ="{{jsname}}";
-          document.body.appendChild(js);
-      }
-      })();
+        var jsname="{{{jsname}}}"
       </script>
   </body>
 </html>
