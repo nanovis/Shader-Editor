@@ -572,7 +572,7 @@ void load_images(SDL_Surface *image, int imgw,int imgh,unsigned char*& img )
 void image_init()
 {		
 		SDL_Surface *image;
-		image=IMG_Load("out/texture/admin_London.jpg");//texture1
+		image=IMG_Load("out/texture/admin_happytree.jpg");//texture1
 		imgw_1=image->w;
 		imgh_1=image->h;
 		img_1=new unsigned char[imgw_1 * imgh_1*4];

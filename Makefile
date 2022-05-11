@@ -10,6 +10,7 @@ EMS_DIR = $(SRC_DIR)/ems
 SOURCES = main.cpp $(SRC_DIR)/Camera.cpp $(SRC_DIR)/CameraController.cpp $(EMS_DIR)/glue.cpp $(EMS_DIR)/webgpu.cpp $(EMS_DIR)/window.cpp
 OBJS = $(addsuffix .o, $(basename $(notdir $(SOURCES))))
 
+
 ##---------------------------------------------------------------------
 ## EMSCRIPTEN OPTIONS
 ##---------------------------------------------------------------------
@@ -46,6 +47,7 @@ all: $(EXE)
 
 $(WEB_DIR):
 	mkdir $@
+	
 
 ## python -m SimpleHTTPServer
 serve: all
@@ -55,10 +57,10 @@ $(EXE): $(OBJS) $(WEB_DIR)
 	$(CXX) -o $@ $(OBJS) $(LIBS) $(LDFLAGS)
 
 clean:
-##rm -f $(EXE) $(OBJS) $(WEB_DIR)/index.js $(WEB_DIR)/new_template.wasm $(WEB_DIR)/new_template.wasm.pre
 	rm -f $(OBJS)
 	rm -f out/temp/*
 	rm -rf out/texture
 	cp  -r texture out/
 	rm -rf out/node_modules
 	find . -name ‘.DS_Store’ -type f -delete
+
