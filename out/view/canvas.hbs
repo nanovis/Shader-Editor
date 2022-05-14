@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <meta http-equiv="origin-trial" content="AiiqErPPIECW3smg0ZrmkBorbURWiOcf1tn4ge/XORQdLjo8OK+lM8WgWT8fDh905BmSi9he8uji55p/rnf1UgUAAABseyJvcmlnaW4iOiJodHRwczovL3NoYWRlcmVkaXRvci5rYXVzdC5lZHUuc2E6NDQzIiwiZmVhdHVyZSI6IldlYkdQVSIsImV4cGlyeSI6MTY2MzcxODM5OSwiaXNTdWJkb21haW4iOnRydWV9">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"/>
+    <title>shader editor</title>
+    <!-- Load Bootstrap and jquery -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="../assets/js/jquery.min.js" ></script>
+    <script src="../assets/js/bootstrap.min.js" ></script>
+    <script src="../assets/js/tool.js" ></script>
+    <link rel="stylesheet" type="text/css" href="../assets/css/jquery.dataTables.css" rel="stylesheet" >
+    <script type="text/javascript" charset="utf8" src="../assets/js/jquery.dataTables.js" ></script>
+    <!-- Default css file -->
+    <link rel="stylesheet" type="text/css" href="../assets/css/main.css">
+  </head>
+  <body>
+      <canvas class="emscripten_canvasonly" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+      <script>
+        $(function (){
+          canvas.addEventListener('click', function() { window.open("{{{redirect}}}");}, false);
+        });
+        var jsname="{{{jsname}}}"
+      </script>
+  </body>
+  
+</html>
