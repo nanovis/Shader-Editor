@@ -40,7 +40,8 @@
  {
      const js = document.createElement('script');
      js.async = true;
-     js.src = jsname;
+     if (jsname!=undefined)
+     {js.src = jsname;}
      document.body.appendChild(js);
  }
  })();
@@ -156,13 +157,15 @@ function click_texture(texture,image,image_name)
     document.getElementById("popover"+image[3]).click();
 }
 
-if(username.length!=0)
+if(username!=undefined)
 {
-
+  if(username.length!=0)
+  {
   document.getElementById("signin").href="/logout";
   document.getElementById("signin").innerText="Log Out";
   document.getElementById("welcome").href="/userprofile";
   document.getElementById("welcome").innerHTML="Welcome,<B><b>"+username+"</b></B>";
+  }
 }
 
 
