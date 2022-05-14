@@ -40,7 +40,7 @@
  {
      const js = document.createElement('script');
      js.async = true;
-     if (jsname!=undefined)
+     if (typeof(jsname)!="undefined")
      {js.src = jsname;}
      document.body.appendChild(js);
  }
@@ -157,7 +157,7 @@ function click_texture(texture,image,image_name)
     document.getElementById("popover"+image[3]).click();
 }
 
-if(username!=undefined)
+if(typeof(username)!="undefined")
 {
   if(username.length!=0)
   {

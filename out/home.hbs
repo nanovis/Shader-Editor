@@ -6,20 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"/>
     <title>shader editor</title>
     <!-- Load Bootstrap and jquery -->
-    <link rel="stylesheet" href="../assets/css/bootstrap.min.css"rel="stylesheet" >
-    <script src="../assets/js/jquery.min.js" ></script>
-    <script src="../assets/js/bootstrap.min.js" ></script>
-
-    <link rel="stylesheet" type="text/css" href="../assets/css/jquery.dataTables.css" rel="stylesheet" >
-    <script type="text/javascript" charset="utf8" src="../assets/js/jquery.dataTables.js" ></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="./assets/js/jquery.min.js" ></script>
+    <script src="./assets/js/bootstrap.min.js" ></script>
+    <link rel="stylesheet" type="text/css" href="./assets/css/jquery.dataTables.css" rel="stylesheet" >
+    <script type="text/javascript" charset="utf8" src="./assets/js/jquery.dataTables.js" ></script>
     <!-- Default css file -->
-    <link rel="stylesheet" type="text/css" href="../assets/css/main.css">    </style>
+    <link rel="stylesheet" type="text/css" href="./assets/css/main.css">
   </head>
   <body>
     <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e3eff8;" >
       <div class="container">
         <div class="navbar-header">
-          <a class="navbar-brand" href="#">Shader Editor</a>
+          <a class="navbar-brand" href="https://www.nanovis.org/"><B>NanoVis</B></a>
+          <a class="navbar-brand" href="/">Shader Editor</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
@@ -36,80 +36,10 @@
         </div>
       </div>
     </nav>
-    <div class="container">
-      <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
-      
-      <div class="textbox">
-        <div class="description" onclick="toggle('display_desc')">
-          <span class="glyphicon glyphicon-menu-down" aria-hidden="true" >Input</span>
-          <p class="display_desc" id="display_desc">
-            uniform Time : f32; //shader playback time (in seconds) <br> 
-            uniform Resolution : vec3&lt;f32&gt;; // viewport resolution <br> 
-            uniform Mouse : vec4&lt;f32&gt;; // mouse pixel coords. xy: current, zw: click <br> 
-            uniform Date1 : vec3&lt;i32&gt;; // year, month, day <br> 
-            uniform Date2 : vec3&lt;i32&gt;; // hour, minute, second <br> 
-            var texture1..4: texture_2d&lt;f32&gt;; // input textures <br> 
-            var sampler_: sampler; // input sampler <br>
-          </p>
-        </div>
-        <form action="/compile" method="post">
-        <p>
-          <textarea id="code" name="code" rows="25" cols="70">
-            {{code}}
-                      </textarea>
-    </p>
-    <input type="hidden" name="texture1" id="texture1" value={{texture1}}>
-    <input type="hidden" name="texture2" id="texture2" value={{texture2}}>
-    <input type="hidden" name="texture3" id="texture3" value={{texture3}}>
-    <input type="hidden" name="texture4" id="texture4" value={{texture4}}>
-    <button type="submit" class="btn btn-primary"  >Compile</button>
-    </form>
-    
-    <br>
-    <br>
-    <button id="popover1" type="button" class="btn btn-default" title="Texture 1" trigger="click"
-        data-container="body" data-toggle="popover1" data-placement="top" 
-        >
-      texture_1
-    </button>
-    <button id="popover2" type="button" class="btn btn-default" title="Texture 2"  
-        data-container="body" data-toggle="popover2" data-placement="top" 
-        >
-        texture_2
-    </button>
-    <button id="popover3" type="button" class="btn btn-default" title="Texture 3"  
-        data-container="body" data-toggle="popover3" data-placement="top" 
-        >
-        texture_3
-    </button>
-    <button id="popover4" type="button" class="btn btn-default" title="Texture 4"  
-        data-container="body" data-toggle="popover4" data-placement="top" 
-        >
-        texture_4
-    </button>
-    <br>
-    <img id="img1" src="../texture/{{texture1}}" class="img-thumbnail" width="84" height="84">
-    <img id="img2" src="../texture/{{texture2}}" class="img-thumbnail" width="84" height="84">
-    <img id="img3" src="../texture/{{texture3}}" class="img-thumbnail" width="84" height="84">
-    <img id="img4" src="../texture/{{texture4}}" class="img-thumbnail" width="84" height="84">
-    </div>
-    
-    
-    </div>
-    
     <script>
-      var global_popover_code="{{texture_code}}"
-      var whether_decode=true 
-      var jsname="{{jsname}}"
       var username="{{{username}}}"
-      function click_texture(texture,image,image_name)
-      {
-        document.getElementById(texture).value=image_name;
-        document.getElementById(image).src="../texture/"+image_name;
-        document.getElementById("popover"+image[3]).click();
-      }
-
     </script>
+    <script src="../assets/js/tool.js" ></script>
 
 <div class="footer">
 <footer class="bg-dark text-center text-white">
@@ -147,9 +77,8 @@
   <div class="text-center p-3">
     © Nanovis
   </div>
+
 </footer>
 </div>
   </body>
-<script src="../assets/js/tool.js" ></script>
-<script src="../assets/js/popover.js"></script>
 </html>

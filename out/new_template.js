@@ -206,7 +206,7 @@ Module['FS_createPath']("/out", "texture", true, true);
     }
 
     }
-    loadPackage({"files": [{"filename": "/out/texture/.DS_Store", "start": 0, "end": 6148}, {"filename": "/out/texture/admin_black.jpg", "start": 6148, "end": 11538}, {"filename": "/out/texture/admin_happytree.jpg", "start": 11538, "end": 39672}, {"filename": "/out/texture/admin_London.jpg", "start": 39672, "end": 221218}, {"filename": "/out/texture/admin_stock.jpg", "start": 221218, "end": 231745}, {"filename": "/out/texture/admin_wall.jpg", "start": 231745, "end": 253999}], "remote_package_size": 253999, "package_uuid": "bf6725eb-40bc-4751-b4bf-92e48eb87b0e"});
+    loadPackage({"files": [{"filename": "/out/texture/.DS_Store", "start": 0, "end": 6148}, {"filename": "/out/texture/admin_black.jpg", "start": 6148, "end": 11538}, {"filename": "/out/texture/admin_happytree.jpg", "start": 11538, "end": 39672}, {"filename": "/out/texture/admin_London.jpg", "start": 39672, "end": 221218}, {"filename": "/out/texture/admin_stock.jpg", "start": 221218, "end": 231745}, {"filename": "/out/texture/admin_wall.jpg", "start": 231745, "end": 253999}], "remote_package_size": 253999, "package_uuid": "680d0663-99cd-476c-b91c-770a1b628f31"});
 
   })();
 

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"/>
     <title>Shader Editor</title>
     <!-- Load Bootstrap and jquery -->
-    <link rel="stylesheet" href="./assets/css/bootstrap.min.css"rel="stylesheet" >
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <script src="./assets/js/jquery.min.js" ></script>
     <script src="./assets/js/bootstrap.min.js" ></script>
     <link rel="stylesheet" type="text/css" href="./assets/css/jquery.dataTables.css" rel="stylesheet" >
@@ -19,7 +19,7 @@
       <div class="container">
         <div class="navbar-header">
           <a class="navbar-brand" href="https://www.nanovis.org/"><B>NanoVis</B></a>
-          <a class="navbar-brand" href="#">Shader Editor</a>
+          <a class="navbar-brand" href="/">Shader Editor</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-left">
@@ -38,10 +38,13 @@
     </nav>
     <div class="about_text">
       <h3> About Shader Editor</h3>
-    <p>Shader Editor is a WebGPU project, created by <a href="https://www.nanovis.org/">NanoVis</a>. It is a online WebGPU Shading Language (WGSL) editor and compiler. Users could load textures and save shaders.</p>
+    <p>Shader Editor is a WebGPU project, created by <a href="https://www.nanovis.org/">NanoVis</a>. It is a online WebGPU Shading Language (WGSL) editor and compiler.</p>
       <h3>Documentation</h3>
-        <p>This is a brief introduction about how to create one new shader. WGSL is a shader language for WebGPU </p>
-        <p><B>Entry point function:</B> <br>fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32>{ }</f32></p>
+        <p>This is a brief introduction about how to create one new shader. WGSL is a shader language for WebGPU. That is, an application using the WebGPU API uses WGSL to express the programs, known as shaders, that run on the GPU. </p>
+        <p><B>Entry point function:</B> </p>
+         <p>Implement the <B>main</B> function in order to generate the images in the pixel level:</p>
+        <p>  fn main(@builtin(position) position: vec4&lt;f32&gt;) -> @location(0) vec4&lt;f32&gt;</p>
+        <p>  where <B>position</B> is a four component vector in the format of (x, y, 0.0, 1.0) containing the pixel coordinates that shader uses to compute the color. The range of coordinates is form 0.5 to resolution-0.5. The resulting color is return by the function in the format of RGBA.</p>
         <p><B>Input Uniform:</B></p>
         <p>uniform Time : f32; //shader playback time (in seconds) <br> 
             uniform Resolution : vec3&lt;f32&gt;; // viewport resolution <br> 
@@ -52,7 +55,6 @@
             var sampler_: sampler; // input sampler <br>
           </p>
           </div>
-    
     <div class="footer">
     <footer class="bg-dark text-center text-white">
       <div class="container p-4">

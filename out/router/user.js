@@ -67,11 +67,11 @@ exports.logout=function(req,res)
 };
 exports.signin=function(req,res)
 {
-    res.render(__dirname+"/../signin.html")
+    res.render(__dirname+"/../signin.hbs")
 };
 exports.signup=function(req,res)
 {
-    res.render(__dirname+"/../signup.html")
+    res.render(__dirname+"/../signup.hbs")
 };
 exports.changepassword=function(req,res)
 {
@@ -159,7 +159,7 @@ exports.userprofile=function(req,res)
                 for(var i=0; i < textures.length; i++){
                     textures[i].id=i+1
                  }
-                    res.render(__dirname+"/../userprofile.html",{username:req.session.username,shaders:shaders,textures:textures})
+                    res.render(__dirname+"/../userprofile.hbs",{username:req.session.username,shaders:shaders,textures:textures})
              });
         });
     });

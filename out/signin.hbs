@@ -6,21 +6,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"/>
     <title>shader editor</title>
     <!-- Load Bootstrap and jquery -->
-    <link rel="stylesheet" href="./assets/css/bootstrap.min.css"rel="stylesheet" >
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <script src="./assets/js/jquery.min.js" ></script>
     <script src="./assets/js/bootstrap.min.js" ></script>
     <link rel="stylesheet" type="text/css" href="./assets/css/jquery.dataTables.css" rel="stylesheet" >
     <script type="text/javascript" charset="utf8" src="./assets/js/jquery.dataTables.js" ></script>
     <!-- Default css, js file -->
-    <link rel="stylesheet" type="text/css" href="./assets/css/main.css">  
+    <link rel="stylesheet" type="text/css" href="./assets/css/main.css">
     <script type="text/javascript" charset="utf8" src="./assets/js/tool.js" ></script>
     <script type="text/javascript" charset="utf8" src="./assets/js/sha256.js" ></script>
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e3eff8;">
+    <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e3eff8;" >
       <div class="container">
         <div class="navbar-header">
-          <a class="navbar-brand" href="#">Shader Editor</a>
+          <a class="navbar-brand" href="https://www.nanovis.org/"><B>NanoVis</B></a>
+          <a class="navbar-brand" href="/">Shader Editor</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
@@ -37,19 +38,14 @@
       </div>
     </nav>
 
-    <div class="signup">
-
-            <h2 class="form-signin-heading">Create Account</h2>
-            <label for="username" >Username</label>
-            <input type="username" name="username" id="username" class="form-control" placeholder="Username" required="" autofocus="">
-            <label for="email">Email address</label>
-            <input type="email" name="email" id="email" class="form-control" placeholder="Email address" required="" autofocus="">
-            <label for="pwd">Password</label>
-            <input type="password" name="pwd" id="pwd" class="form-control" placeholder="Password" required="">
-            <label for="repeatpwd">Repeate password</label>
-            <input type="password" name="repeatpwd" id="repeatpwd" class="form-control" placeholder="Repeat password" required="">
-            <button class="btn btn-lg btn-primary btn-block" onclick="signupsubmit()">Sign Up</button>
-
+    <div class="signin">
+            <h2 class="form-signin-heading">Please sign in</h2>
+            <label for="email" >Email address</label>
+            <input type="email" id="email" name="email" class="form-control" placeholder="Email address" required="">
+            <label for="pwd" >Password</label>
+            <input type="password" id="pwd" name="pwd" class="form-control" placeholder="Password" required="">
+            <button class="btn btn-lg btn-primary btn-block" onclick="signinsubmit()">Sign in</button>
+          <p>Not have account?<a href="/signup">create account</a></p>
     </div>
     <div class="footer">
     <footer class="bg-dark text-center text-white">
@@ -91,4 +87,5 @@
     </footer>
     </div>
   </body>
+
 </html>

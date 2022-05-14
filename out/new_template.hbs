@@ -6,21 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"/>
     <title>shader editor</title>
     <!-- Load Bootstrap and jquery -->
-    <link rel="stylesheet" href="./assets/css/bootstrap.min.css"rel="stylesheet" >
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <script src="./assets/js/jquery.min.js" ></script>
     <script src="./assets/js/bootstrap.min.js" ></script>
     <link rel="stylesheet" type="text/css" href="./assets/css/jquery.dataTables.css" rel="stylesheet" >
     <script type="text/javascript" charset="utf8" src="./assets/js/jquery.dataTables.js" ></script>
     <!-- Default css, js file -->
     <link rel="stylesheet" type="text/css" href="./assets/css/main.css">
-    
 
   </head>
   <body>
     <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e3eff8;" >
       <div class="container">
         <div class="navbar-header">
-          <a class="navbar-brand" href="#">Shader Editor</a>
+          <a class="navbar-brand" href="https://www.nanovis.org/"><B>NanoVis</B></a>
+          <a class="navbar-brand" href="/">Shader Editor</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
@@ -37,13 +37,12 @@
         </div>
       </div>
     </nav>
-
     <div class="container">
       <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
       <div class="save_part" id="save_part" >
         <div class="form-group">
           <label for="save_name">Name of the shader</label>
-          <input  type="text" class="form-control" id="save_name" >
+          <input  type="text" class="form-control" id="save_name" value="{{shadername}}">
         </div>
         <div class="form-group">
           <label for="save_select">Example select</label>
@@ -67,23 +66,16 @@
             var sampler_: sampler; // input sampler <br>
           </p>
         </div>
-        <form action="/compile" method="post">
-        <p name="shader_code">
-          <textarea id="code" name="code" rows="25" cols="70">
-@stage(fragment)
-fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
-  var uv: vec3<f32> =vec3<f32>(position.xyx/Resolution.xyx);
-  var col:vec3<f32> =0.5f+vec3<f32> ( 0.5*cos(uv+Time+vec3<f32>(0.0,2.0,4.0)));
-  return vec4<f32>(col, 1.0);
-}
-          </textarea>
+        <form action="compile" method="post">
+        <p>
+        <textarea id="code" name="code" rows="25" cols="70">{{wgsl_code}}</textarea>
     </p>
-    <input type="hidden" name="texture1" id="texture1" value="admin_black.jpg">
-    <input type="hidden" name="texture2" id="texture2" value="admin_black.jpg">
-    <input type="hidden" name="texture3" id="texture3" value="admin_black.jpg">
-    <input type="hidden" name="texture4" id="texture4" value="admin_black.jpg">
+    <input type="hidden" name="texture1" id="texture1" value={{texture1}}>
+    <input type="hidden" name="texture2" id="texture2" value={{texture2}}>
+    <input type="hidden" name="texture3" id="texture3" value={{texture3}}>
+    <input type="hidden" name="texture4" id="texture4" value={{texture4}}>
     <button type="submit" class="btn btn-primary"  >Compile</button>
-        </form>
+    </form>
     
     <br>
     <br>
@@ -109,10 +101,10 @@ fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
         texture_4
     </button>
     <br>
-    <img id="img1" src="texture/admin_black.jpg" class="img-thumbnail" width="84" height="84">
-    <img id="img2" src="texture/admin_black.jpg" class="img-thumbnail" width="84" height="84">
-    <img id="img3" src="texture/admin_black.jpg" class="img-thumbnail" width="84" height="84">
-    <img id="img4" src="texture/admin_black.jpg" class="img-thumbnail" width="84" height="84">
+    <img id="img1" src="/texture/{{texture1}}" class="img-thumbnail" width="84" height="84">
+    <img id="img2" src="/texture/{{texture2}}" class="img-thumbnail" width="84" height="84">
+    <img id="img3" src="/texture/{{texture3}}" class="img-thumbnail" width="84" height="84">
+    <img id="img4" src="/texture/{{texture4}}" class="img-thumbnail" width="84" height="84">
     </div>
     <div class="upload_texture" id="upload_texture">
       <label for="image">Upload Texture</label>
@@ -120,13 +112,13 @@ fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
       <br>
       <button  class="btn btn-primary" onclick="upload()">Upload</button>
     </div>
-    </div>
+    </div>  
     </div>
     
     <script>
       var global_popover_code="{{texture_code}}"
-      var whether_decode=true
-      var jsname="new.js"
+      var whether_decode=true 
+      var jsname="new_template.js"
       var username="{{{username}}}"
       if(username.length!=0)
       {
@@ -138,8 +130,10 @@ fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
         document.getElementById("save_part").hidden=true;
         document.getElementById("upload_texture").hidden=true;
       }
+      
+    
     </script>
-    <div class="footer">
+<div class="footer">
 <footer class="bg-dark text-center text-white">
   <div class="container p-4">
     <section class="mb-4">
@@ -176,10 +170,9 @@ fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
     © Nanovis
   </div>
 
-</footer>
+</footer>   
 </div>
   </body>
 <script src="./assets/js/tool.js" ></script>
-<script src="./assets/js/popover.js" ></script>
-
+<script  src="./assets/js/popover.js" ></script>
 </html>

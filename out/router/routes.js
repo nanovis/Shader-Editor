@@ -18,22 +18,22 @@ exports.header=function(req,res,next)
 };
 exports.index=function(req,res)
 {
-    res.render(__dirname+"/../browse.html",{username:req.session.username})
+    res.render(__dirname+"/../browse.hbs",{username:req.session.username})
 };
 exports.new=function(req,res)
 {
     gettexturecode(req.session.username,function(err,texturecode)
     {
-      res.render(__dirname+"/../new.html",{texture_code:texturecode,username:req.session.username})
+      res.render(__dirname+"/../new.hbs",{texture_code:texturecode,username:req.session.username})
     });
 };
 exports.browse=function(req,res)
 {
-    res.render(__dirname+"/../browse.html",{username:req.session.username})
+    res.render(__dirname+"/../browse.hbs",{username:req.session.username})
 };
 exports.about=function(req,res)
 {
-    res.render(__dirname+"/../about.html",{username:req.session.username})
+    res.render(__dirname+"/../about.hbs",{username:req.session.username})
 };
 exports.compile=function(req,res)
 {
@@ -90,7 +90,7 @@ exports.compile=function(req,res)
                   {
                     gettexturecode(req.session.username,function(err,texturecode)
                     {
-                      res.render(__dirname+"/../new_template.html",{wgsl_code:req.body.code,texture1:req.body.texture1,texture2:req.body.texture2,texture3:req.body.texture3,texture4:req.body.texture4,texture_code:texturecode,username:req.session.username})
+                      res.render(__dirname+"/../new_template.hbs",{wgsl_code:req.body.code,texture1:req.body.texture1,texture2:req.body.texture2,texture3:req.body.texture3,texture4:req.body.texture4,texture_code:texturecode,username:req.session.username})
                     });
                       
                   }
@@ -125,11 +125,11 @@ exports.view=function(req,res)
             returndata.texture4=result[0].texture4
             returndata.jsname=result[0].jsname
             if (req.query.canvas==undefined)
-            {res.render(__dirname+"/../view/template.html",returndata)}
+            {res.render(__dirname+"/../view/template.hbs",returndata)}
             else
             {
               returndata.redirect="/view?name="+req.query.name+"&user="+req.query.user
-              res.render(__dirname+"/../view/canvas.html",returndata)
+              res.render(__dirname+"/../view/canvas.hbs",returndata)
             }
           });}
       });
@@ -294,7 +294,7 @@ exports.view_user=function(req,res)
                       {
                         gettexturecode(req.session.username,function(err,texturecode)
                         {
-                          res.render(__dirname+"/../new_template.html",{wgsl_code:result[0].code,texture1:texture1,texture2:texture2,texture3:texture3,texture4:texture4,texture_code:texturecode,username:req.session.username,shadername:result[0].name})
+                          res.render(__dirname+"/../new_template.hbs",{wgsl_code:result[0].code,texture1:texture1,texture2:texture2,texture3:texture3,texture4:texture4,texture_code:texturecode,username:req.session.username,shadername:result[0].name})
                         });
                           
                       }

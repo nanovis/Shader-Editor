@@ -15,7 +15,7 @@ Tested with Chrome Canary and Chromium 100.0.4868.0 with the `--enable-unsafe-we
 - [Shader Editor](https://shadereditor.kaust.edu.sa/) - Now it only supports Chorme.
 ## How to run locally
 ```sh
-$ git clone https://github.com/nanovis/shadertoy-webgpu.git
+$ git clone https://github.com/nanovis/Shader-Editor.git
 $ cd Shader-Editor/out
 $ npm install
 $ cd .. && make serve
