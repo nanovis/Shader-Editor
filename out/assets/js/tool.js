@@ -1,58 +1,49 @@
-function signinsubmit(){
-    var email=document.getElementById("email").value
-    var pwd=document.getElementById('pwd').value
-    var formDate = new FormData()
-    formDate.set("email",email)
-    formDate.set("pwd",pwd)
 
-    $.ajax({
-        url: '/signinsubmit',
-        data: formDate,
-        type: 'post',
-        contentType: false,
-        processData: false,
-        success: function(res){
-        if(res=="Login")
-        {
-            alert("Login successful!")
-            window.location.href="/"
-        }
-        else
-        {
-            alert(res)
-        }
-        }
-    })    
-} 
-function signupsubmit(){
-    var email=document.getElementById("email").value
-    var pwd=document.getElementById('pwd').value
-    var username=document.getElementById('username').value
-    var repeatpwd=document.getElementById('repeatpwd').value
-    var formDate = new FormData()
-    formDate.set("email",email)
-    formDate.set("pwd",pwd)
-    formDate.set("repeatpwd",repeatpwd)
-    formDate.set("username",username)
-    $.ajax({
-      url: '/signupsubmit',
-      data: formDate,
-      type: 'post',
-      contentType: false,
-      processData: false,
-      success: function(res){
-        if(res=="success")
-        {
-          alert("Register Successful!")
-          window.location.href="/"
-        }
-        else
-        {
-          alert(res)
-        }
-      }
-    })    
-} 
+ var Module;
+ (async () => {
+   Module = {
+     preRun: [],
+     postRun: [],
+     print: (function() {
+         return function(text) {
+             text = Array.prototype.slice.call(arguments).join(' ');
+             console.log(text);
+         };
+     })(),
+     printErr: function(text) {
+         text = Array.prototype.slice.call(arguments).join(' ');
+         console.error(text);
+     },
+     canvas: (function() {
+         var canvas = document.getElementById('canvas');
+ 
+         return canvas;
+     })(),
+     setStatus: function(text) {
+         console.log("status: " + text);
+     },
+     monitorRunDependencies: function(left) {
+         // no run dependencies to log
+     }
+   };
+   window.onerror = function() {
+     console.log("onerror: " + event);
+   };
+ 
+ // Initialize the graphics adapter
+ {
+     const adapter = await navigator.gpu.requestAdapter();
+     const device = await adapter.requestDevice();
+     Module.preinitializedWebGPUDevice = device;
+ }
+ 
+ {
+     const js = document.createElement('script');
+     js.async = true;
+     js.src = jsname;
+     document.body.appendChild(js);
+ }
+ })();
 function htmlDecode (text){
     var temp = document.createElement("div");
     temp.innerHTML = text;
@@ -157,61 +148,22 @@ function save(){
 
     }
 } 
-var Module;
-(async () => {
-  Module = {
-    preRun: [],
-    postRun: [],
-    print: (function() {
-        return function(text) {
-            text = Array.prototype.slice.call(arguments).join(' ');
-            console.log(text);
-        };
-    })(),
-    printErr: function(text) {
-        text = Array.prototype.slice.call(arguments).join(' ');
-        console.error(text);
-    },
-    canvas: (function() {
-        var canvas = document.getElementById('canvas');
 
-        return canvas;
-    })(),
-    setStatus: function(text) {
-        console.log("status: " + text);
-    },
-    monitorRunDependencies: function(left) {
-        // no run dependencies to log
-    }
-  };
-  window.onerror = function() {
-    console.log("onerror: " + event);
-  };
-
-// Initialize the graphics adapter
-{
-    const adapter = await navigator.gpu.requestAdapter();
-    const device = await adapter.requestDevice();
-    Module.preinitializedWebGPUDevice = device;
-}
-
-{
-    const js = document.createElement('script');
-    js.async = true;
-    js.src = jsname;
-    document.body.appendChild(js);
-}
-})();
 function click_texture(texture,image,image_name)
 {
     document.getElementById(texture).value=image_name;
     document.getElementById(image).src="texture/"+image_name
     document.getElementById("popover"+image[3]).click();
 }
+
 if(username.length!=0)
 {
+
   document.getElementById("signin").href="/logout";
   document.getElementById("signin").innerText="Log Out";
   document.getElementById("welcome").href="/userprofile";
   document.getElementById("welcome").innerHTML="Welcome,<B><b>"+username+"</b></B>";
 }
+
+
+
