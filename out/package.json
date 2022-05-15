@@ -1,5 +1,5 @@
 {
-  "name": "shadertoy-webgpu",
+  "name": "Shader-Editor",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",

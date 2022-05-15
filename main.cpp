@@ -493,10 +493,10 @@ static bool redraw() {
 	colorDesc.view    = backBufView;
 	colorDesc.loadOp  = WGPULoadOp_Clear;
 	colorDesc.storeOp = WGPUStoreOp_Store;
-	colorDesc.clearColor.r = 0.0f;
-	colorDesc.clearColor.g = 0.0f;
-	colorDesc.clearColor.b = 0.0f;
-	colorDesc.clearColor.a = 0.0f;
+	colorDesc.clearValue.r = 0.0f;
+	colorDesc.clearValue.g = 0.0f;
+	colorDesc.clearValue.b = 0.0f;
+	colorDesc.clearValue.a = 0.0f;
 
 	WGPURenderPassDescriptor renderPass = {};
 	renderPass.colorAttachmentCount = 1;
@@ -538,7 +538,7 @@ static bool redraw() {
 	wgpuRenderPassEncoderSetIndexBuffer(pass, indxBuf, WGPUIndexFormat_Uint16, 0, WGPU_WHOLE_SIZE);
 	wgpuRenderPassEncoderDrawIndexed(pass, 6, 1, 0, 0, 0);
 
-	wgpuRenderPassEncoderEndPass(pass);
+	wgpuRenderPassEncoderEnd(pass);
 	wgpuRenderPassEncoderRelease(pass);														// release pass
 	WGPUCommandBuffer commands = wgpuCommandEncoderFinish(encoder, nullptr);				// create commands
 	wgpuCommandEncoderRelease(encoder);														// release encoder

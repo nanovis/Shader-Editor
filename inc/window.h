@@ -55,6 +55,4 @@ void show(Handle _NONNULL wHnd, bool show = true);
  * \param[in] func function to be called each \e frame (or \c null to do nothing)
  */
 void loop(Handle _NONNULL wHnd, Redraw _NULLABLE func = NULLPTR);
-
-
 }

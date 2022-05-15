@@ -4,7 +4,7 @@ This project is a WGSL online editor and compiler based on [WebGPU](https://gpuw
 Tested with Chrome Canary and Chromium 100.0.4868.0 with the `--enable-unsafe-webgpu` flag.
 
 ## Dependences
-- Emscripten: version 3.1.3
+- Emscripten: version 3.1.10
 - Node.js: version 14.18.2
 - MongoDB: version 4.4.13
 
