@@ -12,25 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef DAWNPLATFORM_EXPORT_H_
-#define DAWNPLATFORM_EXPORT_H_
+#ifndef INCLUDE_DAWN_PLATFORM_DAWN_PLATFORM_EXPORT_H_
+#define INCLUDE_DAWN_PLATFORM_DAWN_PLATFORM_EXPORT_H_
 
 #if defined(DAWN_PLATFORM_SHARED_LIBRARY)
-#    if defined(_WIN32)
-#        if defined(DAWN_PLATFORM_IMPLEMENTATION)
-#            define DAWN_PLATFORM_EXPORT __declspec(dllexport)
-#        else
-#            define DAWN_PLATFORM_EXPORT __declspec(dllimport)
-#        endif
-#    else  // defined(_WIN32)
-#        if defined(DAWN_PLATFORM_IMPLEMENTATION)
-#            define DAWN_PLATFORM_EXPORT __attribute__((visibility("default")))
-#        else
-#            define DAWN_PLATFORM_EXPORT
-#        endif
-#    endif  // defined(_WIN32)
-#else       // defined(DAWN_PLATFORM_SHARED_LIBRARY)
-#    define DAWN_PLATFORM_EXPORT
+#if defined(_WIN32)
+#if defined(DAWN_PLATFORM_IMPLEMENTATION)
+#define DAWN_PLATFORM_EXPORT __declspec(dllexport)
+#else
+#define DAWN_PLATFORM_EXPORT __declspec(dllimport)
+#endif
+#else  // defined(_WIN32)
+#if defined(DAWN_PLATFORM_IMPLEMENTATION)
+#define DAWN_PLATFORM_EXPORT __attribute__((visibility("default")))
+#else
+#define DAWN_PLATFORM_EXPORT
+#endif
+#endif  // defined(_WIN32)
+#else   // defined(DAWN_PLATFORM_SHARED_LIBRARY)
+#define DAWN_PLATFORM_EXPORT
 #endif  // defined(DAWN_PLATFORM_SHARED_LIBRARY)
 
-#endif  // DAWNPLATFORM_EXPORT_H_
+#endif  // INCLUDE_DAWN_PLATFORM_DAWN_PLATFORM_EXPORT_H_
