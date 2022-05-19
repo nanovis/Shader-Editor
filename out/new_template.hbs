@@ -13,7 +13,8 @@
     <script type="text/javascript" charset="utf8" src="./assets/js/jquery.dataTables.js" ></script>
     <!-- Default css, js file -->
     <link rel="stylesheet" type="text/css" href="./assets/css/main.css">
-
+    <script src="assets/monaco-editor/min/vs/loader.js"></script>
+    
   </head>
   <body>
     <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e3eff8;" >
@@ -26,7 +27,6 @@
             <ul class="nav navbar-nav">
                 <li><a href="/">Home</a></li>
                 <li><a href="/about">About</a></li>
-                <li><a href="/contact">Contact</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                   <li><a id="welcome"></a></li>
@@ -67,14 +67,13 @@
           </p>
         </div>
         <form action="compile" method="post">
-        <p>
-        <textarea id="code" name="code" rows="25" cols="70">{{wgsl_code}}</textarea>
-    </p>
+    <div id="textarea" style="width:800px;height:450px;"></div>
+    <input type="hidden" name="code" id="code" value="{{wgsl_code}}" >
     <input type="hidden" name="texture1" id="texture1" value={{texture1}}>
     <input type="hidden" name="texture2" id="texture2" value={{texture2}}>
     <input type="hidden" name="texture3" id="texture3" value={{texture3}}>
     <input type="hidden" name="texture4" id="texture4" value={{texture4}}>
-    <button type="submit" class="btn btn-primary"  >Compile</button>
+    <button type="submit" class="btn btn-primary" onclick="updatetextarea()"  >Compile</button>
     </form>
     
     <br>
@@ -118,6 +117,7 @@
     <script>
       var global_popover_code="{{texture_code}}"
       var whether_decode=true 
+      window.wgsl_code="{{wgsl_code}}"
       var jsname="new_template.js"
       var username="{{{username}}}"
       if(username.length!=0)
@@ -175,4 +175,5 @@
   </body>
 <script src="./assets/js/tool.js" ></script>
 <script  src="./assets/js/popover.js" ></script>
+<script src="assets/js/editor_template.js"></script>
 </html>

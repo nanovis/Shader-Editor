@@ -37,6 +37,7 @@ exports.about=function(req,res)
 };
 exports.compile=function(req,res)
 {
+    console.log(req.body)
     texture1_code=""
     texture2_code=""
     texture3_code=""
