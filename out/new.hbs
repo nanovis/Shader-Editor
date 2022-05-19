@@ -132,6 +132,12 @@
         document.getElementById("save_part").hidden=true;
         document.getElementById("upload_texture").hidden=true;
       }
+      function click_texture(texture,image,image_name)
+      {
+          document.getElementById(texture).value=image_name;
+          document.getElementById(image).src="texture/"+image_name
+          document.getElementById("popover"+image[3]).click();
+      }
     </script>
     <div class="footer">
 <footer class="bg-dark text-center text-white">

@@ -150,12 +150,7 @@ function save(){
     }
 } 
 
-function click_texture(texture,image,image_name)
-{
-    document.getElementById(texture).value=image_name;
-    document.getElementById(image).src="texture/"+image_name
-    document.getElementById("popover"+image[3]).click();
-}
+
 
 if(typeof(username)!="undefined")
 {

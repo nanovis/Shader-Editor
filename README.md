@@ -1,5 +1,5 @@
 # Shader Editor
-This project is a WGSL online editor and compiler based on [WebGPU](https://gpuweb.github.io/gpuweb/)/[Emscripten](https://emscripten.org/) and [Dawn](https://dawn.googlesource.com/dawn). Users could upload textures and save shaders.
+This project is a WGSL online editor and compiler based on [WebGPU](https://gpuweb.github.io/gpuweb/)/[Emscripten](https://emscripten.org/) and [Dawn](https://dawn.googlesource.com/dawn). Users could write shaders to do the pixel-level operations. During each frame, different input uniforms are fed into shaders to utilise mouse, time and texture information. After logging in, users could save shaders and upload textures.
 
 Tested with Chrome Canary and Chromium 100.0.4868.0 with the `--enable-unsafe-webgpu` flag.
 
