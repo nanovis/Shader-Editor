@@ -60,7 +60,6 @@ function  content(texturenum,imgnum)  {
   {code=htmlDecode(code)}
   code=code.replace(/texturenum/g,texturenum).replace(/imgnum/g,imgnum);
   var  data  =  $(code); 
-  console.log(code)
   return  data;  
 } 
 
@@ -142,7 +141,7 @@ function save(){
         contentType: false,
         processData: false,
         success: function(res){
-            console.log(res)
+
             alert(res)
         }
       })
