@@ -1,7 +1,7 @@
 # Shader Editor
 This project is a WGSL online editor and compiler based on [WebGPU](https://gpuweb.github.io/gpuweb/)/[Emscripten](https://emscripten.org/) and [Dawn](https://dawn.googlesource.com/dawn). Users could write shaders to do the pixel-level operations. During each frame, different input uniforms are fed into shaders to utilise mouse, time and texture information. After logging in, users could save shaders and upload textures.
 
-Tested with Chrome Canary and Chromium 100.0.4868.0 with the `--enable-unsafe-webgpu` flag.
+Tested with Chrome Dev (version 103.0.5060.13) with the `--enable-unsafe-webgpu` flag.
 
 ## Dependences
 - Emscripten: version 3.1.10
@@ -20,7 +20,7 @@ $ cd Shader-Editor/out
 $ npm install
 $ cd .. && make serve
 ```
-Access http://localhost:8080 on [Chorme Canary](https://www.google.com/chrome/canary/) and access `chrome://flags` to enable `--enable-unsafe-webgpu`.
+Access http://localhost:8080 on [Chorme Dev](https://www.google.com/chrome/dev/) and access `chrome://flags` to enable `--enable-unsafe-webgpu`.
 ## Todo:
 - Syntax highlighting
 - Compiling error log
