@@ -24,6 +24,8 @@ Access http://localhost:8080 on [Chorme Dev](https://www.google.com/chrome/dev/)
 ## Todo:
 - Syntax highlighting
 - Compiling error log
+- Shaders' distributed version control
+- Simultaneous editing by multiple people
 - Shader sharing and publishing
 - Register email verification
 - Brower pages pagination 
