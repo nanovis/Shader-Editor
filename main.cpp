@@ -48,7 +48,7 @@ WGPUImageCopyTexture texCopy1 = {},texCopy2 = {},texCopy3 = {},texCopy4 = {};
 glm::vec4 mouselocation=glm::vec4(2.0f,3.0f,0.0f,0.0f);
 int date1[3];
 int date2[3];
-float keypress=100.0; //ascii
+int keypress=100; //ascii
 int mouseflag=0;
 
 /**
@@ -80,7 +80,7 @@ static char const triangle_frag_wgsl[] = R"(@group(0) @binding(0) var<uniform> T
 @group(0) @binding(2) var<uniform> Mouse : vec4<f32>;
 @group(0) @binding(3) var<uniform> Date1 : vec3<i32>;
 @group(0) @binding(4) var<uniform> Date2 : vec3<i32>;
-@group(0) @binding(5) var<uniform> Key : f32;
+@group(0) @binding(5) var<uniform> Key : i32;
 @group(1) @binding(0) var texture1: texture_2d<f32>;
 @group(1) @binding(1) var texture2: texture_2d<f32>;
 @group(1) @binding(2) var texture3: texture_2d<f32>;
@@ -88,7 +88,7 @@ static char const triangle_frag_wgsl[] = R"(@group(0) @binding(0) var<uniform> T
 @group(1) @binding(4) var sampler_: sampler;
 @stage(fragment)
 fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
-if (Key==102.0)
+if (Key==102)
 {
     return textureSample(texture1, sampler_, position.xy/Resolution);
 }
@@ -505,13 +505,12 @@ EM_BOOL key_callback(int eventType, const EmscriptenKeyboardEvent *e, void *user
     e->repeat, e->locale, e->charValue, e->charCode, e->keyCode, e->which,
     e->timestamp);*/
   if (eventType == EMSCRIPTEN_EVENT_KEYPRESS) {
-    keypress=(float)e->which;
+    keypress=e->which;
 	press=true;
   }
   return 0;
 }
 static bool redraw() {
-	//keypress=0;
 	EMSCRIPTEN_RESULT ret;
 	if (mouseflag%10==0)
 	{
