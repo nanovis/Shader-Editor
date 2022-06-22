@@ -27,6 +27,7 @@ WGPUBuffer indxBuf; // index buffer
 WGPUBuffer timeBuf; // uniform buffer (containing the rotation angle)
 WGPUBuffer resolutionBuf;  //uniform buffer
 WGPUBuffer mouseBuf;
+WGPUBuffer keypressBuf; 
 WGPUBuffer date1Buf;
 WGPUBuffer date2Buf;
 WGPUBindGroup bindGroup;
@@ -47,13 +48,15 @@ WGPUImageCopyTexture texCopy1 = {},texCopy2 = {},texCopy3 = {},texCopy4 = {};
 glm::vec4 mouselocation=glm::vec4(2.0f,3.0f,0.0f,0.0f);
 int date1[3];
 int date2[3];
-
+float keypress=100.0; //ascii
 int mouseflag=0;
 
 /**
  * Current rotation angle (in degrees, updated per frame).
  */
 clock_t startTime,endTime;
+bool press=false;
+int pressflag=0;
 float runtime = 0.0f;
 glm::vec2 resolution=glm::vec2(800.0f,600.0f);
 
@@ -77,6 +80,7 @@ static char const triangle_frag_wgsl[] = R"(@group(0) @binding(0) var<uniform> T
 @group(0) @binding(2) var<uniform> Mouse : vec4<f32>;
 @group(0) @binding(3) var<uniform> Date1 : vec3<i32>;
 @group(0) @binding(4) var<uniform> Date2 : vec3<i32>;
+@group(0) @binding(5) var<uniform> Key : f32;
 @group(1) @binding(0) var texture1: texture_2d<f32>;
 @group(1) @binding(1) var texture2: texture_2d<f32>;
 @group(1) @binding(2) var texture3: texture_2d<f32>;
@@ -84,9 +88,14 @@ static char const triangle_frag_wgsl[] = R"(@group(0) @binding(0) var<uniform> T
 @group(1) @binding(4) var sampler_: sampler;
 @stage(fragment)
 fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
-var uv: vec3<f32> =vec3<f32>(position.xyx/Resolution.xyx);
-var col:vec3<f32> =0.5f+vec3<f32> ( 0.5*cos(vec3<f32>(0.0,2.0,4.0)));
-return vec4<f32>(col, 1.0);
+if (Key==102.0)
+{
+    return textureSample(texture1, sampler_, position.xy/Resolution);
+}
+else
+{
+    return textureSample(texture2, sampler_, position.xy/Resolution);
+}
 })"; // fragment shader end
 
 /*
@@ -125,9 +134,6 @@ static WGPUBuffer createBuffer(const void* data, size_t size, WGPUBufferUsage us
 	wgpuQueueWriteBuffer(queue, buffer, 0, data, size);
 	return buffer;
 }
-
-
-
 static WGPUTexture createTexture(unsigned char* data, unsigned int w, unsigned int h,WGPUExtent3D &texSize, WGPUTextureDescriptor &texDesc, WGPUTextureDataLayout &texDataLayout ,WGPUImageCopyTexture &texCopy) {
 
 
@@ -188,17 +194,23 @@ static void createPipelineAndBuffers() {
 	date2lEntry.binding = 4;
 	date2lEntry.visibility = WGPUShaderStage_Fragment;
 	date2lEntry.buffer = buf;
+	
+	WGPUBindGroupLayoutEntry keylEntry = {};
+	keylEntry.binding = 5;
+	keylEntry.visibility = WGPUShaderStage_Fragment;
+	keylEntry.buffer = buf;
 
 
-	WGPUBindGroupLayoutEntry* allBgLayoutEntries = new WGPUBindGroupLayoutEntry[5];
+	WGPUBindGroupLayoutEntry* allBgLayoutEntries = new WGPUBindGroupLayoutEntry[6];
 	allBgLayoutEntries[0] = timelEntry;
 	allBgLayoutEntries[1] = resolutionlEntry;
 	allBgLayoutEntries[2] = mouselEntry;
 	allBgLayoutEntries[3] = date1lEntry;
 	allBgLayoutEntries[4] = date2lEntry;
+	allBgLayoutEntries[5] = keylEntry;
 
 	WGPUBindGroupLayoutDescriptor bglDesc = {};
-	bglDesc.entryCount = 5;  
+	bglDesc.entryCount = 6;  
 	bglDesc.entries = allBgLayoutEntries;
 	WGPUBindGroupLayout bindGroupLayout = wgpuDeviceCreateBindGroupLayout(device, &bglDesc);
 
@@ -373,6 +385,7 @@ static void createPipelineAndBuffers() {
 	mouseBuf = createBuffer(&mouselocation, sizeof(mouselocation), WGPUBufferUsage_Uniform);
 	date1Buf = createBuffer(&date1, sizeof(date1), WGPUBufferUsage_Uniform);
 	date2Buf = createBuffer(&date2, sizeof(date2), WGPUBufferUsage_Uniform);
+	keypressBuf= createBuffer(&keypress,sizeof(keypress), WGPUBufferUsage_Uniform);
 	WGPUBindGroupEntry timeEntry = {};
 	timeEntry.binding = 0;
 	timeEntry.buffer = timeBuf;
@@ -400,16 +413,22 @@ static void createPipelineAndBuffers() {
 	date2Entry.buffer = date2Buf;
 	date2Entry.size = sizeof(date2);
 
+	WGPUBindGroupEntry keypressEntry = {};
+	keypressEntry.binding = 5;
+	keypressEntry.buffer = keypressBuf;
+	keypressEntry.size = sizeof(keypress);
+
 	WGPUBindGroupEntry* uniformBgEntries = new WGPUBindGroupEntry[5];
 	uniformBgEntries[0] = timeEntry;
 	uniformBgEntries[1] = resolutionEntry;
 	uniformBgEntries[2] = mouseEntry;
 	uniformBgEntries[3] = date1Entry;
 	uniformBgEntries[4] = date2Entry;
+	uniformBgEntries[5] = keypressEntry;
 
 	WGPUBindGroupDescriptor uniformbgDesc = {};
 	uniformbgDesc.layout = bindGroupLayout;
-	uniformbgDesc.entryCount = 5;   
+	uniformbgDesc.entryCount = 6;   
 	uniformbgDesc.entries = uniformBgEntries;
 
 	bindGroup = wgpuDeviceCreateBindGroup(device, &uniformbgDesc);
@@ -450,8 +469,8 @@ static void createPipelineAndBuffers() {
 	wgpuBindGroupLayoutRelease(bindGroupLayout);
 	wgpuBindGroupLayoutRelease(texturebindGroupLayout);
 }
-EM_JS(void, jsprint, ( float x,float y), {
-  console.log(x,y);
+EM_JS(void, jsprint, ( int x), {
+  console.log(x);
 });
 EM_JS(void, say, (const char* str), {
   console.log( UTF8ToString(str));
@@ -478,13 +497,42 @@ EM_BOOL mouse_click_callback(int eventType, const EmscriptenMouseEvent *e, void 
 	mouselocation[3]=e->clientY;
   return 0;
 }
+EM_BOOL key_callback(int eventType, const EmscriptenKeyboardEvent *e, void *userData)
+{
+  /*printf("%s, key: \"%s\", code: \"%s\", location: %lu,%s%s%s%s repeat: %d, locale: \"%s\", char: \"%s\", charCode: %lu, keyCode: %lu, which: %lu, timestamp: %lf\n",
+    emscripten_event_type_to_string(eventType), e->key, e->code, e->location, 
+    e->ctrlKey ? " CTRL" : "", e->shiftKey ? " SHIFT" : "", e->altKey ? " ALT" : "", e->metaKey ? " META" : "", 
+    e->repeat, e->locale, e->charValue, e->charCode, e->keyCode, e->which,
+    e->timestamp);*/
+  if (eventType == EMSCRIPTEN_EVENT_KEYPRESS) {
+    keypress=(float)e->which;
+	press=true;
+  }
+  return 0;
+}
 static bool redraw() {
+	//keypress=0;
+	EMSCRIPTEN_RESULT ret;
 	if (mouseflag%10==0)
 	{
-		EMSCRIPTEN_RESULT ret = emscripten_set_mousemove_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, mouse_callback);
+		ret = emscripten_set_mousemove_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, mouse_callback);
 		ret = emscripten_set_click_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, mouse_click_callback);
 		mouseflag++;
 	}
+	if(press==true)
+	{
+		pressflag++;
+	}
+	if(pressflag%15==0)
+	{
+		pressflag=0;
+		keypress=0;
+		press=false;
+	}
+	ret = emscripten_set_keypress_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, key_callback);
+	// update the time 
+	endTime = clock();
+	runtime = (float)(endTime - startTime) / (CLOCKS_PER_SEC);
 
 	WGPUTextureView backBufView = wgpuSwapChainGetCurrentTextureView(swapchain);			// create textureView
 
@@ -504,9 +552,7 @@ static bool redraw() {
 	WGPUCommandEncoder encoder = wgpuDeviceCreateCommandEncoder(device, nullptr);			// create encoder
 	WGPURenderPassEncoder pass = wgpuCommandEncoderBeginRenderPass(encoder, &renderPass);	// create pass
 
-	// update the time 
-	endTime = clock();
-	runtime = (float)(endTime - startTime) / (CLOCKS_PER_SEC);
+	
 
 	//update the date
 
@@ -519,12 +565,14 @@ static bool redraw() {
 	date2[0]=ltm->tm_hour;
 	date2[1]=ltm->tm_min;
 	date2[2]=ltm->tm_sec;
+
 	
 	wgpuQueueWriteBuffer(queue, timeBuf,0, &runtime, sizeof(runtime));
 	wgpuQueueWriteBuffer(queue, resolutionBuf,0, &resolution, sizeof(resolution));
 	wgpuQueueWriteBuffer(queue, mouseBuf,0, &mouselocation, sizeof(mouselocation));
 	wgpuQueueWriteBuffer(queue, date1Buf,0, &date1, sizeof(date1));
 	wgpuQueueWriteBuffer(queue, date2Buf,0, &date2, sizeof(date2));
+	wgpuQueueWriteBuffer(queue, keypressBuf,0, &keypress, sizeof(keypress));
 	wgpuQueueWriteTexture(queue, &texCopy1, img_1, imgh_1 * imgw_1 * 4, &texDataLayout1, &texSize1);
 	wgpuQueueWriteTexture(queue, &texCopy2, img_2, imgh_2 * imgw_2 * 4, &texDataLayout2, &texSize2);
 	wgpuQueueWriteTexture(queue, &texCopy3, img_3, imgh_3 * imgw_3 * 4, &texDataLayout3, &texSize3);
@@ -571,13 +619,13 @@ void load_images(SDL_Surface *image, int imgw,int imgh,unsigned char*& img )
 void image_init()
 {		
 		SDL_Surface *image;
-		image=IMG_Load("out/texture/admin_black.jpg");//texture1
+		image=IMG_Load("out/texture/admin_happytree.jpg");//texture1
 		imgw_1=image->w;
 		imgh_1=image->h;
 		img_1=new unsigned char[imgw_1 * imgh_1*4];
 		load_images(image,imgw_1,imgh_1,img_1);
 
-		image=IMG_Load("out/texture/admin_black.jpg");//texture2
+		image=IMG_Load("out/texture/admin_London.jpg");//texture2
 		imgw_2=image->w;
 		imgh_2=image->h;
 		img_2=new unsigned char[imgw_2 * imgh_2*4];
@@ -620,6 +668,7 @@ extern "C" int __main__(int /*argc*/, char* /*argv*/[]) {
 			wgpuBufferRelease(mouseBuf);
 			wgpuBufferRelease(indxBuf);
 			wgpuBufferRelease(vertBuf);
+			wgpuBufferRelease(keypressBuf);
 			wgpuRenderPipelineRelease(pipeline);
 			wgpuSwapChainRelease(swapchain);
 			wgpuQueueRelease(queue);
