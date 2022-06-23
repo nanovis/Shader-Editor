@@ -565,8 +565,8 @@ EM_BOOL key_callback(int eventType, const EmscriptenKeyboardEvent *e, void *user
   }
   if(position[0]<0.0f){position[0]=0.0f;}
   if(position[0]>800.0f){position[0]=800.0f;}
-  if(position[1]<0.0f){position[0]=0.0f;}
-  if(position[1]>600.0f){position[0]=600.0f;}
+  if(position[1]<0.0f){position[1]=0.0f;}
+  if(position[1]>600.0f){position[1]=600.0f;}
   return 0;
 }
 static bool redraw() {
