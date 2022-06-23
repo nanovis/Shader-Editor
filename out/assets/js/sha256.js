@@ -552,7 +552,7 @@
       var email=document.getElementById("email").value
       var pwd= encryption(document.getElementById('pwd').value)
       var username=document.getElementById('username').value
-      var repeatpwd=document.getElementById('repeatpwd').value
+      var repeatpwd=encryption(document.getElementById('repeatpwd').value)
       var formDate = new FormData()
       formDate.set("email",email)
       formDate.set("pwd",pwd)

@@ -30,6 +30,7 @@ WGPUBuffer mouseBuf;
 WGPUBuffer keypressBuf; 
 WGPUBuffer date1Buf;
 WGPUBuffer date2Buf;
+WGPUBuffer positionBuf;
 WGPUBindGroup bindGroup;
 WGPUBindGroup texturebindGroup;  //bindgroup for textures
 
@@ -48,6 +49,7 @@ WGPUImageCopyTexture texCopy1 = {},texCopy2 = {},texCopy3 = {},texCopy4 = {};
 glm::vec4 mouselocation=glm::vec4(2.0f,3.0f,0.0f,0.0f);
 int date1[3];
 int date2[3];
+float position[2]={0.0f,580.0f};
 int keypress=100; //ascii
 int mouseflag=0;
 
@@ -81,6 +83,7 @@ static char const triangle_frag_wgsl[] = R"(@group(0) @binding(0) var<uniform> T
 @group(0) @binding(3) var<uniform> Date1 : vec3<i32>;
 @group(0) @binding(4) var<uniform> Date2 : vec3<i32>;
 @group(0) @binding(5) var<uniform> Key : i32;
+@group(0) @binding(6) var<uniform> Position : vec2<f32>;
 @group(1) @binding(0) var texture1: texture_2d<f32>;
 @group(1) @binding(1) var texture2: texture_2d<f32>;
 @group(1) @binding(2) var texture3: texture_2d<f32>;
@@ -88,14 +91,29 @@ static char const triangle_frag_wgsl[] = R"(@group(0) @binding(0) var<uniform> T
 @group(1) @binding(4) var sampler_: sampler;
 @stage(fragment)
 fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
-if (Key==102)
-{
-    return textureSample(texture1, sampler_, position.xy/Resolution);
-}
-else
-{
-    return textureSample(texture2, sampler_, position.xy/Resolution);
-}
+    switch Key
+    {
+      case 119:
+      {
+        return textureSample(texture1, sampler_, position.xy/Resolution);
+      }
+      case 97:
+      {
+        return textureSample(texture2, sampler_, position.xy/Resolution);
+      }
+      case 115:
+      {
+        return textureSample(texture3, sampler_, position.xy/Resolution);
+      }
+      case 100:
+      {
+        return textureSample(texture4, sampler_, position.xy/Resolution);
+      }
+      default
+      {
+        return vec4<f32>(0.0,0.0,0.0,1.0);
+      }
+    }
 })"; // fragment shader end
 
 /*
@@ -200,17 +218,22 @@ static void createPipelineAndBuffers() {
 	keylEntry.visibility = WGPUShaderStage_Fragment;
 	keylEntry.buffer = buf;
 
+	WGPUBindGroupLayoutEntry positionlEntry = {};
+	positionlEntry.binding = 6;
+	positionlEntry.visibility = WGPUShaderStage_Fragment;
+	positionlEntry.buffer = buf;
 
-	WGPUBindGroupLayoutEntry* allBgLayoutEntries = new WGPUBindGroupLayoutEntry[6];
+
+	WGPUBindGroupLayoutEntry* allBgLayoutEntries = new WGPUBindGroupLayoutEntry[7];
 	allBgLayoutEntries[0] = timelEntry;
 	allBgLayoutEntries[1] = resolutionlEntry;
 	allBgLayoutEntries[2] = mouselEntry;
 	allBgLayoutEntries[3] = date1lEntry;
 	allBgLayoutEntries[4] = date2lEntry;
 	allBgLayoutEntries[5] = keylEntry;
-
+	allBgLayoutEntries[6] = positionlEntry;
 	WGPUBindGroupLayoutDescriptor bglDesc = {};
-	bglDesc.entryCount = 6;  
+	bglDesc.entryCount = 7;  
 	bglDesc.entries = allBgLayoutEntries;
 	WGPUBindGroupLayout bindGroupLayout = wgpuDeviceCreateBindGroupLayout(device, &bglDesc);
 
@@ -386,6 +409,7 @@ static void createPipelineAndBuffers() {
 	date1Buf = createBuffer(&date1, sizeof(date1), WGPUBufferUsage_Uniform);
 	date2Buf = createBuffer(&date2, sizeof(date2), WGPUBufferUsage_Uniform);
 	keypressBuf= createBuffer(&keypress,sizeof(keypress), WGPUBufferUsage_Uniform);
+	positionBuf= createBuffer(&position,sizeof(position), WGPUBufferUsage_Uniform);
 	WGPUBindGroupEntry timeEntry = {};
 	timeEntry.binding = 0;
 	timeEntry.buffer = timeBuf;
@@ -418,17 +442,23 @@ static void createPipelineAndBuffers() {
 	keypressEntry.buffer = keypressBuf;
 	keypressEntry.size = sizeof(keypress);
 
-	WGPUBindGroupEntry* uniformBgEntries = new WGPUBindGroupEntry[5];
+	WGPUBindGroupEntry positionEntry = {};
+	positionEntry.binding = 6;
+	positionEntry.buffer = positionBuf;
+	positionEntry.size = sizeof(position);
+
+	WGPUBindGroupEntry* uniformBgEntries = new WGPUBindGroupEntry[7];
 	uniformBgEntries[0] = timeEntry;
 	uniformBgEntries[1] = resolutionEntry;
 	uniformBgEntries[2] = mouseEntry;
 	uniformBgEntries[3] = date1Entry;
 	uniformBgEntries[4] = date2Entry;
 	uniformBgEntries[5] = keypressEntry;
+	uniformBgEntries[6] = positionEntry;
 
 	WGPUBindGroupDescriptor uniformbgDesc = {};
 	uniformbgDesc.layout = bindGroupLayout;
-	uniformbgDesc.entryCount = 6;   
+	uniformbgDesc.entryCount = 7;   
 	uniformbgDesc.entries = uniformBgEntries;
 
 	bindGroup = wgpuDeviceCreateBindGroup(device, &uniformbgDesc);
@@ -504,10 +534,39 @@ EM_BOOL key_callback(int eventType, const EmscriptenKeyboardEvent *e, void *user
     e->ctrlKey ? " CTRL" : "", e->shiftKey ? " SHIFT" : "", e->altKey ? " ALT" : "", e->metaKey ? " META" : "", 
     e->repeat, e->locale, e->charValue, e->charCode, e->keyCode, e->which,
     e->timestamp);*/
-  if (eventType == EMSCRIPTEN_EVENT_KEYPRESS) {
+
+  if (eventType == EMSCRIPTEN_EVENT_KEYPRESS&& (!strcmp(e->key, "w")|| e->which == 119)&&press==false)
+  {
+	keypress=e->which;
+	position[1]-=10.0f;
+	press=true;
+  }
+  if (eventType == EMSCRIPTEN_EVENT_KEYPRESS && (!strcmp(e->key, "a")|| e->which == 97)&&press==false)
+  {
+	keypress=e->which;
+	position[0]-=10.0f;
+	press=true;
+  }
+  if (eventType == EMSCRIPTEN_EVENT_KEYPRESS&& (!strcmp(e->key, "s")|| e->which == 115)&&press==false)
+  {
+	keypress=e->which;
+	position[1]+=10.0f;
+	press=true;
+  }
+  if (eventType == EMSCRIPTEN_EVENT_KEYPRESS&& (!strcmp(e->key, "d")|| e->which == 100)&&press==false)
+  {
+	keypress=e->which;
+	position[0]+=10.0f;
+	press=true;
+  }
+  if (eventType == EMSCRIPTEN_EVENT_KEYPRESS && press==false) {
     keypress=e->which;
 	press=true;
   }
+  if(position[0]<0.0f){position[0]=0.0f;}
+  if(position[0]>800.0f){position[0]=800.0f;}
+  if(position[1]<0.0f){position[0]=0.0f;}
+  if(position[1]>600.0f){position[0]=600.0f;}
   return 0;
 }
 static bool redraw() {
@@ -572,6 +631,7 @@ static bool redraw() {
 	wgpuQueueWriteBuffer(queue, date1Buf,0, &date1, sizeof(date1));
 	wgpuQueueWriteBuffer(queue, date2Buf,0, &date2, sizeof(date2));
 	wgpuQueueWriteBuffer(queue, keypressBuf,0, &keypress, sizeof(keypress));
+	wgpuQueueWriteBuffer(queue, positionBuf,0, &position, sizeof(position));
 	wgpuQueueWriteTexture(queue, &texCopy1, img_1, imgh_1 * imgw_1 * 4, &texDataLayout1, &texSize1);
 	wgpuQueueWriteTexture(queue, &texCopy2, img_2, imgh_2 * imgw_2 * 4, &texDataLayout2, &texSize2);
 	wgpuQueueWriteTexture(queue, &texCopy3, img_3, imgh_3 * imgw_3 * 4, &texDataLayout3, &texSize3);
@@ -618,25 +678,25 @@ void load_images(SDL_Surface *image, int imgw,int imgh,unsigned char*& img )
 void image_init()
 {		
 		SDL_Surface *image;
-		image=IMG_Load("out/texture/admin_happytree.jpg");//texture1
+		image=IMG_Load("out/texture/admin_London.jpg");//texture1
 		imgw_1=image->w;
 		imgh_1=image->h;
 		img_1=new unsigned char[imgw_1 * imgh_1*4];
 		load_images(image,imgw_1,imgh_1,img_1);
 
-		image=IMG_Load("out/texture/admin_London.jpg");//texture2
+		image=IMG_Load("out/texture/admin_happytree.jpg");//texture2
 		imgw_2=image->w;
 		imgh_2=image->h;
 		img_2=new unsigned char[imgw_2 * imgh_2*4];
 		load_images(image,imgw_2,imgh_2,img_2);
 
-		image=IMG_Load("out/texture/admin_black.jpg");//texture3
+		image=IMG_Load("out/texture/admin_wall.jpg");//texture3
 		imgw_3=image->w;
 		imgh_3=image->h;
 		img_3=new unsigned char[imgw_3 * imgh_3*4];
 		load_images(image,imgw_3,imgh_3,img_3);
 
-		image=IMG_Load("out/texture/admin_black.jpg");//texture4
+		image=IMG_Load("out/texture/admin_stock.jpg");//texture4
 		imgw_4=image->w;
 		imgh_4=image->h;
 
@@ -668,6 +728,7 @@ extern "C" int __main__(int /*argc*/, char* /*argv*/[]) {
 			wgpuBufferRelease(indxBuf);
 			wgpuBufferRelease(vertBuf);
 			wgpuBufferRelease(keypressBuf);
+			wgpuBufferRelease(positionBuf);
 			wgpuRenderPipelineRelease(pipeline);
 			wgpuSwapChainRelease(swapchain);
 			wgpuQueueRelease(queue);
