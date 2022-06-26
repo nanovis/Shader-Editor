@@ -31,6 +31,7 @@ WGPUBuffer keypressBuf;
 WGPUBuffer date1Buf;
 WGPUBuffer date2Buf;
 WGPUBuffer positionBuf;
+WGPUBuffer randomBuf;
 WGPUBindGroup bindGroup;
 WGPUBindGroup texturebindGroup;  //bindgroup for textures
 
@@ -49,9 +50,11 @@ WGPUImageCopyTexture texCopy1 = {},texCopy2 = {},texCopy3 = {},texCopy4 = {};
 glm::vec4 mouselocation=glm::vec4(2.0f,3.0f,0.0f,0.0f);
 int date1[3];
 int date2[3];
-float position[2]={0.0f,580.0f};
+float position[2]={0.0f,300.0f};
 int keypress=100; //ascii
 int mouseflag=0;
+float random_num=0.0f;
+int w_press=0; 
 
 /**
  * Current rotation angle (in degrees, updated per frame).
@@ -84,6 +87,7 @@ static char const triangle_frag_wgsl[] = R"(@group(0) @binding(0) var<uniform> T
 @group(0) @binding(4) var<uniform> Date2 : vec3<i32>;
 @group(0) @binding(5) var<uniform> Key : i32;
 @group(0) @binding(6) var<uniform> Position : vec2<f32>;
+@group(0) @binding(7) var<uniform> Random : f32;
 @group(1) @binding(0) var texture1: texture_2d<f32>;
 @group(1) @binding(1) var texture2: texture_2d<f32>;
 @group(1) @binding(2) var texture3: texture_2d<f32>;
@@ -91,29 +95,18 @@ static char const triangle_frag_wgsl[] = R"(@group(0) @binding(0) var<uniform> T
 @group(1) @binding(4) var sampler_: sampler;
 @stage(fragment)
 fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
-    switch Key
+
+    if(position.x>Position.x+Time*50.0 && position.x< Position.x+30.0+Time*50.0 && position.y>Position.y && position.y<Position.y+20.0)
     {
-      case 119:
-      {
-        return textureSample(texture1, sampler_, position.xy/Resolution);
-      }
-      case 97:
-      {
-        return textureSample(texture2, sampler_, position.xy/Resolution);
-      }
-      case 115:
-      {
-        return textureSample(texture3, sampler_, position.xy/Resolution);
-      }
-      case 100:
-      {
-        return textureSample(texture4, sampler_, position.xy/Resolution);
-      }
-      default
-      {
-        return vec4<f32>(0.0,0.0,0.0,1.0);
-      }
+    var tempx:f32=position.x-Position.x;
+    var tempy:f32=position.y-Position.y;
+    return textureSample(texture2, sampler_, vec2<f32>(tempx/30.0,tempy/20.0));
     }
+    else
+    {
+      return textureSample(texture1, sampler_, position.xy/Resolution);
+    }
+
 })"; // fragment shader end
 
 /*
@@ -223,8 +216,13 @@ static void createPipelineAndBuffers() {
 	positionlEntry.visibility = WGPUShaderStage_Fragment;
 	positionlEntry.buffer = buf;
 
+	WGPUBindGroupLayoutEntry randomlEntry = {};
+	randomlEntry.binding = 7;
+	randomlEntry.visibility = WGPUShaderStage_Fragment;
+	randomlEntry.buffer = buf;
 
-	WGPUBindGroupLayoutEntry* allBgLayoutEntries = new WGPUBindGroupLayoutEntry[7];
+
+	WGPUBindGroupLayoutEntry* allBgLayoutEntries = new WGPUBindGroupLayoutEntry[8];
 	allBgLayoutEntries[0] = timelEntry;
 	allBgLayoutEntries[1] = resolutionlEntry;
 	allBgLayoutEntries[2] = mouselEntry;
@@ -232,8 +230,9 @@ static void createPipelineAndBuffers() {
 	allBgLayoutEntries[4] = date2lEntry;
 	allBgLayoutEntries[5] = keylEntry;
 	allBgLayoutEntries[6] = positionlEntry;
+	allBgLayoutEntries[7] = randomlEntry;
 	WGPUBindGroupLayoutDescriptor bglDesc = {};
-	bglDesc.entryCount = 7;  
+	bglDesc.entryCount = 8;  
 	bglDesc.entries = allBgLayoutEntries;
 	WGPUBindGroupLayout bindGroupLayout = wgpuDeviceCreateBindGroupLayout(device, &bglDesc);
 
@@ -410,6 +409,7 @@ static void createPipelineAndBuffers() {
 	date2Buf = createBuffer(&date2, sizeof(date2), WGPUBufferUsage_Uniform);
 	keypressBuf= createBuffer(&keypress,sizeof(keypress), WGPUBufferUsage_Uniform);
 	positionBuf= createBuffer(&position,sizeof(position), WGPUBufferUsage_Uniform);
+	randomBuf= createBuffer(&random_num,sizeof(random_num), WGPUBufferUsage_Uniform);
 	WGPUBindGroupEntry timeEntry = {};
 	timeEntry.binding = 0;
 	timeEntry.buffer = timeBuf;
@@ -447,7 +447,12 @@ static void createPipelineAndBuffers() {
 	positionEntry.buffer = positionBuf;
 	positionEntry.size = sizeof(position);
 
-	WGPUBindGroupEntry* uniformBgEntries = new WGPUBindGroupEntry[7];
+	WGPUBindGroupEntry randomEntry = {};
+	randomEntry.binding = 7;
+	randomEntry.buffer = randomBuf;
+	randomEntry.size = sizeof(random_num);
+
+	WGPUBindGroupEntry* uniformBgEntries = new WGPUBindGroupEntry[8];
 	uniformBgEntries[0] = timeEntry;
 	uniformBgEntries[1] = resolutionEntry;
 	uniformBgEntries[2] = mouseEntry;
@@ -455,10 +460,11 @@ static void createPipelineAndBuffers() {
 	uniformBgEntries[4] = date2Entry;
 	uniformBgEntries[5] = keypressEntry;
 	uniformBgEntries[6] = positionEntry;
+	uniformBgEntries[7] = randomEntry;
 
 	WGPUBindGroupDescriptor uniformbgDesc = {};
 	uniformbgDesc.layout = bindGroupLayout;
-	uniformbgDesc.entryCount = 7;   
+	uniformbgDesc.entryCount = 8;   
 	uniformbgDesc.entries = uniformBgEntries;
 
 	bindGroup = wgpuDeviceCreateBindGroup(device, &uniformbgDesc);
@@ -538,26 +544,8 @@ EM_BOOL key_callback(int eventType, const EmscriptenKeyboardEvent *e, void *user
   if (eventType == EMSCRIPTEN_EVENT_KEYPRESS&& (!strcmp(e->key, "w")|| e->which == 119)&&press==false)
   {
 	keypress=e->which;
-	position[1]-=10.0f;
 	press=true;
-  }
-  if (eventType == EMSCRIPTEN_EVENT_KEYPRESS && (!strcmp(e->key, "a")|| e->which == 97)&&press==false)
-  {
-	keypress=e->which;
-	position[0]-=10.0f;
-	press=true;
-  }
-  if (eventType == EMSCRIPTEN_EVENT_KEYPRESS&& (!strcmp(e->key, "s")|| e->which == 115)&&press==false)
-  {
-	keypress=e->which;
-	position[1]+=10.0f;
-	press=true;
-  }
-  if (eventType == EMSCRIPTEN_EVENT_KEYPRESS&& (!strcmp(e->key, "d")|| e->which == 100)&&press==false)
-  {
-	keypress=e->which;
-	position[0]+=10.0f;
-	press=true;
+	w_press=30;
   }
   if (eventType == EMSCRIPTEN_EVENT_KEYPRESS && press==false) {
     keypress=e->which;
@@ -570,6 +558,7 @@ EM_BOOL key_callback(int eventType, const EmscriptenKeyboardEvent *e, void *user
   return 0;
 }
 static bool redraw() {
+	random_num=emscripten_random();
 	EMSCRIPTEN_RESULT ret;
 	if (mouseflag%10==0)
 	{
@@ -581,12 +570,19 @@ static bool redraw() {
 	{
 		pressflag++;
 	}
-	if(pressflag%15==0)
+	if(pressflag%10==0)
 	{
 		pressflag=0;
 		keypress=0;
 		press=false;
 	}
+	if(w_press>0)
+	{
+		position[1]-=5.0f;
+		w_press-=1;
+	}
+	else
+	{position[1]+=5.0f;}
 	ret = emscripten_set_keypress_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, key_callback);
 	// update the time 
 	endTime = clock();
@@ -632,6 +628,7 @@ static bool redraw() {
 	wgpuQueueWriteBuffer(queue, date2Buf,0, &date2, sizeof(date2));
 	wgpuQueueWriteBuffer(queue, keypressBuf,0, &keypress, sizeof(keypress));
 	wgpuQueueWriteBuffer(queue, positionBuf,0, &position, sizeof(position));
+	wgpuQueueWriteBuffer(queue, randomBuf,0, &random_num, sizeof(random_num));
 	wgpuQueueWriteTexture(queue, &texCopy1, img_1, imgh_1 * imgw_1 * 4, &texDataLayout1, &texSize1);
 	wgpuQueueWriteTexture(queue, &texCopy2, img_2, imgh_2 * imgw_2 * 4, &texDataLayout2, &texSize2);
 	wgpuQueueWriteTexture(queue, &texCopy3, img_3, imgh_3 * imgw_3 * 4, &texDataLayout3, &texSize3);
@@ -678,25 +675,25 @@ void load_images(SDL_Surface *image, int imgw,int imgh,unsigned char*& img )
 void image_init()
 {		
 		SDL_Surface *image;
-		image=IMG_Load("out/texture/admin_London.jpg");//texture1
+		image=IMG_Load("out/texture/admin_happytree.jpg");//texture1
 		imgw_1=image->w;
 		imgh_1=image->h;
 		img_1=new unsigned char[imgw_1 * imgh_1*4];
 		load_images(image,imgw_1,imgh_1,img_1);
 
-		image=IMG_Load("out/texture/admin_happytree.jpg");//texture2
+		image=IMG_Load("out/texture/admin_London.jpg");//texture2
 		imgw_2=image->w;
 		imgh_2=image->h;
 		img_2=new unsigned char[imgw_2 * imgh_2*4];
 		load_images(image,imgw_2,imgh_2,img_2);
 
-		image=IMG_Load("out/texture/admin_wall.jpg");//texture3
+		image=IMG_Load("out/texture/admin_black.jpg");//texture3
 		imgw_3=image->w;
 		imgh_3=image->h;
 		img_3=new unsigned char[imgw_3 * imgh_3*4];
 		load_images(image,imgw_3,imgh_3,img_3);
 
-		image=IMG_Load("out/texture/admin_stock.jpg");//texture4
+		image=IMG_Load("out/texture/admin_black.jpg");//texture4
 		imgw_4=image->w;
 		imgh_4=image->h;
 

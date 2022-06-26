@@ -205,7 +205,7 @@ Module['FS_createPath']("/out", "texture", true, true);
     }
 
     }
-    loadPackage({"files": [{"filename": "/out/texture/.DS_Store", "start": 0, "end": 6148}, {"filename": "/out/texture/admin_stock.jpg", "start": 6148, "end": 16675}, {"filename": "/out/texture/admin_black.jpg", "start": 16675, "end": 22065}, {"filename": "/out/texture/admin_London.jpg", "start": 22065, "end": 203611}, {"filename": "/out/texture/admin_wall.jpg", "start": 203611, "end": 225865}, {"filename": "/out/texture/admin_happytree.jpg", "start": 225865, "end": 253999}], "remote_package_size": 253999, "package_uuid": "d5bb8bc1-fd3d-46de-88b0-d4c8ef013058"});
+    loadPackage({"files": [{"filename": "/out/texture/.DS_Store", "start": 0, "end": 6148}, {"filename": "/out/texture/admin_stock.jpg", "start": 6148, "end": 16675}, {"filename": "/out/texture/admin_black.jpg", "start": 16675, "end": 22065}, {"filename": "/out/texture/admin_London.jpg", "start": 22065, "end": 203611}, {"filename": "/out/texture/admin_wall.jpg", "start": 203611, "end": 225865}, {"filename": "/out/texture/admin_happytree.jpg", "start": 225865, "end": 253999}], "remote_package_size": 253999, "package_uuid": "265bfb29-3fed-4856-920a-dfc49a0a0b61"});
 
   })();
 
@@ -5027,6 +5027,10 @@ function say(str){ console.log( UTF8ToString(str)); }
       HEAPU8.copyWithin(dest, src, src + num);
     }
 
+  function _emscripten_random() {
+      return Math.random();
+    }
+
   function _emscripten_request_animation_frame_loop(cb, userData) {
       function tick(timeStamp) {
         if (getWasmTableEntry(cb)(timeStamp, userData)) {
@@ -6572,6 +6576,7 @@ var asmLibraryArg = {
   "emscripten_get_preloaded_image_data_from_FILE": _emscripten_get_preloaded_image_data_from_FILE,
   "emscripten_has_asyncify": _emscripten_has_asyncify,
   "emscripten_memcpy_big": _emscripten_memcpy_big,
+  "emscripten_random": _emscripten_random,
   "emscripten_request_animation_frame_loop": _emscripten_request_animation_frame_loop,
   "emscripten_resize_heap": _emscripten_resize_heap,
   "emscripten_set_click_callback_on_thread": _emscripten_set_click_callback_on_thread,
