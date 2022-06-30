@@ -14,6 +14,8 @@
 #include"CameraController.h"
 #include "window.h"
 #include<ctime>
+#include<math.h>
+#include<vector>
 
 WGPUDevice device;
 WGPUQueue queue;
@@ -32,8 +34,10 @@ WGPUBuffer date1Buf;
 WGPUBuffer date2Buf;
 WGPUBuffer positionBuf;
 WGPUBuffer randomBuf;
+WGPUBuffer randomArrayBuf;
 WGPUBindGroup bindGroup;
 WGPUBindGroup texturebindGroup;  //bindgroup for textures
+
 
 unsigned char* img_1;
 unsigned char* img_2;
@@ -50,6 +54,7 @@ WGPUImageCopyTexture texCopy1 = {},texCopy2 = {},texCopy3 = {},texCopy4 = {};
 glm::vec4 mouselocation=glm::vec4(2.0f,3.0f,0.0f,0.0f);
 int date1[3];
 int date2[3];
+glm::vec4 randomArray[25];
 float position[2]={0.0f,300.0f};
 int keypress=100; //ascii
 int mouseflag=0;
@@ -88,6 +93,7 @@ static char const triangle_frag_wgsl[] = R"(@group(0) @binding(0) var<uniform> T
 @group(0) @binding(5) var<uniform> Key : i32;
 @group(0) @binding(6) var<uniform> Position : vec2<f32>;
 @group(0) @binding(7) var<uniform> Random : f32;
+@group(0) @binding(8) var<uniform> randomarray: array<vec4<f32>,25>;
 @group(1) @binding(0) var texture1: texture_2d<f32>;
 @group(1) @binding(1) var texture2: texture_2d<f32>;
 @group(1) @binding(2) var texture3: texture_2d<f32>;
@@ -95,18 +101,9 @@ static char const triangle_frag_wgsl[] = R"(@group(0) @binding(0) var<uniform> T
 @group(1) @binding(4) var sampler_: sampler;
 @stage(fragment)
 fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
-
-    if(position.x>Position.x+Time*50.0 && position.x< Position.x+30.0+Time*50.0 && position.y>Position.y && position.y<Position.y+20.0)
-    {
-    var tempx:f32=position.x-Position.x;
-    var tempy:f32=position.y-Position.y;
-    return textureSample(texture2, sampler_, vec2<f32>(tempx/30.0,tempy/20.0));
-    }
-    else
-    {
-      return textureSample(texture1, sampler_, position.xy/Resolution);
-    }
-
+var uv: vec3<f32> =vec3<f32>(position.xyx/Resolution.xyx);
+var col:vec3<f32> =randomarray[1].x+0.5f+vec3<f32> ( 0.5*cos(uv+vec3<f32>(0.0,2.0,4.0)));
+return randomarray[1].xyzw;
 })"; // fragment shader end
 
 /*
@@ -221,8 +218,13 @@ static void createPipelineAndBuffers() {
 	randomlEntry.visibility = WGPUShaderStage_Fragment;
 	randomlEntry.buffer = buf;
 
+	WGPUBindGroupLayoutEntry randomArraylEntry = {};
+	randomArraylEntry.binding = 8;
+	randomArraylEntry.visibility = WGPUShaderStage_Fragment;
+	randomArraylEntry.buffer = buf;
 
-	WGPUBindGroupLayoutEntry* allBgLayoutEntries = new WGPUBindGroupLayoutEntry[8];
+
+	WGPUBindGroupLayoutEntry* allBgLayoutEntries = new WGPUBindGroupLayoutEntry[9];
 	allBgLayoutEntries[0] = timelEntry;
 	allBgLayoutEntries[1] = resolutionlEntry;
 	allBgLayoutEntries[2] = mouselEntry;
@@ -231,8 +233,9 @@ static void createPipelineAndBuffers() {
 	allBgLayoutEntries[5] = keylEntry;
 	allBgLayoutEntries[6] = positionlEntry;
 	allBgLayoutEntries[7] = randomlEntry;
+	allBgLayoutEntries[8] = randomArraylEntry;
 	WGPUBindGroupLayoutDescriptor bglDesc = {};
-	bglDesc.entryCount = 8;  
+	bglDesc.entryCount = 9;  
 	bglDesc.entries = allBgLayoutEntries;
 	WGPUBindGroupLayout bindGroupLayout = wgpuDeviceCreateBindGroupLayout(device, &bglDesc);
 
@@ -410,6 +413,7 @@ static void createPipelineAndBuffers() {
 	keypressBuf= createBuffer(&keypress,sizeof(keypress), WGPUBufferUsage_Uniform);
 	positionBuf= createBuffer(&position,sizeof(position), WGPUBufferUsage_Uniform);
 	randomBuf= createBuffer(&random_num,sizeof(random_num), WGPUBufferUsage_Uniform);
+	randomArrayBuf= createBuffer(&randomArray,sizeof(randomArray), WGPUBufferUsage_Uniform);
 	WGPUBindGroupEntry timeEntry = {};
 	timeEntry.binding = 0;
 	timeEntry.buffer = timeBuf;
@@ -452,7 +456,12 @@ static void createPipelineAndBuffers() {
 	randomEntry.buffer = randomBuf;
 	randomEntry.size = sizeof(random_num);
 
-	WGPUBindGroupEntry* uniformBgEntries = new WGPUBindGroupEntry[8];
+	WGPUBindGroupEntry randomArrayEntry = {};
+	randomArrayEntry.binding = 8;
+	randomArrayEntry.buffer = randomArrayBuf;
+	randomArrayEntry.size = sizeof(randomArray);
+
+	WGPUBindGroupEntry* uniformBgEntries = new WGPUBindGroupEntry[9];
 	uniformBgEntries[0] = timeEntry;
 	uniformBgEntries[1] = resolutionEntry;
 	uniformBgEntries[2] = mouseEntry;
@@ -461,10 +470,11 @@ static void createPipelineAndBuffers() {
 	uniformBgEntries[5] = keypressEntry;
 	uniformBgEntries[6] = positionEntry;
 	uniformBgEntries[7] = randomEntry;
+	uniformBgEntries[8] = randomArrayEntry;
 
 	WGPUBindGroupDescriptor uniformbgDesc = {};
 	uniformbgDesc.layout = bindGroupLayout;
-	uniformbgDesc.entryCount = 8;   
+	uniformbgDesc.entryCount = 9;   
 	uniformbgDesc.entries = uniformBgEntries;
 
 	bindGroup = wgpuDeviceCreateBindGroup(device, &uniformbgDesc);
@@ -505,7 +515,7 @@ static void createPipelineAndBuffers() {
 	wgpuBindGroupLayoutRelease(bindGroupLayout);
 	wgpuBindGroupLayoutRelease(texturebindGroupLayout);
 }
-EM_JS(void, jsprint, ( int x), {
+EM_JS(void, jsprint, ( float x), {
   console.log(x);
 });
 EM_JS(void, say, (const char* str), {
@@ -587,7 +597,6 @@ static bool redraw() {
 	// update the time 
 	endTime = clock();
 	runtime = (float)(endTime - startTime) / (CLOCKS_PER_SEC);
-
 	WGPUTextureView backBufView = wgpuSwapChainGetCurrentTextureView(swapchain);			// create textureView
 
 	WGPURenderPassColorAttachment colorDesc = {};
@@ -629,6 +638,7 @@ static bool redraw() {
 	wgpuQueueWriteBuffer(queue, keypressBuf,0, &keypress, sizeof(keypress));
 	wgpuQueueWriteBuffer(queue, positionBuf,0, &position, sizeof(position));
 	wgpuQueueWriteBuffer(queue, randomBuf,0, &random_num, sizeof(random_num));
+	wgpuQueueWriteBuffer(queue, randomArrayBuf,0, &randomArray, sizeof(randomArray));
 	wgpuQueueWriteTexture(queue, &texCopy1, img_1, imgh_1 * imgw_1 * 4, &texDataLayout1, &texSize1);
 	wgpuQueueWriteTexture(queue, &texCopy2, img_2, imgh_2 * imgw_2 * 4, &texDataLayout2, &texSize2);
 	wgpuQueueWriteTexture(queue, &texCopy3, img_3, imgh_3 * imgw_3 * 4, &texDataLayout3, &texSize3);
@@ -675,13 +685,13 @@ void load_images(SDL_Surface *image, int imgw,int imgh,unsigned char*& img )
 void image_init()
 {		
 		SDL_Surface *image;
-		image=IMG_Load("out/texture/admin_happytree.jpg");//texture1
+		image=IMG_Load("out/texture/admin_black.jpg");//texture1
 		imgw_1=image->w;
 		imgh_1=image->h;
 		img_1=new unsigned char[imgw_1 * imgh_1*4];
 		load_images(image,imgw_1,imgh_1,img_1);
 
-		image=IMG_Load("out/texture/admin_London.jpg");//texture2
+		image=IMG_Load("out/texture/admin_black.jpg");//texture2
 		imgw_2=image->w;
 		imgh_2=image->h;
 		img_2=new unsigned char[imgw_2 * imgh_2*4];
@@ -707,6 +717,12 @@ extern "C" int __main__(int /*argc*/, char* /*argv*/[]) {
 	int flags=IMG_INIT_JPG|IMG_INIT_PNG|IMG_INIT_TIF;
 	int initted=IMG_Init(flags);
 	image_init();
+	for (int i=0;i<100;i++)
+	{
+		int t=i/4;
+		int index=i%4;
+		randomArray[t][index]=emscripten_random();
+	}
 	if (window::Handle wHnd = window::create()) {
 		if ((device = webgpu::create(wHnd))) {
 			queue = wgpuDeviceGetQueue(device);
@@ -726,6 +742,8 @@ extern "C" int __main__(int /*argc*/, char* /*argv*/[]) {
 			wgpuBufferRelease(vertBuf);
 			wgpuBufferRelease(keypressBuf);
 			wgpuBufferRelease(positionBuf);
+			wgpuBufferRelease(randomBuf);
+			wgpuBufferRelease(randomArrayBuf);
 			wgpuRenderPipelineRelease(pipeline);
 			wgpuSwapChainRelease(swapchain);
 			wgpuQueueRelease(queue);
