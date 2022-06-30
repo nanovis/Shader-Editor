@@ -1,31 +1,38 @@
 {
-  "name": "Shader-Editor",
+  "name": "shader_editor",
   "version": "1.0.0",
-  "description": "",
+  "description": "An online WGSL shader editor and compiler.",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nanovis/Shader-Editor.git"
+  },
+  "keywords": [
+    "WebGPU",
+    "Dawn",
+    "WGSL"
+  ],
   "author": "Donggang Jia",
   "license": "ISC",
-  "dependencies": {
-    "@tensorflow/tfjs-node": "^3.16.0",
-    "body-parser": "^1.19.2",
-    "bootstrap-icons": "^1.8.1",
-    "cookie-parser": "^1.4.6",
-    "express": "^4.17.3",
-    "express-hbs": "^2.4.0",
-    "express-session": "^1.17.2",
-    "express-validator": "^6.14.0",
-    "image-size": "^1.0.1",
-    "monaco-editor": "^0.33.0",
-    "mongodb": "^4.5.0",
-    "multer": "^1.4.4",
-    "node-cmd": "^5.0.0",
-    "nsfwjs": "^2.4.1"
+  "bugs": {
+    "url": "https://github.com/nanovis/Shader-Editor/issues"
   },
-  "devDependencies": {
-    "hbs": "^4.2.0"
+  "homepage": "https://github.com/nanovis/Shader-Editor#readme",
+  "dependencies": {
+    "@tensorflow/tfjs-node": "^3.18.0",
+    "express": "^4.18.1",
+    "express-session": "^1.17.3",
+    "express-validator": "^6.14.2",
+    "hbs": "^4.2.0",
+    "image-size": "^1.0.1",
+    "jpeg-js": "^0.4.4",
+    "mongodb": "^4.7.0",
+    "multer": "^1.4.5-lts.1",
+    "node-cmd": "^5.0.0",
+    "nsfwjs": "^2.2.0"
   }
 }
