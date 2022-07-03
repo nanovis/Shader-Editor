@@ -33,6 +33,7 @@ WGPUBuffer keypressBuf;
 WGPUBuffer date1Buf;
 WGPUBuffer date2Buf;
 WGPUBuffer positionBuf;
+WGPUBuffer positionDinoBuf;
 WGPUBuffer randomBuf;
 WGPUBuffer randomArrayBuf;
 WGPUBindGroup bindGroup;
@@ -56,6 +57,7 @@ int date1[3];
 int date2[3];
 glm::vec4 randomArray[25];
 float position[2]={0.0f,300.0f};
+float position_dino[2]={50.0f,600.0f};
 int keypress=100; //ascii
 int mouseflag=0;
 float random_num=0.0f;
@@ -94,6 +96,7 @@ static char const triangle_frag_wgsl[] = R"(@group(0) @binding(0) var<uniform> T
 @group(0) @binding(6) var<uniform> Position : vec2<f32>;
 @group(0) @binding(7) var<uniform> Random : f32;
 @group(0) @binding(8) var<uniform> randomarray: array<vec4<f32>,25>;
+@group(0) @binding(9) var<uniform> Position_dino : vec2<f32>;
 @group(1) @binding(0) var texture1: texture_2d<f32>;
 @group(1) @binding(1) var texture2: texture_2d<f32>;
 @group(1) @binding(2) var texture3: texture_2d<f32>;
@@ -101,10 +104,19 @@ static char const triangle_frag_wgsl[] = R"(@group(0) @binding(0) var<uniform> T
 @group(1) @binding(4) var sampler_: sampler;
 @stage(fragment)
 fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
-var uv: vec3<f32> =vec3<f32>(position.xyx/Resolution.xyx);
-var col:vec3<f32> =randomarray[1].x+0.5f+vec3<f32> ( 0.5*cos(uv+vec3<f32>(0.0,2.0,4.0)));
-return randomarray[1].xyzw;
-})"; // fragment shader end
+
+    if(position.x>Position_dino.x && position.x< Position_dino.x+30.0 && position.y>Position_dino.y && position.y<Position_dino.y+20.0)
+    {
+    var tempx:f32=position.x-Position_dino.x;
+    var tempy:f32=position.y-Position_dino.y;
+    return textureSample(texture2, sampler_, vec2<f32>(tempx/30.0,tempy/20.0));
+    }
+    else
+    {
+      return textureSample(texture1, sampler_, position.xy/Resolution);
+    }
+}
+)"; // fragment shader end
 
 /*
 [[group(0),binding(0)]] var<uniform> Time : f32;
@@ -223,8 +235,13 @@ static void createPipelineAndBuffers() {
 	randomArraylEntry.visibility = WGPUShaderStage_Fragment;
 	randomArraylEntry.buffer = buf;
 
+	WGPUBindGroupLayoutEntry positiondinolEntry = {};
+	positiondinolEntry.binding = 9;
+	positiondinolEntry.visibility = WGPUShaderStage_Fragment;
+	positiondinolEntry.buffer = buf;
 
-	WGPUBindGroupLayoutEntry* allBgLayoutEntries = new WGPUBindGroupLayoutEntry[9];
+
+	WGPUBindGroupLayoutEntry* allBgLayoutEntries = new WGPUBindGroupLayoutEntry[10];
 	allBgLayoutEntries[0] = timelEntry;
 	allBgLayoutEntries[1] = resolutionlEntry;
 	allBgLayoutEntries[2] = mouselEntry;
@@ -234,8 +251,9 @@ static void createPipelineAndBuffers() {
 	allBgLayoutEntries[6] = positionlEntry;
 	allBgLayoutEntries[7] = randomlEntry;
 	allBgLayoutEntries[8] = randomArraylEntry;
+	allBgLayoutEntries[9] = positiondinolEntry;
 	WGPUBindGroupLayoutDescriptor bglDesc = {};
-	bglDesc.entryCount = 9;  
+	bglDesc.entryCount = 10;  
 	bglDesc.entries = allBgLayoutEntries;
 	WGPUBindGroupLayout bindGroupLayout = wgpuDeviceCreateBindGroupLayout(device, &bglDesc);
 
@@ -414,6 +432,7 @@ static void createPipelineAndBuffers() {
 	positionBuf= createBuffer(&position,sizeof(position), WGPUBufferUsage_Uniform);
 	randomBuf= createBuffer(&random_num,sizeof(random_num), WGPUBufferUsage_Uniform);
 	randomArrayBuf= createBuffer(&randomArray,sizeof(randomArray), WGPUBufferUsage_Uniform);
+	positionDinoBuf = createBuffer(&position_dino,sizeof(position_dino), WGPUBufferUsage_Uniform);
 	WGPUBindGroupEntry timeEntry = {};
 	timeEntry.binding = 0;
 	timeEntry.buffer = timeBuf;
@@ -461,7 +480,12 @@ static void createPipelineAndBuffers() {
 	randomArrayEntry.buffer = randomArrayBuf;
 	randomArrayEntry.size = sizeof(randomArray);
 
-	WGPUBindGroupEntry* uniformBgEntries = new WGPUBindGroupEntry[9];
+	WGPUBindGroupEntry positiondinoEntry = {};
+	positiondinoEntry.binding = 9;
+	positiondinoEntry.buffer = positionDinoBuf;
+	positiondinoEntry.size = sizeof(position_dino);
+
+	WGPUBindGroupEntry* uniformBgEntries = new WGPUBindGroupEntry[10];
 	uniformBgEntries[0] = timeEntry;
 	uniformBgEntries[1] = resolutionEntry;
 	uniformBgEntries[2] = mouseEntry;
@@ -471,10 +495,11 @@ static void createPipelineAndBuffers() {
 	uniformBgEntries[6] = positionEntry;
 	uniformBgEntries[7] = randomEntry;
 	uniformBgEntries[8] = randomArrayEntry;
+	uniformBgEntries[9] = positiondinoEntry;
 
 	WGPUBindGroupDescriptor uniformbgDesc = {};
 	uniformbgDesc.layout = bindGroupLayout;
-	uniformbgDesc.entryCount = 9;   
+	uniformbgDesc.entryCount = 10;   
 	uniformbgDesc.entries = uniformBgEntries;
 
 	bindGroup = wgpuDeviceCreateBindGroup(device, &uniformbgDesc);
@@ -565,6 +590,10 @@ EM_BOOL key_callback(int eventType, const EmscriptenKeyboardEvent *e, void *user
   if(position[0]>800.0f){position[0]=800.0f;}
   if(position[1]<0.0f){position[1]=0.0f;}
   if(position[1]>600.0f){position[1]=600.0f;}
+  if(position_dino[0]<0.0f){position_dino[0]=0.0f;}
+  if(position_dino[0]>800.0f){position_dino[0]=800.0f;}
+  if(position_dino[1]<0.0f){position_dino[1]=0.0f;}
+  if(position_dino[1]>600.0f){position_dino[1]=600.0f;}
   return 0;
 }
 static bool redraw() {
@@ -589,10 +618,18 @@ static bool redraw() {
 	if(w_press>0)
 	{
 		position[1]-=5.0f;
+		position_dino[1]-=5.0f;
 		w_press-=1;
 	}
 	else
-	{position[1]+=5.0f;}
+	{
+		position[1]+=5.0f;
+		position_dino[1]+=5.0f;
+		if(position_dino[1]>600.0f)
+		{
+			position_dino[1]=600.0f;
+		}
+	}
 	ret = emscripten_set_keypress_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, key_callback);
 	// update the time 
 	endTime = clock();
@@ -639,6 +676,7 @@ static bool redraw() {
 	wgpuQueueWriteBuffer(queue, positionBuf,0, &position, sizeof(position));
 	wgpuQueueWriteBuffer(queue, randomBuf,0, &random_num, sizeof(random_num));
 	wgpuQueueWriteBuffer(queue, randomArrayBuf,0, &randomArray, sizeof(randomArray));
+	wgpuQueueWriteBuffer(queue, positionDinoBuf,0, &position_dino, sizeof(position_dino));
 	wgpuQueueWriteTexture(queue, &texCopy1, img_1, imgh_1 * imgw_1 * 4, &texDataLayout1, &texSize1);
 	wgpuQueueWriteTexture(queue, &texCopy2, img_2, imgh_2 * imgw_2 * 4, &texDataLayout2, &texSize2);
 	wgpuQueueWriteTexture(queue, &texCopy3, img_3, imgh_3 * imgw_3 * 4, &texDataLayout3, &texSize3);
@@ -685,13 +723,13 @@ void load_images(SDL_Surface *image, int imgw,int imgh,unsigned char*& img )
 void image_init()
 {		
 		SDL_Surface *image;
-		image=IMG_Load("out/texture/admin_black.jpg");//texture1
+		image=IMG_Load("out/texture/admin_London.jpg");//texture1
 		imgw_1=image->w;
 		imgh_1=image->h;
 		img_1=new unsigned char[imgw_1 * imgh_1*4];
 		load_images(image,imgw_1,imgh_1,img_1);
 
-		image=IMG_Load("out/texture/admin_black.jpg");//texture2
+		image=IMG_Load("out/texture/admin_happytree.jpg");//texture2
 		imgw_2=image->w;
 		imgh_2=image->h;
 		img_2=new unsigned char[imgw_2 * imgh_2*4];
