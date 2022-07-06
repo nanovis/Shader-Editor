@@ -22,6 +22,7 @@ $ cd .. && make serve
 ```
 Access http://localhost:8080 on [Chorme Dev](https://www.google.com/chrome/dev/) and access `chrome://flags` to enable `--enable-unsafe-webgpu`.
 ## Todo:
+- Provide an interface for users to create uniform buffers
 - Syntax highlighting
 - Compiling error log
 - Shaders' distributed version control
