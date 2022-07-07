@@ -13,10 +13,9 @@
 // after the generated code, you will need to define   var Module = {};
 // before the code. Then that object will be used in the code, and you
 // can continue to use Module afterwards as well.
-var Module = typeof Module !== 'undefined' ? Module : {};
+var Module = typeof Module != 'undefined' ? Module : {};
 
 // See https://caniuse.com/mdn-javascript_builtins_object_assign
-var objAssign = Object.assign;
 
 // --pre-jses are emitted after the Module integration code, so that they can
 // refer to Module (if they choose; they can also define Module)
@@ -39,7 +38,7 @@ var objAssign = Object.assign;
         // web worker
         PACKAGE_PATH = encodeURIComponent(location.pathname.toString().substring(0, location.pathname.toString().lastIndexOf('/')) + '/');
       }
-      var PACKAGE_NAME = 'out/view/simpletexture.data';
+      var PACKAGE_NAME = 'out/simpletexture.data';
       var REMOTE_PACKAGE_BASE = 'simpletexture.data';
       if (typeof Module['locateFilePackage'] === 'function' && !Module['locateFile']) {
         Module['locateFile'] = Module['locateFilePackage'];
@@ -129,7 +128,8 @@ var objAssign = Object.assign;
       function assert(check, msg) {
         if (!check) throw msg + new Error().stack;
       }
-Module['FS_createPath']("/", "texture", true, true);
+Module['FS_createPath']("/", "out", true, true);
+Module['FS_createPath']("/out", "texture", true, true);
 
       /** @constructor */
       function DataRequest(start, end, audio) {
@@ -181,10 +181,10 @@ Module['FS_createPath']("/", "texture", true, true);
           var files = metadata['files'];
           for (var i = 0; i < files.length; ++i) {
             DataRequest.prototype.requests[files[i].filename].onload();
-          }          Module['removeRunDependency']('datafile_out/view/simpletexture.data');
+          }          Module['removeRunDependency']('datafile_out/simpletexture.data');
 
       };
-      Module['addRunDependency']('datafile_out/view/simpletexture.data');
+      Module['addRunDependency']('datafile_out/simpletexture.data');
 
       if (!Module.preloadResults) Module.preloadResults = {};
 
@@ -205,7 +205,7 @@ Module['FS_createPath']("/", "texture", true, true);
     }
 
     }
-    loadPackage({"files": [{"filename": "/texture/happytree.jpg", "start": 0, "end": 28134}, {"filename": "/texture/London.jpg", "start": 28134, "end": 209680}, {"filename": "/texture/black.jpg", "start": 209680, "end": 215070}, {"filename": "/texture/wall.jpg", "start": 215070, "end": 237324}, {"filename": "/texture/stock.jpg", "start": 237324, "end": 247851}], "remote_package_size": 247851, "package_uuid": "27dac4dd-18da-4392-935d-8957529667eb"});
+    loadPackage({"files": [{"filename": "/out/texture/.DS_Store", "start": 0, "end": 6148}, {"filename": "/out/texture/admin_black.jpg", "start": 6148, "end": 11538}, {"filename": "/out/texture/admin_happytree.jpg", "start": 11538, "end": 39672}, {"filename": "/out/texture/admin_London.jpg", "start": 39672, "end": 221218}, {"filename": "/out/texture/admin_stock.jpg", "start": 221218, "end": 231745}, {"filename": "/out/texture/admin_wall.jpg", "start": 231745, "end": 253999}], "remote_package_size": 253999, "package_uuid": "0df25c17-fd8a-47bf-9147-1f365c7ce198"});
 
   })();
 
@@ -216,7 +216,7 @@ Module['FS_createPath']("/", "texture", true, true);
 // we collect those properties and reapply _after_ we configure
 // the current environment's defaults to avoid having to be so
 // defensive during initialization.
-var moduleOverrides = objAssign({}, Module);
+var moduleOverrides = Object.assign({}, Module);
 
 var arguments_ = [];
 var thisProgram = './this.program';
@@ -228,11 +228,11 @@ var quit_ = (status, toThrow) => {
 // setting the ENVIRONMENT setting at compile time (see settings.js).
 
 // Attempt to auto-detect the environment
-var ENVIRONMENT_IS_WEB = typeof window === 'object';
-var ENVIRONMENT_IS_WORKER = typeof importScripts === 'function';
+var ENVIRONMENT_IS_WEB = typeof window == 'object';
+var ENVIRONMENT_IS_WORKER = typeof importScripts == 'function';
 // N.b. Electron.js environment is simultaneously a NODE-environment, but
 // also a web environment.
-var ENVIRONMENT_IS_NODE = typeof process === 'object' && typeof process.versions === 'object' && typeof process.versions.node === 'string';
+var ENVIRONMENT_IS_NODE = typeof process == 'object' && typeof process.versions == 'object' && typeof process.versions.node == 'string';
 var ENVIRONMENT_IS_SHELL = !ENVIRONMENT_IS_WEB && !ENVIRONMENT_IS_NODE && !ENVIRONMENT_IS_WORKER;
 
 // `/` should be present at the end if `scriptDirectory` is not empty
@@ -290,7 +290,7 @@ requireNodeFS = () => {
 read_ = function shell_read(filename, binary) {
   requireNodeFS();
   filename = nodePath['normalize'](filename);
-  return fs.readFileSync(filename, binary ? null : 'utf8');
+  return fs.readFileSync(filename, binary ? undefined : 'utf8');
 };
 
 readBinary = (filename) => {
@@ -317,7 +317,7 @@ readAsync = (filename, onload, onerror) => {
 
   arguments_ = process['argv'].slice(2);
 
-  if (typeof module !== 'undefined') {
+  if (typeof module != 'undefined') {
     module['exports'] = Module;
   }
 
@@ -354,7 +354,7 @@ readAsync = (filename, onload, onerror) => {
 if (ENVIRONMENT_IS_WEB || ENVIRONMENT_IS_WORKER) {
   if (ENVIRONMENT_IS_WORKER) { // Check worker, not web, since window could be polyfilled
     scriptDirectory = self.location.href;
-  } else if (typeof document !== 'undefined' && document.currentScript) { // web
+  } else if (typeof document != 'undefined' && document.currentScript) { // web
     scriptDirectory = document.currentScript.src;
   }
   // blob urls look like blob:http://site.com/etc/etc and we cannot infer anything from them.
@@ -419,7 +419,7 @@ var out = Module['print'] || console.log.bind(console);
 var err = Module['printErr'] || console.warn.bind(console);
 
 // Merge back in the overrides
-objAssign(Module, moduleOverrides);
+Object.assign(Module, moduleOverrides);
 // Free the object hierarchy contained in the overrides, this lets the GC
 // reclaim data used e.g. in memoryInitializerRequest, which is a large typed array.
 moduleOverrides = null;
@@ -445,10 +445,10 @@ var POINTER_SIZE = 4;
 
 function getNativeTypeSize(type) {
   switch (type) {
-    case 'i1': case 'i8': return 1;
-    case 'i16': return 2;
-    case 'i32': return 4;
-    case 'i64': return 8;
+    case 'i1': case 'i8': case 'u8': return 1;
+    case 'i16': case 'u16': return 2;
+    case 'i32': case 'u32': return 4;
+    case 'i64': case 'u64': return 8;
     case 'float': return 4;
     case 'double': return 8;
     default: {
@@ -476,6 +476,15 @@ function warnOnce(text) {
 // include: runtime_functions.js
 
 
+// This gives correct answers for everything less than 2^{14} = 16384
+// I hope nobody is contemplating functions with 16384 arguments...
+function uleb128Encode(n) {
+  if (n < 128) {
+    return [n];
+  }
+  return [(n % 128) | 128, n >> 7];
+}
+
 // Wraps a JS function as a wasm function with a given signature.
 function convertJsFunctionToWasm(func, sig) {
 
@@ -483,7 +492,7 @@ function convertJsFunctionToWasm(func, sig) {
   // "WebAssembly.Function" constructor.
   // Otherwise, construct a minimal wasm module importing the JS function and
   // re-exporting it.
-  if (typeof WebAssembly.Function === "function") {
+  if (typeof WebAssembly.Function == "function") {
     var typeNames = {
       'i': 'i32',
       'j': 'i64',
@@ -503,8 +512,6 @@ function convertJsFunctionToWasm(func, sig) {
   // The module is static, with the exception of the type section, which is
   // generated based on the signature passed in.
   var typeSection = [
-    0x01, // id: section,
-    0x00, // length: 0 (placeholder)
     0x01, // count: 1
     0x60, // form: func
   ];
@@ -518,7 +525,7 @@ function convertJsFunctionToWasm(func, sig) {
   };
 
   // Parameters, length + signatures
-  typeSection.push(sigParam.length);
+  typeSection = typeSection.concat(uleb128Encode(sigParam.length));
   for (var i = 0; i < sigParam.length; ++i) {
     typeSection.push(typeCodes[sigParam[i]]);
   }
@@ -531,9 +538,12 @@ function convertJsFunctionToWasm(func, sig) {
     typeSection = typeSection.concat([0x01, typeCodes[sigRet]]);
   }
 
-  // Write the overall length of the type section back into the section header
-  // (excepting the 2 bytes for the section id and length)
-  typeSection[1] = typeSection.length - 2;
+  // Write the section code and overall length of the type section into the
+  // section header
+  typeSection = [0x01 /* Type section code */].concat(
+    uleb128Encode(typeSection.length),
+    typeSection
+  );
 
   // Rest of the module is static
   var bytes = new Uint8Array([
@@ -592,8 +602,11 @@ function updateTableMap(offset, count) {
   }
 }
 
-// Add a function to the table.
-// 'sig' parameter is required if the function being added is a JS function.
+/**
+ * Add a function to the table.
+ * 'sig' parameter is required if the function being added is a JS function.
+ * @param {string=} sig
+ */
 function addFunction(func, sig) {
 
   // Check if the function is already in the table, to ensure each function
@@ -657,50 +670,51 @@ var wasmBinary;
 if (Module['wasmBinary']) wasmBinary = Module['wasmBinary'];
 var noExitRuntime = Module['noExitRuntime'] || false;
 
-if (typeof WebAssembly !== 'object') {
+if (typeof WebAssembly != 'object') {
   abort('no native wasm support detected');
 }
 
 // include: runtime_safe_heap.js
 
 
-// In MINIMAL_RUNTIME, setValue() and getValue() are only available when building with safe heap enabled, for heap safety checking.
-// In traditional runtime, setValue() and getValue() are always available (although their use is highly discouraged due to perf penalties)
+// In MINIMAL_RUNTIME, setValue() and getValue() are only available when
+// building with safe heap enabled, for heap safety checking.
+// In traditional runtime, setValue() and getValue() are always available
+// (although their use is highly discouraged due to perf penalties)
 
 /** @param {number} ptr
     @param {number} value
     @param {string} type
     @param {number|boolean=} noSafe */
 function setValue(ptr, value, type = 'i8', noSafe) {
-  if (type.charAt(type.length-1) === '*') type = 'i32';
-    switch (type) {
-      case 'i1': HEAP8[((ptr)>>0)] = value; break;
-      case 'i8': HEAP8[((ptr)>>0)] = value; break;
-      case 'i16': HEAP16[((ptr)>>1)] = value; break;
-      case 'i32': HEAP32[((ptr)>>2)] = value; break;
-      case 'i64': (tempI64 = [value>>>0,(tempDouble=value,(+(Math.abs(tempDouble))) >= 1.0 ? (tempDouble > 0.0 ? ((Math.min((+(Math.floor((tempDouble)/4294967296.0))), 4294967295.0))|0)>>>0 : (~~((+(Math.ceil((tempDouble - +(((~~(tempDouble)))>>>0))/4294967296.0)))))>>>0) : 0)],HEAP32[((ptr)>>2)] = tempI64[0],HEAP32[(((ptr)+(4))>>2)] = tempI64[1]); break;
-      case 'float': HEAPF32[((ptr)>>2)] = value; break;
-      case 'double': HEAPF64[((ptr)>>3)] = value; break;
-      default: abort('invalid type for setValue: ' + type);
-    }
+  if (type.endsWith('*')) type = 'i32';
+  switch (type) {
+    case 'i1': HEAP8[((ptr)>>0)] = value; break;
+    case 'i8': HEAP8[((ptr)>>0)] = value; break;
+    case 'i16': HEAP16[((ptr)>>1)] = value; break;
+    case 'i32': HEAP32[((ptr)>>2)] = value; break;
+    case 'i64': (tempI64 = [value>>>0,(tempDouble=value,(+(Math.abs(tempDouble))) >= 1.0 ? (tempDouble > 0.0 ? ((Math.min((+(Math.floor((tempDouble)/4294967296.0))), 4294967295.0))|0)>>>0 : (~~((+(Math.ceil((tempDouble - +(((~~(tempDouble)))>>>0))/4294967296.0)))))>>>0) : 0)],HEAP32[((ptr)>>2)] = tempI64[0],HEAP32[(((ptr)+(4))>>2)] = tempI64[1]); break;
+    case 'float': HEAPF32[((ptr)>>2)] = value; break;
+    case 'double': HEAPF64[((ptr)>>3)] = value; break;
+    default: abort('invalid type for setValue: ' + type);
+  }
 }
 
 /** @param {number} ptr
     @param {string} type
     @param {number|boolean=} noSafe */
 function getValue(ptr, type = 'i8', noSafe) {
-  if (type.charAt(type.length-1) === '*') type = 'i32';
-    switch (type) {
-      case 'i1': return HEAP8[((ptr)>>0)];
-      case 'i8': return HEAP8[((ptr)>>0)];
-      case 'i16': return HEAP16[((ptr)>>1)];
-      case 'i32': return HEAP32[((ptr)>>2)];
-      case 'i64': return HEAP32[((ptr)>>2)];
-      case 'float': return HEAPF32[((ptr)>>2)];
-      case 'double': return Number(HEAPF64[((ptr)>>3)]);
-      default: abort('invalid type for getValue: ' + type);
-    }
-  return null;
+  if (type.endsWith('*')) type = 'i32';
+  switch (type) {
+    case 'i1': return HEAP8[((ptr)>>0)];
+    case 'i8': return HEAP8[((ptr)>>0)];
+    case 'i16': return HEAP16[((ptr)>>1)];
+    case 'i32': return HEAP32[((ptr)>>2)];
+    case 'i64': return HEAP32[((ptr)>>2)];
+    case 'float': return HEAPF32[((ptr)>>2)];
+    case 'double': return Number(HEAPF64[((ptr)>>3)]);
+    default: abort('invalid type for getValue: ' + type);
+  }
 }
 
 // end include: runtime_safe_heap.js
@@ -809,17 +823,21 @@ function cwrap(ident, returnType, argTypes, opts) {
   }
 }
 
+// include: runtime_legacy.js
+
+
 var ALLOC_NORMAL = 0; // Tries to use _malloc()
 var ALLOC_STACK = 1; // Lives for the duration of the current function call
 
-// allocate(): This is for internal use. You can use it yourself as well, but the interface
-//             is a little tricky (see docs right below). The reason is that it is optimized
-//             for multiple syntaxes to save space in generated code. So you should
-//             normally not use allocate(), and instead allocate memory using _malloc(),
-//             initialize it with setValue(), and so forth.
-// @slab: An array of data.
-// @allocator: How to allocate memory, see ALLOC_*
-/** @type {function((Uint8Array|Array<number>), number)} */
+/**
+ * allocate(): This function is no longer used by emscripten but is kept around to avoid
+ *             breaking external users.
+ *             You should normally not use allocate(), and instead allocate
+ *             memory using _malloc()/stackAlloc(), initialize it with
+ *             setValue(), and so forth.
+ * @param {(Uint8Array|Array<number>)} slab: An array of data.
+ * @param {number=} allocator : How to allocate memory, see ALLOC_*
+ */
 function allocate(slab, allocator) {
   var ret;
 
@@ -829,39 +847,39 @@ function allocate(slab, allocator) {
     ret = _malloc(slab.length);
   }
 
-  if (slab.subarray || slab.slice) {
-    HEAPU8.set(/** @type {!Uint8Array} */(slab), ret);
-  } else {
-    HEAPU8.set(new Uint8Array(slab), ret);
+  if (!slab.subarray && !slab.slice) {
+    slab = new Uint8Array(slab);
   }
+  HEAPU8.set(slab, ret);
   return ret;
 }
 
+// end include: runtime_legacy.js
 // include: runtime_strings.js
 
 
 // runtime_strings.js: Strings related runtime functions that are part of both MINIMAL_RUNTIME and regular runtime.
 
+var UTF8Decoder = typeof TextDecoder != 'undefined' ? new TextDecoder('utf8') : undefined;
+
 // Given a pointer 'ptr' to a null-terminated UTF8-encoded string in the given array that contains uint8 values, returns
 // a copy of that string as a Javascript String object.
-
-var UTF8Decoder = typeof TextDecoder !== 'undefined' ? new TextDecoder('utf8') : undefined;
-
 /**
+ * heapOrArray is either a regular array, or a JavaScript typed array view.
  * @param {number} idx
  * @param {number=} maxBytesToRead
  * @return {string}
  */
-function UTF8ArrayToString(heap, idx, maxBytesToRead) {
+function UTF8ArrayToString(heapOrArray, idx, maxBytesToRead) {
   var endIdx = idx + maxBytesToRead;
   var endPtr = idx;
   // TextDecoder needs to know the byte length in advance, it doesn't stop on null terminator by itself.
   // Also, use the length info to avoid running tiny strings through TextDecoder, since .subarray() allocates garbage.
   // (As a tiny code save trick, compare endPtr against endIdx using a negation, so that undefined means Infinity)
-  while (heap[endPtr] && !(endPtr >= endIdx)) ++endPtr;
+  while (heapOrArray[endPtr] && !(endPtr >= endIdx)) ++endPtr;
 
-  if (endPtr - idx > 16 && heap.subarray && UTF8Decoder) {
-    return UTF8Decoder.decode(heap.subarray(idx, endPtr));
+  if (endPtr - idx > 16 && heapOrArray.buffer && UTF8Decoder) {
+    return UTF8Decoder.decode(heapOrArray.subarray(idx, endPtr));
   } else {
     var str = '';
     // If building with TextDecoder, we have already computed the string length above, so test loop end condition against that
@@ -870,15 +888,15 @@ function UTF8ArrayToString(heap, idx, maxBytesToRead) {
       // http://en.wikipedia.org/wiki/UTF-8#Description
       // https://www.ietf.org/rfc/rfc2279.txt
       // https://tools.ietf.org/html/rfc3629
-      var u0 = heap[idx++];
+      var u0 = heapOrArray[idx++];
       if (!(u0 & 0x80)) { str += String.fromCharCode(u0); continue; }
-      var u1 = heap[idx++] & 63;
+      var u1 = heapOrArray[idx++] & 63;
       if ((u0 & 0xE0) == 0xC0) { str += String.fromCharCode(((u0 & 31) << 6) | u1); continue; }
-      var u2 = heap[idx++] & 63;
+      var u2 = heapOrArray[idx++] & 63;
       if ((u0 & 0xF0) == 0xE0) {
         u0 = ((u0 & 15) << 12) | (u1 << 6) | u2;
       } else {
-        u0 = ((u0 & 7) << 18) | (u1 << 12) | (u2 << 6) | (heap[idx++] & 63);
+        u0 = ((u0 & 7) << 18) | (u1 << 12) | (u2 << 6) | (heapOrArray[idx++] & 63);
       }
 
       if (u0 < 0x10000) {
@@ -1018,7 +1036,7 @@ function stringToAscii(str, outPtr) {
 // Given a pointer 'ptr' to a null-terminated UTF16LE-encoded string in the emscripten HEAP, returns
 // a copy of that string as a Javascript String object.
 
-var UTF16Decoder = typeof TextDecoder !== 'undefined' ? new TextDecoder('utf-16le') : undefined;
+var UTF16Decoder = typeof TextDecoder != 'undefined' ? new TextDecoder('utf-16le') : undefined;
 
 function UTF16ToString(ptr, maxBytesToRead) {
   var endPtr = ptr;
@@ -1213,31 +1231,24 @@ function writeAsciiToMemory(str, buffer, dontAddNull) {
 // end include: runtime_strings_extra.js
 // Memory management
 
-function alignUp(x, multiple) {
-  if (x % multiple > 0) {
-    x += multiple - (x % multiple);
-  }
-  return x;
-}
-
 var HEAP,
-/** @type {ArrayBuffer} */
+/** @type {!ArrayBuffer} */
   buffer,
-/** @type {Int8Array} */
+/** @type {!Int8Array} */
   HEAP8,
-/** @type {Uint8Array} */
+/** @type {!Uint8Array} */
   HEAPU8,
-/** @type {Int16Array} */
+/** @type {!Int16Array} */
   HEAP16,
-/** @type {Uint16Array} */
+/** @type {!Uint16Array} */
   HEAPU16,
-/** @type {Int32Array} */
+/** @type {!Int32Array} */
   HEAP32,
-/** @type {Uint32Array} */
+/** @type {!Uint32Array} */
   HEAPU32,
-/** @type {Float32Array} */
+/** @type {!Float32Array} */
   HEAPF32,
-/** @type {Float64Array} */
+/** @type {!Float64Array} */
   HEAPF64;
 
 function updateGlobalBufferAndViews(buf) {
@@ -1278,6 +1289,7 @@ var __ATEXIT__    = []; // functions called during shutdown
 var __ATPOSTRUN__ = []; // functions called after the main() is called
 
 var runtimeInitialized = false;
+
 var runtimeExited = false;
 var runtimeKeepaliveCounter = 0;
 
@@ -1410,9 +1422,6 @@ function removeRunDependency(id) {
   }
 }
 
-Module["preloadedImages"] = {}; // maps url to image data
-Module["preloadedAudios"] = {}; // maps url to audio data
-
 /** @param {string|number=} what */
 function abort(what) {
   {
@@ -1429,11 +1438,18 @@ function abort(what) {
   ABORT = true;
   EXITSTATUS = 1;
 
-  what += '. Build with -s ASSERTIONS=1 for more info.';
+  what += '. Build with -sASSERTIONS for more info.';
 
   // Use a wasm runtime error, because a JS error might be seen as a foreign
   // exception, which means we'd run destructors on it. We need the error to
   // simply make the program stop.
+
+  // Suppress closure compiler warning here. Closure compiler's builtin extern
+  // defintion for WebAssembly.RuntimeError claims it takes no arguments even
+  // though it can.
+  // TODO(https://github.com/google/closure-compiler/pull/3913): Remove if/when upstream closure gets fixed.
+
+  /** @suppress {checkTypes} */
   var e = new WebAssembly.RuntimeError(what);
 
   // Throw the error whether or not MODULARIZE is set because abort is used
@@ -1495,7 +1511,7 @@ function getBinaryPromise() {
   // Cordova or Electron apps are typically loaded from a file:// url.
   // So use fetch if it is available and the url is not a file, otherwise fall back to XHR.
   if (!wasmBinary && (ENVIRONMENT_IS_WEB || ENVIRONMENT_IS_WORKER)) {
-    if (typeof fetch === 'function'
+    if (typeof fetch == 'function'
       && !isFileURI(wasmBinaryFile)
     ) {
       return fetch(wasmBinaryFile, { credentials: 'same-origin' }).then(function(response) {
@@ -1546,6 +1562,7 @@ function createWasm() {
     addOnInit(Module['asm']['__wasm_call_ctors']);
 
     removeRunDependency('wasm-instantiate');
+
   }
   // we can't run yet (except in a pthread, where we have a custom sync instantiator)
   addRunDependency('wasm-instantiate');
@@ -1573,12 +1590,17 @@ function createWasm() {
 
   function instantiateAsync() {
     if (!wasmBinary &&
-        typeof WebAssembly.instantiateStreaming === 'function' &&
+        typeof WebAssembly.instantiateStreaming == 'function' &&
         !isDataURI(wasmBinaryFile) &&
         // Don't use streaming for file:// delivered objects in a webview, fetch them synchronously.
         !isFileURI(wasmBinaryFile) &&
-        typeof fetch === 'function') {
-      return fetch(wasmBinaryFile, { credentials: 'same-origin' }).then(function (response) {
+        typeof fetch == 'function') {
+      return fetch(wasmBinaryFile, { credentials: 'same-origin' }).then(function(response) {
+        // Suppress closure warning here since the upstream definition for
+        // instantiateStreaming only allows Promise<Repsponse> rather than
+        // an actual Response.
+        // TODO(https://github.com/google/closure-compiler/pull/3913): Remove if/when upstream closure is fixed.
+        /** @suppress {checkTypes} */
         var result = WebAssembly.instantiateStreaming(response, info);
 
         return result.then(
@@ -1599,6 +1621,7 @@ function createWasm() {
   // User shell pages can write their own Module.instantiateWasm = function(imports, successCallback) callback
   // to manually instantiate the Wasm module themselves. This allows pages to run the instantiation parallel
   // to any other async startup actions they are performing.
+  // Also pthreads and wasm workers initialize the wasm instance through this path.
   if (Module['instantiateWasm']) {
     try {
       var exports = Module['instantiateWasm'](info, receiveInstance);
@@ -1623,7 +1646,7 @@ var ASM_CONSTS = {
   
 };
 function glue_preint(){ var entry = __glue_main_; if (entry) { if (navigator["gpu"]) { navigator["gpu"]["requestAdapter"]().then(function (adapter) { adapter["requestDevice"]().then( function (device) { Module["preinitializedWebGPUDevice"] = device; entry(); }); }, function () { console.error("No WebGPU adapter; not starting"); }); } else { console.error("No support for WebGPU; not starting"); } } else { console.error("Entry point not found; unable to start"); } }
-function jsprint(x,y){ console.log(x,y); }
+function jsprint(x){ console.log(x); }
 function say(str){ console.log( UTF8ToString(str)); }
 
 
@@ -1654,11 +1677,11 @@ function say(str){ console.log( UTF8ToString(str)); }
         };
         Browser.mainLoop.method = 'rAF';
       } else if (mode == 2 /*EM_TIMING_SETIMMEDIATE*/) {
-        if (typeof setImmediate === 'undefined') {
+        if (typeof setImmediate == 'undefined') {
           // Emulate setImmediate. (note: not a complete polyfill, we don't emulate clearImmediate() to keep code size to minimum, since not needed)
           var setImmediates = [];
           var emscriptenMainLoopMessageId = 'setimmediate';
-          var Browser_setImmediate_messageHandler = function(event) {
+          var Browser_setImmediate_messageHandler = function(/** @type {Event} */ event) {
             // When called in current thread or Worker, the main loop ID is structured slightly different to accommodate for --proxy-to-worker runtime listening to Worker events,
             // so check for both cases.
             if (event.data === emscriptenMainLoopMessageId || event.data.target === emscriptenMainLoopMessageId) {
@@ -1722,6 +1745,11 @@ function say(str){ console.log( UTF8ToString(str)); }
         }
       }
     }
+  
+    /**
+     * @param {number=} arg
+     * @param {boolean=} noSetTiming
+     */
   function setMainLoop(browserIterationFunc, fps, simulateInfiniteLoop, arg, noSetTiming) {
       assert(!Browser.mainLoop.func, 'emscripten_set_main_loop: there can only be one main loop function at once: call emscripten_cancel_main_loop to cancel the previous one before setting a new one with different parameters.');
   
@@ -1796,7 +1824,7 @@ function say(str){ console.log( UTF8ToString(str)); }
         // to queue the newest produced audio samples.
         // TODO: Consider adding pre- and post- rAF callbacks so that GL.newRenderingFrameStarted() and SDL.audio.queueNewAudioData()
         //       do not need to be hardcoded into this function, but can be more generic.
-        if (typeof SDL === 'object' && SDL.audio && SDL.audio.queueNewAudioData) SDL.audio.queueNewAudioData();
+        if (typeof SDL == 'object' && SDL.audio && SDL.audio.queueNewAudioData) SDL.audio.queueNewAudioData();
   
         Browser.mainLoop.scheduler();
       }
@@ -1813,6 +1841,7 @@ function say(str){ console.log( UTF8ToString(str)); }
       }
     }
   
+  /** @param {boolean=} synchronous */
   function callUserCallback(func, synchronous) {
       if (runtimeExited || ABORT) {
         return;
@@ -1833,6 +1862,7 @@ function say(str){ console.log( UTF8ToString(str)); }
   function runtimeKeepalivePop() {
       runtimeKeepaliveCounter -= 1;
     }
+  /** @param {number=} timeout */
   function safeSetTimeout(func, timeout) {
       runtimeKeepalivePush();
       return setTimeout(function() {
@@ -1894,7 +1924,7 @@ function say(str){ console.log( UTF8ToString(str)); }
         }
         Browser.BlobBuilder = typeof MozBlobBuilder != "undefined" ? MozBlobBuilder : (typeof WebKitBlobBuilder != "undefined" ? WebKitBlobBuilder : (!Browser.hasBlobConstructor ? out("warning: no BlobBuilder") : null));
         Browser.URLObject = typeof window != "undefined" ? (window.URL ? window.URL : window.webkitURL) : undefined;
-        if (!Module.noImageDecoding && typeof Browser.URLObject === 'undefined') {
+        if (!Module.noImageDecoding && typeof Browser.URLObject == 'undefined') {
           out("warning: Browser does not support creating object URLs. Built-in browser image decoding will not be available.");
           Module.noImageDecoding = true;
         }
@@ -1933,12 +1963,12 @@ function say(str){ console.log( UTF8ToString(str)); }
           var img = new Image();
           img.onload = () => {
             assert(img.complete, 'Image ' + name + ' could not be decoded');
-            var canvas = document.createElement('canvas');
+            var canvas = /** @type {!HTMLCanvasElement} */ (document.createElement('canvas'));
             canvas.width = img.width;
             canvas.height = img.height;
             var ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0);
-            Module["preloadedImages"][name] = canvas;
+            preloadedImages[name] = canvas;
             Browser.URLObject.revokeObjectURL(url);
             if (onload) onload(byteArray);
           };
@@ -1959,13 +1989,13 @@ function say(str){ console.log( UTF8ToString(str)); }
           function finish(audio) {
             if (done) return;
             done = true;
-            Module["preloadedAudios"][name] = audio;
+            preloadedAudios[name] = audio;
             if (onload) onload(byteArray);
           }
           function fail() {
             if (done) return;
             done = true;
-            Module["preloadedAudios"][name] = new Audio(); // empty shim
+            preloadedAudios[name] = new Audio(); // empty shim
             if (onerror) onerror();
           }
           if (Browser.hasBlobConstructor) {
@@ -2070,7 +2100,7 @@ function say(str){ console.log( UTF8ToString(str)); }
           }
         });
         return handled;
-      },createContext:function(canvas, useWebGL, setInModule, webGLContextAttributes) {
+      },createContext:function(/** @type {HTMLCanvasElement} */ canvas, useWebGL, setInModule, webGLContextAttributes) {
         if (useWebGL && Module.ctx && canvas == Module.canvas) return Module.ctx; // no need to recreate GL context if it's already been created for this canvas.
   
         var ctx;
@@ -2092,7 +2122,7 @@ function say(str){ console.log( UTF8ToString(str)); }
           // This check of existence of GL is here to satisfy Closure compiler, which yells if variable GL is referenced below but GL object is not
           // actually compiled in because application is not doing any GL operations. TODO: Ideally if GL is not being used, this function
           // Browser.createContext() should not even be emitted.
-          if (typeof GL !== 'undefined') {
+          if (typeof GL != 'undefined') {
             contextHandle = GL.createContext(canvas, contextAttributes);
             if (contextHandle) {
               ctx = GL.getContext(contextHandle).GLctx;
@@ -2105,7 +2135,7 @@ function say(str){ console.log( UTF8ToString(str)); }
         if (!ctx) return null;
   
         if (setInModule) {
-          if (!useWebGL) assert(typeof GLctx === 'undefined', 'cannot set in module if GLctx is used, but we are a non-GL context that would replace it');
+          if (!useWebGL) assert(typeof GLctx == 'undefined', 'cannot set in module if GLctx is used, but we are a non-GL context that would replace it');
   
           Module.ctx = ctx;
           if (useWebGL) GL.makeContextCurrent(contextHandle);
@@ -2117,8 +2147,8 @@ function say(str){ console.log( UTF8ToString(str)); }
       },destroyContext:function(canvas, useWebGL, setInModule) {},fullscreenHandlersInstalled:false,lockPointer:undefined,resizeCanvas:undefined,requestFullscreen:function(lockPointer, resizeCanvas) {
         Browser.lockPointer = lockPointer;
         Browser.resizeCanvas = resizeCanvas;
-        if (typeof Browser.lockPointer === 'undefined') Browser.lockPointer = true;
-        if (typeof Browser.resizeCanvas === 'undefined') Browser.resizeCanvas = false;
+        if (typeof Browser.lockPointer == 'undefined') Browser.lockPointer = true;
+        if (typeof Browser.resizeCanvas == 'undefined') Browser.resizeCanvas = false;
   
         var canvas = Module['canvas'];
         function fullscreenChange() {
@@ -2200,7 +2230,7 @@ function say(str){ console.log( UTF8ToString(str)); }
         var delay = Math.max(Browser.nextRAF - now, 0);
         setTimeout(func, delay);
       },requestAnimationFrame:function(func) {
-        if (typeof requestAnimationFrame === 'function') {
+        if (typeof requestAnimationFrame == 'function') {
           requestAnimationFrame(func);
           return;
         }
@@ -2309,8 +2339,8 @@ function say(str){ console.log( UTF8ToString(str)); }
           // Neither .scrollX or .pageXOffset are defined in a spec, but
           // we prefer .scrollX because it is currently in a spec draft.
           // (see: http://www.w3.org/TR/2013/WD-cssom-view-20131217/)
-          var scrollX = ((typeof window.scrollX !== 'undefined') ? window.scrollX : window.pageXOffset);
-          var scrollY = ((typeof window.scrollY !== 'undefined') ? window.scrollY : window.pageYOffset);
+          var scrollX = ((typeof window.scrollX != 'undefined') ? window.scrollX : window.pageXOffset);
+          var scrollY = ((typeof window.scrollY != 'undefined') ? window.scrollY : window.pageYOffset);
   
           if (event.type === 'touchstart' || event.type === 'touchend' || event.type === 'touchmove') {
             var touch = event.touch;
@@ -2428,6 +2458,7 @@ function say(str){ console.log( UTF8ToString(str)); }
   function listenOnce(object, event, func) {
       object.addEventListener(event, func, { 'once': true });
     }
+  /** @param {Object=} elements */
   function autoResumeAudioContext(ctx, elements) {
       if (!elements) {
         elements = [document, document.getElementById('canvas')];
@@ -2451,10 +2482,15 @@ function say(str){ console.log( UTF8ToString(str)); }
           continue;
         }
         var func = callback.func;
-        if (typeof func === 'number') {
+        if (typeof func == 'number') {
           if (callback.arg === undefined) {
+            // Run the wasm function ptr with signature 'v'. If no function
+            // with such signature was exported, this call does not need
+            // to be emitted (and would confuse Closure)
             getWasmTableEntry(func)();
           } else {
+            // If any function with signature 'vi' was exported, run
+            // the callback with that signature.
             getWasmTableEntry(func)(callback.arg);
           }
         } else {
@@ -2497,6 +2533,7 @@ function say(str){ console.log( UTF8ToString(str)); }
       }
       return func;
     }
+  /** @param {Object=} args */
   function dynCall(sig, ptr, args) {
       // Without WASM_BIGINT support we cannot directly call function with i64 as
       // part of thier signature, so we rely the dynCall functions generated by
@@ -2512,8 +2549,8 @@ function say(str){ console.log( UTF8ToString(str)); }
   function jsStackTrace() {
       var error = new Error();
       if (!error.stack) {
-        // IE10+ special cases: It does have callstack info, but it is only populated if an Error object is thrown,
-        // so try that as a special-case.
+        // IE10+ special cases: It does have callstack info, but it is only
+        // populated if an Error object is thrown, so try that as a special-case.
         try {
           throw new Error();
         } catch(e) {
@@ -2528,7 +2565,10 @@ function say(str){ console.log( UTF8ToString(str)); }
 
   function setWasmTableEntry(idx, func) {
       wasmTable.set(idx, func);
-      wasmTableMirror[idx] = func;
+      // With ABORT_ON_WASM_EXCEPTIONS wasmTable.get is overriden to return wrapped
+      // functions so we need to call it here to retrieve the potential wrapper correctly
+      // instead of just storing 'func' directly into wasmTableMirror
+      wasmTableMirror[idx] = wasmTable.get(idx);
     }
 
   function stackTrace() {
@@ -2546,10 +2586,10 @@ function say(str){ console.log( UTF8ToString(str)); }
       return value;
     }
   
-  var PATH = {splitPath:function(filename) {
+  var PATH = {isAbs:(path) => path.charAt(0) === '/',splitPath:(filename) => {
         var splitPathRe = /^(\/?|)([\s\S]*?)((?:\.{1,2}|[^\/]+?|)(\.[^.\/]*|))(?:[\/]*)$/;
         return splitPathRe.exec(filename).slice(1);
-      },normalizeArray:function(parts, allowAboveRoot) {
+      },normalizeArray:(parts, allowAboveRoot) => {
         // if the path tries to go above the root, `up` ends up > 0
         var up = 0;
         for (var i = parts.length - 1; i >= 0; i--) {
@@ -2571,13 +2611,11 @@ function say(str){ console.log( UTF8ToString(str)); }
           }
         }
         return parts;
-      },normalize:function(path) {
-        var isAbsolute = path.charAt(0) === '/',
+      },normalize:(path) => {
+        var isAbsolute = PATH.isAbs(path),
             trailingSlash = path.substr(-1) === '/';
         // Normalize the path
-        path = PATH.normalizeArray(path.split('/').filter(function(p) {
-          return !!p;
-        }), !isAbsolute).join('/');
+        path = PATH.normalizeArray(path.split('/').filter((p) => !!p), !isAbsolute).join('/');
         if (!path && !isAbsolute) {
           path = '.';
         }
@@ -2585,7 +2623,7 @@ function say(str){ console.log( UTF8ToString(str)); }
           path += '/';
         }
         return (isAbsolute ? '/' : '') + path;
-      },dirname:function(path) {
+      },dirname:(path) => {
         var result = PATH.splitPath(path),
             root = result[0],
             dir = result[1];
@@ -2598,7 +2636,7 @@ function say(str){ console.log( UTF8ToString(str)); }
           dir = dir.substr(0, dir.length - 1);
         }
         return root + dir;
-      },basename:function(path) {
+      },basename:(path) => {
         // EMSCRIPTEN return '/'' for '/', not an empty string
         if (path === '/') return '/';
         path = PATH.normalize(path);
@@ -2606,17 +2644,15 @@ function say(str){ console.log( UTF8ToString(str)); }
         var lastSlash = path.lastIndexOf('/');
         if (lastSlash === -1) return path;
         return path.substr(lastSlash+1);
-      },extname:function(path) {
-        return PATH.splitPath(path)[3];
       },join:function() {
         var paths = Array.prototype.slice.call(arguments, 0);
         return PATH.normalize(paths.join('/'));
-      },join2:function(l, r) {
+      },join2:(l, r) => {
         return PATH.normalize(l + '/' + r);
       }};
   
   function getRandomDevice() {
-      if (typeof crypto === 'object' && typeof crypto['getRandomValues'] === 'function') {
+      if (typeof crypto == 'object' && typeof crypto['getRandomValues'] == 'function') {
         // for modern web browsers
         var randomBuffer = new Uint8Array(1);
         return function() { crypto.getRandomValues(randomBuffer); return randomBuffer[0]; };
@@ -2641,21 +2677,19 @@ function say(str){ console.log( UTF8ToString(str)); }
         for (var i = arguments.length - 1; i >= -1 && !resolvedAbsolute; i--) {
           var path = (i >= 0) ? arguments[i] : FS.cwd();
           // Skip empty and invalid entries
-          if (typeof path !== 'string') {
+          if (typeof path != 'string') {
             throw new TypeError('Arguments to path.resolve must be strings');
           } else if (!path) {
             return ''; // an invalid portion invalidates the whole thing
           }
           resolvedPath = path + '/' + resolvedPath;
-          resolvedAbsolute = path.charAt(0) === '/';
+          resolvedAbsolute = PATH.isAbs(path);
         }
         // At this point the path should be resolved to a full absolute path, but
         // handle relative paths to be safe (might happen when process.cwd() fails)
-        resolvedPath = PATH.normalizeArray(resolvedPath.split('/').filter(function(p) {
-          return !!p;
-        }), !resolvedAbsolute).join('/');
+        resolvedPath = PATH.normalizeArray(resolvedPath.split('/').filter((p) => !!p), !resolvedAbsolute).join('/');
         return ((resolvedAbsolute ? '/' : '') + resolvedPath) || '.';
-      },relative:function(from, to) {
+      },relative:(from, to) => {
         from = PATH_FS.resolve(from).substr(1);
         to = PATH_FS.resolve(to).substr(1);
         function trim(arr) {
@@ -2770,7 +2804,7 @@ function say(str){ console.log( UTF8ToString(str)); }
               var bytesRead = 0;
   
               try {
-                bytesRead = fs.readSync(process.stdin.fd, buf, 0, BUFSIZE, null);
+                bytesRead = fs.readSync(process.stdin.fd, buf, 0, BUFSIZE, -1);
               } catch(e) {
                 // Cross-platform differences: on Windows, reading EOF throws an exception, but on other OSes,
                 // reading EOF returns 0. Uniformize behavior by treating the EOF exception to return 0.
@@ -3156,6 +3190,7 @@ function say(str){ console.log( UTF8ToString(str)); }
           return 0;
         }}};
   
+  /** @param {boolean=} noRunDep */
   function asyncLoad(url, onload, onerror, noRunDep) {
       var dep = !noRunDep ? getUniqueRunDependency('al ' + url) : '';
       readAsync(url, function(arrayBuffer) {
@@ -3180,11 +3215,7 @@ function say(str){ console.log( UTF8ToString(str)); }
           follow_mount: true,
           recurse_count: 0
         };
-        for (var key in defaults) {
-          if (opts[key] === undefined) {
-            opts[key] = defaults[key];
-          }
-        }
+        opts = Object.assign(defaults, opts)
   
         if (opts.recurse_count > 8) {  // max recursive lookup of 8
           throw new FS.ErrnoError(32);
@@ -3222,7 +3253,7 @@ function say(str){ console.log( UTF8ToString(str)); }
               var link = FS.readlink(current_path);
               current_path = PATH_FS.resolve(PATH.dirname(current_path), link);
   
-              var lookup = FS.lookupPath(current_path, { recurse_count: opts.recurse_count });
+              var lookup = FS.lookupPath(current_path, { recurse_count: opts.recurse_count + 1 });
               current = lookup.node;
   
               if (count++ > 40) {  // limit max consecutive symlinks to 40 (SYMLOOP_MAX).
@@ -3311,7 +3342,7 @@ function say(str){ console.log( UTF8ToString(str)); }
         return (mode & 49152) === 49152;
       },flagModes:{"r":0,"r+":2,"w":577,"w+":578,"a":1089,"a+":1090},modeStringToFlags:(str) => {
         var flags = FS.flagModes[str];
-        if (typeof flags === 'undefined') {
+        if (typeof flags == 'undefined') {
           throw new Error('Unknown file open mode: ' + str);
         }
         return flags;
@@ -3392,7 +3423,9 @@ function say(str){ console.log( UTF8ToString(str)); }
         throw new FS.ErrnoError(33);
       },getStream:(fd) => FS.streams[fd],createStream:(stream, fd_start, fd_end) => {
         if (!FS.FSStream) {
-          FS.FSStream = /** @constructor */ function(){};
+          FS.FSStream = /** @constructor */ function() {
+            this.shared = { };
+          };
           FS.FSStream.prototype = {
             object: {
               get: function() { return this.node; },
@@ -3406,15 +3439,19 @@ function say(str){ console.log( UTF8ToString(str)); }
             },
             isAppend: {
               get: function() { return (this.flags & 1024); }
-            }
+            },
+            flags: {
+              get: function() { return this.shared.flags; },
+              set: function(val) { this.shared.flags = val; },
+            },
+            position : {
+              get function() { return this.shared.position; },
+              set: function(val) { this.shared.position = val; },
+            },
           };
         }
         // clone it, so we can return an instance of FSStream
-        var newStream = new FS.FSStream();
-        for (var p in stream) {
-          newStream[p] = stream[p];
-        }
-        stream = newStream;
+        stream = Object.assign(new FS.FSStream(), stream);
         var fd = FS.nextfd(fd_start, fd_end);
         stream.fd = fd;
         FS.streams[fd] = stream;
@@ -3447,7 +3484,7 @@ function say(str){ console.log( UTF8ToString(str)); }
   
         return mounts;
       },syncfs:(populate, callback) => {
-        if (typeof(populate) === 'function') {
+        if (typeof populate == 'function') {
           callback = populate;
           populate = false;
         }
@@ -3605,7 +3642,7 @@ function say(str){ console.log( UTF8ToString(str)); }
           }
         }
       },mkdev:(path, mode, dev) => {
-        if (typeof(dev) === 'undefined') {
+        if (typeof dev == 'undefined') {
           dev = mode;
           mode = 438 /* 0666 */;
         }
@@ -3781,7 +3818,7 @@ function say(str){ console.log( UTF8ToString(str)); }
         return FS.stat(path, true);
       },chmod:(path, mode, dontFollow) => {
         var node;
-        if (typeof path === 'string') {
+        if (typeof path == 'string') {
           var lookup = FS.lookupPath(path, { follow: !dontFollow });
           node = lookup.node;
         } else {
@@ -3804,7 +3841,7 @@ function say(str){ console.log( UTF8ToString(str)); }
         FS.chmod(stream.node, mode);
       },chown:(path, uid, gid, dontFollow) => {
         var node;
-        if (typeof path === 'string') {
+        if (typeof path == 'string') {
           var lookup = FS.lookupPath(path, { follow: !dontFollow });
           node = lookup.node;
         } else {
@@ -3830,7 +3867,7 @@ function say(str){ console.log( UTF8ToString(str)); }
           throw new FS.ErrnoError(28);
         }
         var node;
-        if (typeof path === 'string') {
+        if (typeof path == 'string') {
           var lookup = FS.lookupPath(path, { follow: true });
           node = lookup.node;
         } else {
@@ -3868,19 +3905,19 @@ function say(str){ console.log( UTF8ToString(str)); }
         node.node_ops.setattr(node, {
           timestamp: Math.max(atime, mtime)
         });
-      },open:(path, flags, mode, fd_start, fd_end) => {
+      },open:(path, flags, mode) => {
         if (path === "") {
           throw new FS.ErrnoError(44);
         }
-        flags = typeof flags === 'string' ? FS.modeStringToFlags(flags) : flags;
-        mode = typeof mode === 'undefined' ? 438 /* 0666 */ : mode;
+        flags = typeof flags == 'string' ? FS.modeStringToFlags(flags) : flags;
+        mode = typeof mode == 'undefined' ? 438 /* 0666 */ : mode;
         if ((flags & 64)) {
           mode = (mode & 4095) | 32768;
         } else {
           mode = 0;
         }
         var node;
-        if (typeof path === 'object') {
+        if (typeof path == 'object') {
           node = path;
         } else {
           path = PATH.normalize(path);
@@ -3928,7 +3965,7 @@ function say(str){ console.log( UTF8ToString(str)); }
           }
         }
         // do truncation if necessary
-        if ((flags & 512)) {
+        if ((flags & 512) && !created) {
           FS.truncate(node, 0);
         }
         // we've already handled these, don't pass down to the underlying vfs
@@ -3945,7 +3982,7 @@ function say(str){ console.log( UTF8ToString(str)); }
           // used by the file family libc calls (fopen, fwrite, ferror, etc.)
           ungotten: [],
           error: false
-        }, fd_start, fd_end);
+        });
         // call the new stream's open function
         if (stream.stream_ops.open) {
           stream.stream_ops.open(stream);
@@ -4003,7 +4040,7 @@ function say(str){ console.log( UTF8ToString(str)); }
         if (!stream.stream_ops.read) {
           throw new FS.ErrnoError(28);
         }
-        var seeking = typeof position !== 'undefined';
+        var seeking = typeof position != 'undefined';
         if (!seeking) {
           position = stream.position;
         } else if (!stream.seekable) {
@@ -4032,7 +4069,7 @@ function say(str){ console.log( UTF8ToString(str)); }
           // seek to the end before writing in append mode
           FS.llseek(stream, 0, 2);
         }
-        var seeking = typeof position !== 'undefined';
+        var seeking = typeof position != 'undefined';
         if (!seeking) {
           position = stream.position;
         } else if (!stream.seekable) {
@@ -4109,7 +4146,7 @@ function say(str){ console.log( UTF8ToString(str)); }
       },writeFile:(path, data, opts = {}) => {
         opts.flags = opts.flags || 577;
         var stream = FS.open(path, opts.flags, opts.mode);
-        if (typeof data === 'string') {
+        if (typeof data == 'string') {
           var buf = new Uint8Array(lengthBytesUTF8(data)+1);
           var actualNumBytes = stringToUTF8Array(data, buf, 0, buf.length);
           FS.write(stream, buf, 0, actualNumBytes, undefined, opts.canOwn);
@@ -4311,7 +4348,7 @@ function say(str){ console.log( UTF8ToString(str)); }
         };
         return ret;
       },createPath:(parent, path, canRead, canWrite) => {
-        parent = typeof parent === 'string' ? parent : FS.getPath(parent);
+        parent = typeof parent == 'string' ? parent : FS.getPath(parent);
         var parts = path.split('/').reverse();
         while (parts.length) {
           var part = parts.pop();
@@ -4326,19 +4363,19 @@ function say(str){ console.log( UTF8ToString(str)); }
         }
         return current;
       },createFile:(parent, name, properties, canRead, canWrite) => {
-        var path = PATH.join2(typeof parent === 'string' ? parent : FS.getPath(parent), name);
+        var path = PATH.join2(typeof parent == 'string' ? parent : FS.getPath(parent), name);
         var mode = FS.getMode(canRead, canWrite);
         return FS.create(path, mode);
       },createDataFile:(parent, name, data, canRead, canWrite, canOwn) => {
         var path = name;
         if (parent) {
-          parent = typeof parent === 'string' ? parent : FS.getPath(parent);
+          parent = typeof parent == 'string' ? parent : FS.getPath(parent);
           path = name ? PATH.join2(parent, name) : parent;
         }
         var mode = FS.getMode(canRead, canWrite);
         var node = FS.create(path, mode);
         if (data) {
-          if (typeof data === 'string') {
+          if (typeof data == 'string') {
             var arr = new Array(data.length);
             for (var i = 0, len = data.length; i < len; ++i) arr[i] = data.charCodeAt(i);
             data = arr;
@@ -4352,7 +4389,7 @@ function say(str){ console.log( UTF8ToString(str)); }
         }
         return node;
       },createDevice:(parent, name, input, output) => {
-        var path = PATH.join2(typeof parent === 'string' ? parent : FS.getPath(parent), name);
+        var path = PATH.join2(typeof parent == 'string' ? parent : FS.getPath(parent), name);
         var mode = FS.getMode(!!input, !!output);
         if (!FS.createDevice.major) FS.createDevice.major = 64;
         var dev = FS.makedev(FS.createDevice.major++, 0);
@@ -4406,7 +4443,7 @@ function say(str){ console.log( UTF8ToString(str)); }
         return FS.mkdev(path, mode, dev);
       },forceLoadFile:(obj) => {
         if (obj.isDevice || obj.isFolder || obj.link || obj.contents) return true;
-        if (typeof XMLHttpRequest !== 'undefined') {
+        if (typeof XMLHttpRequest != 'undefined') {
           throw new Error("Lazy loading should have been performed (contents set) in createLazyFile, but it was not. Lazy loading only works in web workers. Use --embed-file or --preload-file in emcc on the main thread.");
         } else if (read_) {
           // Command-line.
@@ -4465,7 +4502,7 @@ function say(str){ console.log( UTF8ToString(str)); }
             if (datalength !== chunkSize) xhr.setRequestHeader("Range", "bytes=" + from + "-" + to);
   
             // Some hints to the browser that we want binary data.
-            if (typeof Uint8Array != 'undefined') xhr.responseType = 'arraybuffer';
+            xhr.responseType = 'arraybuffer';
             if (xhr.overrideMimeType) {
               xhr.overrideMimeType('text/plain; charset=x-user-defined');
             }
@@ -4483,10 +4520,10 @@ function say(str){ console.log( UTF8ToString(str)); }
             var start = chunkNum * chunkSize;
             var end = (chunkNum+1) * chunkSize - 1; // including this byte
             end = Math.min(end, datalength-1); // if datalength-1 is selected, this is the last block
-            if (typeof(lazyArray.chunks[chunkNum]) === "undefined") {
+            if (typeof lazyArray.chunks[chunkNum] == 'undefined') {
               lazyArray.chunks[chunkNum] = doXHR(start, end);
             }
-            if (typeof(lazyArray.chunks[chunkNum]) === "undefined") throw new Error("doXHR failed!");
+            if (typeof lazyArray.chunks[chunkNum] == 'undefined') throw new Error('doXHR failed!');
             return lazyArray.chunks[chunkNum];
           });
   
@@ -4502,7 +4539,7 @@ function say(str){ console.log( UTF8ToString(str)); }
           this._chunkSize = chunkSize;
           this.lengthKnown = true;
         };
-        if (typeof XMLHttpRequest !== 'undefined') {
+        if (typeof XMLHttpRequest != 'undefined') {
           if (!ENVIRONMENT_IS_WORKER) throw 'Cannot do synchronous binary XHRs outside webworkers in modern browsers. Use --embed-file or --preload-file in emcc';
           var lazyArray = new LazyUint8Array();
           Object.defineProperties(lazyArray, {
@@ -4676,8 +4713,8 @@ function say(str){ console.log( UTF8ToString(str)); }
         };
         openRequest.onerror = onerror;
       }};
-  var SYSCALLS = {mappings:{},DEFAULT_POLLMASK:5,calculateAt:function(dirfd, path, allowEmpty) {
-        if (path[0] === '/') {
+  var SYSCALLS = {DEFAULT_POLLMASK:5,calculateAt:function(dirfd, path, allowEmpty) {
+        if (PATH.isAbs(path)) {
           return path;
         }
         // relative path
@@ -4729,81 +4766,6 @@ function say(str){ console.log( UTF8ToString(str)); }
       },doMsync:function(addr, stream, len, flags, offset) {
         var buffer = HEAPU8.slice(addr, addr + len);
         FS.msync(stream, buffer, offset, len, flags);
-      },doMkdir:function(path, mode) {
-        // remove a trailing slash, if one - /a/b/ has basename of '', but
-        // we want to create b in the context of this function
-        path = PATH.normalize(path);
-        if (path[path.length-1] === '/') path = path.substr(0, path.length-1);
-        FS.mkdir(path, mode, 0);
-        return 0;
-      },doMknod:function(path, mode, dev) {
-        // we don't want this in the JS API as it uses mknod to create all nodes.
-        switch (mode & 61440) {
-          case 32768:
-          case 8192:
-          case 24576:
-          case 4096:
-          case 49152:
-            break;
-          default: return -28;
-        }
-        FS.mknod(path, mode, dev);
-        return 0;
-      },doReadlink:function(path, buf, bufsize) {
-        if (bufsize <= 0) return -28;
-        var ret = FS.readlink(path);
-  
-        var len = Math.min(bufsize, lengthBytesUTF8(ret));
-        var endChar = HEAP8[buf+len];
-        stringToUTF8(ret, buf, bufsize+1);
-        // readlink is one of the rare functions that write out a C string, but does never append a null to the output buffer(!)
-        // stringToUTF8() always appends a null byte, so restore the character under the null byte after the write.
-        HEAP8[buf+len] = endChar;
-  
-        return len;
-      },doAccess:function(path, amode) {
-        if (amode & ~7) {
-          // need a valid mode
-          return -28;
-        }
-        var lookup = FS.lookupPath(path, { follow: true });
-        var node = lookup.node;
-        if (!node) {
-          return -44;
-        }
-        var perms = '';
-        if (amode & 4) perms += 'r';
-        if (amode & 2) perms += 'w';
-        if (amode & 1) perms += 'x';
-        if (perms /* otherwise, they've just passed F_OK */ && FS.nodePermissions(node, perms)) {
-          return -2;
-        }
-        return 0;
-      },doDup:function(path, flags, suggestFD) {
-        var suggest = FS.getStream(suggestFD);
-        if (suggest) FS.close(suggest);
-        return FS.open(path, flags, 0, suggestFD, suggestFD).fd;
-      },doReadv:function(stream, iov, iovcnt, offset) {
-        var ret = 0;
-        for (var i = 0; i < iovcnt; i++) {
-          var ptr = HEAP32[(((iov)+(i*8))>>2)];
-          var len = HEAP32[(((iov)+(i*8 + 4))>>2)];
-          var curr = FS.read(stream, HEAP8,ptr, len, offset);
-          if (curr < 0) return -1;
-          ret += curr;
-          if (curr < len) break; // nothing more to read
-        }
-        return ret;
-      },doWritev:function(stream, iov, iovcnt, offset) {
-        var ret = 0;
-        for (var i = 0; i < iovcnt; i++) {
-          var ptr = HEAP32[(((iov)+(i*8))>>2)];
-          var len = HEAP32[(((iov)+(i*8 + 4))>>2)];
-          var curr = FS.write(stream, HEAP8,ptr, len, offset);
-          if (curr < 0) return -1;
-          ret += curr;
-        }
-        return ret;
       },varargs:undefined,get:function() {
         SYSCALLS.varargs += 4;
         var ret = HEAP32[(((SYSCALLS.varargs)-(4))>>2)];
@@ -4815,10 +4777,9 @@ function say(str){ console.log( UTF8ToString(str)); }
         var stream = FS.getStream(fd);
         if (!stream) throw new FS.ErrnoError(8);
         return stream;
-      },get64:function(low, high) {
-        return low;
       }};
-  function ___syscall_fcntl64(fd, cmd, varargs) {SYSCALLS.varargs = varargs;
+  function ___syscall_fcntl64(fd, cmd, varargs) {
+  SYSCALLS.varargs = varargs;
   try {
   
       var stream = SYSCALLS.getStreamFromFD(fd);
@@ -4829,7 +4790,7 @@ function say(str){ console.log( UTF8ToString(str)); }
             return -28;
           }
           var newStream;
-          newStream = FS.open(stream.path, stream.flags, 0, arg);
+          newStream = FS.createStream(stream, arg);
           return newStream.fd;
         }
         case 1:
@@ -4870,12 +4831,13 @@ function say(str){ console.log( UTF8ToString(str)); }
         }
       }
     } catch (e) {
-    if (typeof FS === 'undefined' || !(e instanceof FS.ErrnoError)) throw e;
+    if (typeof FS == 'undefined' || !(e instanceof FS.ErrnoError)) throw e;
     return -e.errno;
   }
   }
 
-  function ___syscall_ioctl(fd, op, varargs) {SYSCALLS.varargs = varargs;
+  function ___syscall_ioctl(fd, op, varargs) {
+  SYSCALLS.varargs = varargs;
   try {
   
       var stream = SYSCALLS.getStreamFromFD(fd);
@@ -4924,25 +4886,35 @@ function say(str){ console.log( UTF8ToString(str)); }
         default: abort('bad ioctl syscall ' + op);
       }
     } catch (e) {
-    if (typeof FS === 'undefined' || !(e instanceof FS.ErrnoError)) throw e;
+    if (typeof FS == 'undefined' || !(e instanceof FS.ErrnoError)) throw e;
     return -e.errno;
   }
   }
 
-  function ___syscall_open(path, flags, varargs) {SYSCALLS.varargs = varargs;
+  function ___syscall_openat(dirfd, path, flags, varargs) {
+  SYSCALLS.varargs = varargs;
   try {
   
-      var pathname = SYSCALLS.getStr(path);
+      path = SYSCALLS.getStr(path);
+      path = SYSCALLS.calculateAt(dirfd, path);
       var mode = varargs ? SYSCALLS.get() : 0;
-      var stream = FS.open(pathname, flags, mode);
-      return stream.fd;
+      return FS.open(path, flags, mode).fd;
     } catch (e) {
-    if (typeof FS === 'undefined' || !(e instanceof FS.ErrnoError)) throw e;
+    if (typeof FS == 'undefined' || !(e instanceof FS.ErrnoError)) throw e;
     return -e.errno;
   }
   }
 
-  function __emscripten_throw_longjmp() { throw 'longjmp'; }
+  function __emscripten_date_now() {
+      return Date.now();
+    }
+
+  var nowIsMonotonic = true;;
+  function __emscripten_get_now_is_monotonic() {
+      return nowIsMonotonic;
+    }
+
+  function __emscripten_throw_longjmp() { throw Infinity; }
 
   function __localtime_js(time, tmPtr) {
       var date = new Date(HEAP32[((time)>>2)]*1000);
@@ -5015,18 +4987,13 @@ function say(str){ console.log( UTF8ToString(str)); }
       abort('');
     }
 
-  function _clock() {
-      if (_clock.start === undefined) _clock.start = Date.now();
-      return ((Date.now() - _clock.start) * (1000000 / 1000))|0;
-    }
-
 
   function _emscripten_get_preloaded_image_data(path, w, h) {
       if ((path | 0) === path) path = UTF8ToString(path);
   
       path = PATH_FS.resolve(path);
   
-      var canvas = Module["preloadedImages"][path];
+      var canvas = /** @type {HTMLCanvasElement} */(preloadedImages[path]);
       if (canvas) {
         var ctx = canvas.getContext("2d");
         var image = ctx.getImageData(0, 0, canvas.width, canvas.height);
@@ -5053,11 +5020,15 @@ function say(str){ console.log( UTF8ToString(str)); }
     }
 
   function _emscripten_has_asyncify() {
-      return 0;
+      return false;
     }
 
   function _emscripten_memcpy_big(dest, src, num) {
       HEAPU8.copyWithin(dest, src, src + num);
+    }
+
+  function _emscripten_random() {
+      return Math.random();
     }
 
   function _emscripten_request_animation_frame_loop(cb, userData) {
@@ -5069,6 +5040,14 @@ function say(str){ console.log( UTF8ToString(str)); }
       return requestAnimationFrame(tick);
     }
 
+  function _emscripten_get_heap_max() {
+      // Stay one Wasm page short of 4GB: while e.g. Chrome is able to allocate
+      // full 4GB Wasm memories, the size will wrap back to 0 bytes in Wasm side
+      // for any code that deals with heap sizes, which would require special
+      // casing all heap size related code to treat 0 specially.
+      return 2147483648;
+    }
+  
   function emscripten_realloc_buffer(size) {
       try {
         // round size grow request up to wasm page size (fixed 64KB per spec)
@@ -5083,30 +5062,38 @@ function say(str){ console.log( UTF8ToString(str)); }
   function _emscripten_resize_heap(requestedSize) {
       var oldSize = HEAPU8.length;
       requestedSize = requestedSize >>> 0;
-      // With pthreads, races can happen (another thread might increase the size in between), so return a failure, and let the caller retry.
+      // With multithreaded builds, races can happen (another thread might increase the size
+      // in between), so return a failure, and let the caller retry.
   
       // Memory resize rules:
-      // 1. Always increase heap size to at least the requested size, rounded up to next page multiple.
-      // 2a. If MEMORY_GROWTH_LINEAR_STEP == -1, excessively resize the heap geometrically: increase the heap size according to
-      //                                         MEMORY_GROWTH_GEOMETRIC_STEP factor (default +20%),
-      //                                         At most overreserve by MEMORY_GROWTH_GEOMETRIC_CAP bytes (default 96MB).
-      // 2b. If MEMORY_GROWTH_LINEAR_STEP != -1, excessively resize the heap linearly: increase the heap size by at least MEMORY_GROWTH_LINEAR_STEP bytes.
-      // 3. Max size for the heap is capped at 2048MB-WASM_PAGE_SIZE, or by MAXIMUM_MEMORY, or by ASAN limit, depending on which is smallest
-      // 4. If we were unable to allocate as much memory, it may be due to over-eager decision to excessively reserve due to (3) above.
-      //    Hence if an allocation fails, cut down on the amount of excess growth, in an attempt to succeed to perform a smaller allocation.
+      // 1.  Always increase heap size to at least the requested size, rounded up
+      //     to next page multiple.
+      // 2a. If MEMORY_GROWTH_LINEAR_STEP == -1, excessively resize the heap
+      //     geometrically: increase the heap size according to
+      //     MEMORY_GROWTH_GEOMETRIC_STEP factor (default +20%), At most
+      //     overreserve by MEMORY_GROWTH_GEOMETRIC_CAP bytes (default 96MB).
+      // 2b. If MEMORY_GROWTH_LINEAR_STEP != -1, excessively resize the heap
+      //     linearly: increase the heap size by at least
+      //     MEMORY_GROWTH_LINEAR_STEP bytes.
+      // 3.  Max size for the heap is capped at 2048MB-WASM_PAGE_SIZE, or by
+      //     MAXIMUM_MEMORY, or by ASAN limit, depending on which is smallest
+      // 4.  If we were unable to allocate as much memory, it may be due to
+      //     over-eager decision to excessively reserve due to (3) above.
+      //     Hence if an allocation fails, cut down on the amount of excess
+      //     growth, in an attempt to succeed to perform a smaller allocation.
   
       // A limit is set for how much we can grow. We should not exceed that
       // (the wasm binary specifies it, so if we tried, we'd fail anyhow).
-      // In CAN_ADDRESS_2GB mode, stay one Wasm page short of 4GB: while e.g. Chrome is able to allocate full 4GB Wasm memories, the size will wrap
-      // back to 0 bytes in Wasm side for any code that deals with heap sizes, which would require special casing all heap size related code to treat
-      // 0 specially.
-      var maxHeapSize = 2147483648;
+      var maxHeapSize = _emscripten_get_heap_max();
       if (requestedSize > maxHeapSize) {
         return false;
       }
   
-      // Loop through potential heap size increases. If we attempt a too eager reservation that fails, cut down on the
-      // attempted size and reserve a smaller bump instead. (max 3 times, chosen somewhat arbitrarily)
+      let alignUp = (x, multiple) => x + (multiple - x % multiple) % multiple;
+  
+      // Loop through potential heap size increases. If we attempt a too eager
+      // reservation that fails, cut down on the attempted size and reserve a
+      // smaller bump instead. (max 3 times, chosen somewhat arbitrarily)
       for (var cutDown = 1; cutDown <= 4; cutDown *= 2) {
         var overGrownHeapSize = oldSize * (1 + 0.2 / cutDown); // ensure geometric growth
         // but limit overreserving (default to capping at +96MB overgrowth at most)
@@ -5228,7 +5215,7 @@ function say(str){ console.log( UTF8ToString(str)); }
          ;
       }};
   
-  var specialHTMLTargets = [0, typeof document !== 'undefined' ? document : 0, typeof window !== 'undefined' ? window : 0];
+  var specialHTMLTargets = [0, typeof document != 'undefined' ? document : 0, typeof window != 'undefined' ? window : 0];
   function getBoundingClientRect(e) {
       return specialHTMLTargets.indexOf(e) < 0 ? e.getBoundingClientRect() : {'left':0,'top':0};
     }
@@ -5267,7 +5254,7 @@ function say(str){ console.log( UTF8ToString(str)); }
     }
   function findEventTarget(target) {
       target = maybeCStringToJsString(target);
-      var domElement = specialHTMLTargets[target] || (typeof document !== 'undefined' ? document.querySelector(target) : undefined);
+      var domElement = specialHTMLTargets[target] || (typeof document != 'undefined' ? document.querySelector(target) : undefined);
       return domElement;
     }
   function registerMouseEventCallback(target, userData, useCapture, callbackfunc, eventTypeId, eventTypeString, targetThread) {
@@ -5298,6 +5285,48 @@ function say(str){ console.log( UTF8ToString(str)); }
       return 0;
     }
 
+  function registerKeyEventCallback(target, userData, useCapture, callbackfunc, eventTypeId, eventTypeString, targetThread) {
+      if (!JSEvents.keyEvent) JSEvents.keyEvent = _malloc( 176 );
+  
+      var keyEventHandlerFunc = function(e) {
+  
+        var keyEventData = JSEvents.keyEvent;
+        HEAPF64[((keyEventData)>>3)] = e.timeStamp;
+  
+        var idx = keyEventData >> 2;
+  
+        HEAP32[idx + 2] = e.location;
+        HEAP32[idx + 3] = e.ctrlKey;
+        HEAP32[idx + 4] = e.shiftKey;
+        HEAP32[idx + 5] = e.altKey;
+        HEAP32[idx + 6] = e.metaKey;
+        HEAP32[idx + 7] = e.repeat;
+        HEAP32[idx + 8] = e.charCode;
+        HEAP32[idx + 9] = e.keyCode;
+        HEAP32[idx + 10] = e.which;
+        stringToUTF8(e.key || '', keyEventData + 44, 32);
+        stringToUTF8(e.code || '', keyEventData + 76, 32);
+        stringToUTF8(e.char || '', keyEventData + 108, 32);
+        stringToUTF8(e.locale || '', keyEventData + 140, 32);
+  
+        if (getWasmTableEntry(callbackfunc)(eventTypeId, keyEventData, userData)) e.preventDefault();
+      };
+  
+      var eventHandler = {
+        target: findEventTarget(target),
+        allowsDeferredCalls: true,
+        eventTypeString: eventTypeString,
+        callbackfunc: callbackfunc,
+        handlerFunc: keyEventHandlerFunc,
+        useCapture: useCapture
+      };
+      JSEvents.registerOrRemoveHandler(eventHandler);
+    }
+  function _emscripten_set_keypress_callback_on_thread(target, userData, useCapture, callbackfunc, targetThread) {
+      registerKeyEventCallback(target, userData, useCapture, callbackfunc, 1, "keypress", targetThread);
+      return 0;
+    }
+
   function _emscripten_set_mousemove_callback_on_thread(target, userData, useCapture, callbackfunc, targetThread) {
       registerMouseEventCallback(target, userData, useCapture, callbackfunc, 8, "mousemove", targetThread);
       return 0;
@@ -5310,71 +5339,70 @@ function say(str){ console.log( UTF8ToString(str)); }
   var WebGPU = {initManagers:function() {
         if (WebGPU.mgrDevice) return;
   
-        function makeManager() {
-          return {
-            objects: {},
-            nextId: 1,
-            create: function(object, wrapper /* = {} */) {
-              wrapper = wrapper || {};
+        /** @constructor */
+        function Manager() {
+          this.objects = {};
+          this.nextId = 1;
+          this.create = function(object, wrapper /* = {} */) {
+            wrapper = wrapper || {};
   
-              var id = this.nextId++;
-              
-              wrapper.refcount = 1;
-              wrapper.object = object;
-              this.objects[id] = wrapper;
-              return id;
-            },
-            get: function(id) {
-              if (!id) return undefined;
-              var o = this.objects[id];
-              
-              return o.object;
-            },
-            reference: function(id) {
-              var o = this.objects[id];
-              
-              o.refcount++;
-            },
-            release: function(id) {
-              var o = this.objects[id];
-              
-              
-              o.refcount--;
-              if (o.refcount <= 0) {
-                delete this.objects[id];
-              }
-            },
+            var id = this.nextId++;
+            
+            wrapper.refcount = 1;
+            wrapper.object = object;
+            this.objects[id] = wrapper;
+            return id;
+          };
+          this.get = function(id) {
+            if (!id) return undefined;
+            var o = this.objects[id];
+            
+            return o.object;
+          };
+          this.reference = function(id) {
+            var o = this.objects[id];
+            
+            o.refcount++;
+          };
+          this.release = function(id) {
+            var o = this.objects[id];
+            
+            
+            o.refcount--;
+            if (o.refcount <= 0) {
+              delete this.objects[id];
+            }
           };
         }
   
-        WebGPU.mgrSurface = WebGPU.mgrSurface || makeManager();
-        WebGPU.mgrSwapChain = WebGPU.mgrSwapChain || makeManager();
+        WebGPU.mgrSurface = WebGPU.mgrSurface || new Manager();
+        WebGPU.mgrSwapChain = WebGPU.mgrSwapChain || new Manager();
   
-        WebGPU.mgrAdapter = WebGPU.mgrAdapter || makeManager();
+        WebGPU.mgrAdapter = WebGPU.mgrAdapter || new Manager();
         // TODO: Release() the device's default queue when the device is freed.
-        WebGPU.mgrDevice = WebGPU.mgrDevice || makeManager();
-        WebGPU.mgrQueue = WebGPU.mgrQueue || makeManager();
+        WebGPU.mgrDevice = WebGPU.mgrDevice || new Manager();
+        WebGPU.mgrQueue = WebGPU.mgrQueue || new Manager();
   
-        WebGPU.mgrCommandBuffer = WebGPU.mgrCommandBuffer || makeManager();
-        WebGPU.mgrCommandEncoder = WebGPU.mgrCommandEncoder || makeManager();
-        WebGPU.mgrRenderPassEncoder = WebGPU.mgrRenderPassEncoder || makeManager();
-        WebGPU.mgrComputePassEncoder = WebGPU.mgrComputePassEncoder || makeManager();
+        WebGPU.mgrCommandBuffer = WebGPU.mgrCommandBuffer || new Manager();
+        WebGPU.mgrCommandEncoder = WebGPU.mgrCommandEncoder || new Manager();
+        WebGPU.mgrRenderPassEncoder = WebGPU.mgrRenderPassEncoder || new Manager();
+        WebGPU.mgrComputePassEncoder = WebGPU.mgrComputePassEncoder || new Manager();
   
-        WebGPU.mgrBindGroup = WebGPU.mgrBindGroup || makeManager();
-        WebGPU.mgrBuffer = WebGPU.mgrBuffer || makeManager();
-        WebGPU.mgrSampler = WebGPU.mgrSampler || makeManager();
-        WebGPU.mgrTexture = WebGPU.mgrTexture || makeManager();
-        WebGPU.mgrTextureView = WebGPU.mgrTextureView || makeManager();
-        WebGPU.mgrQuerySet = WebGPU.mgrQuerySet || makeManager();
+        WebGPU.mgrBindGroup = WebGPU.mgrBindGroup || new Manager();
+        WebGPU.mgrBuffer = WebGPU.mgrBuffer || new Manager();
+        WebGPU.mgrSampler = WebGPU.mgrSampler || new Manager();
+        WebGPU.mgrTexture = WebGPU.mgrTexture || new Manager();
+        WebGPU.mgrTextureView = WebGPU.mgrTextureView || new Manager();
+        WebGPU.mgrQuerySet = WebGPU.mgrQuerySet || new Manager();
   
-        WebGPU.mgrBindGroupLayout = WebGPU.mgrBindGroupLayout || makeManager();
-        WebGPU.mgrPipelineLayout = WebGPU.mgrPipelineLayout || makeManager();
-        WebGPU.mgrRenderPipeline = WebGPU.mgrRenderPipeline || makeManager();
-        WebGPU.mgrComputePipeline = WebGPU.mgrComputePipeline || makeManager();
-        WebGPU.mgrShaderModule = WebGPU.mgrShaderModule || makeManager();
+        WebGPU.mgrBindGroupLayout = WebGPU.mgrBindGroupLayout || new Manager();
+        WebGPU.mgrPipelineLayout = WebGPU.mgrPipelineLayout || new Manager();
+        WebGPU.mgrRenderPipeline = WebGPU.mgrRenderPipeline || new Manager();
+        WebGPU.mgrComputePipeline = WebGPU.mgrComputePipeline || new Manager();
+        WebGPU.mgrShaderModule = WebGPU.mgrShaderModule || new Manager();
   
-        WebGPU.mgrRenderBundleEncoder = WebGPU.mgrRenderBundleEncoder || makeManager();
-        WebGPU.mgrRenderBundle = WebGPU.mgrRenderBundle || makeManager();
+        WebGPU.mgrRenderBundleEncoder = WebGPU.mgrRenderBundleEncoder || new Manager();
+        WebGPU.mgrRenderBundle = WebGPU.mgrRenderBundle || new Manager();
       },makeColor:function(ptr) {
         return {
           "r": Number(HEAPF64[((ptr)>>3)]),
@@ -5398,7 +5426,7 @@ function say(str){ console.log( UTF8ToString(str)); }
         
         return {
           "texture": WebGPU.mgrTexture.get(
-            HEAP32[(((ptr)+(4))>>2)]),
+            HEAPU32[(((ptr)+(4))>>2)]),
           "mipLevel": HEAPU32[(((ptr)+(8))>>2)],
           "origin": WebGPU.makeOrigin3D(ptr + 12),
           "aspect": WebGPU.TextureAspect[HEAPU32[(((ptr)+(24))>>2)]],
@@ -5417,14 +5445,14 @@ function say(str){ console.log( UTF8ToString(str)); }
         var layoutPtr = ptr + 8;
         var bufferCopyView = WebGPU.makeTextureDataLayout(layoutPtr);
         bufferCopyView["buffer"] = WebGPU.mgrBuffer.get(
-          HEAP32[(((ptr)+(32))>>2)]);
+          HEAPU32[(((ptr)+(32))>>2)]);
         return bufferCopyView;
       },makePipelineConstants:function(constantCount, constantsPtr) {
         if (!constantCount) return;
         var constants = {};
         for (var i = 0; i < constantCount; ++i) {
           var entryPtr = constantsPtr + 16 * i;
-          var key = UTF8ToString(HEAP32[(((entryPtr)+(4))>>2)]);
+          var key = UTF8ToString(HEAPU32[(((entryPtr)+(4))>>2)]);
           constants[key] = Number(HEAPF64[(((entryPtr)+(8))>>3)]);
         }
         return constants;
@@ -5433,14 +5461,14 @@ function say(str){ console.log( UTF8ToString(str)); }
         
         return {
           "module": WebGPU.mgrShaderModule.get(
-            HEAP32[(((ptr)+(4))>>2)]),
+            HEAPU32[(((ptr)+(4))>>2)]),
           "entryPoint": UTF8ToString(
-            HEAP32[(((ptr)+(8))>>2)]),
+            HEAPU32[(((ptr)+(8))>>2)]),
           "constants": WebGPU.makePipelineConstants(
             HEAPU32[(((ptr)+(12))>>2)],
-            HEAP32[(((ptr)+(16))>>2)]),
+            HEAPU32[(((ptr)+(16))>>2)]),
         };
-      },DeviceLostReason:{undefined:0,destroyed:1},PreferredFormat:{rgba8unorm:18,bgra8unorm:23},AddressMode:["repeat","mirror-repeat","clamp-to-edge"],BlendFactor:["zero","one","src","one-minus-src","src-alpha","one-minus-src-alpha","dst","one-minus-dst","dst-alpha","one-minus-dst-alpha","src-alpha-saturated","constant","one-minus-constant"],BlendOperation:["add","subtract","reverse-subtract","min","max"],BufferBindingType:[,"uniform","storage","read-only-storage"],CompareFunction:[,"never","less","less-equal","greater","greater-equal","equal","not-equal","always"],CullMode:["none","front","back"],ErrorFilter:["validation","out-of-memory"],FeatureName:[,"depth-clamping","depth24unorm-stencil8","depth32float-stencil8","timestamp-query","pipeline-statistics-query","texture-compression-bc","texture-compression-etc2","texture-compression-astc"],FilterMode:["nearest","linear"],FrontFace:["ccw","cw"],IndexFormat:[,"uint16","uint32"],PipelineStatisticName:["vertex-shader-invocations","clipper-invocations","clipper-primitives-out","fragment-shader-invocations","compute-shader-invocations"],PowerPreference:["low-power","high-performance"],PrimitiveTopology:["point-list","line-list","line-strip","triangle-list","triangle-strip"],QueryType:["occlusion","pipeline-statistics","timestamp"],SamplerBindingType:[,"filtering","non-filtering","comparison"],StencilOperation:["keep","zero","replace","invert","increment-clamp","decrement-clamp","increment-wrap","decrement-wrap"],StorageTextureAccess:[,"write-only"],StoreOp:["store","discard"],TextureAspect:["all","stencil-only","depth-only"],TextureComponentType:["float","sint","uint","depth-comparison"],TextureDimension:["1d","2d","3d"],TextureFormat:[,"r8unorm","r8snorm","r8uint","r8sint","r16uint","r16sint","r16float","rg8unorm","rg8snorm","rg8uint","rg8sint","r32float","r32uint","r32sint","rg16uint","rg16sint","rg16float","rgba8unorm","rgba8unorm-srgb","rgba8snorm","rgba8uint","rgba8sint","bgra8unorm","bgra8unorm-srgb","rgb10a2unorm","rg11b10ufloat","rgb9e5ufloat","rg32float","rg32uint","rg32sint","rgba16uint","rgba16sint","rgba16float","rgba32float","rgba32uint","rgba32sint","stencil8","depth16unorm","depth24plus","depth24plus-stencil8","depth32float","bc1-rgba-unorm","bc1-rgba-unorm-srgb","bc2-rgba-unorm","bc2-rgba-unorm-srgb","bc3-rgba-unorm","bc3-rgba-unorm-srgb","bc4-r-unorm","bc4-r-snorm","bc5-rg-unorm","bc5-rg-snorm","bc6h-rgb-ufloat","bc6h-rgb-float","bc7-rgba-unorm","bc7-rgba-unorm-srgb","etc2-rgb8unorm","etc2-rgb8unorm-srgb","etc2-rgb8a1unorm","etc2-rgb8a1unorm-srgb","etc2-rgba8unorm","etc2-rgba8unorm-srgb","eac-r11unorm","eac-r11snorm","eac-rg11unorm","eac-rg11snorm","astc-4x4-unorm","astc-4x4-unorm-srgb","astc-5x4-unorm","astc-5x4-unorm-srgb","astc-5x5-unorm","astc-5x5-unorm-srgb","astc-6x5-unorm","astc-6x5-unorm-srgb","astc-6x6-unorm","astc-6x6-unorm-srgb","astc-8x5-unorm","astc-8x5-unorm-srgb","astc-8x6-unorm","astc-8x6-unorm-srgb","astc-8x8-unorm","astc-8x8-unorm-srgb","astc-10x5-unorm","astc-10x5-unorm-srgb","astc-10x6-unorm","astc-10x6-unorm-srgb","astc-10x8-unorm","astc-10x8-unorm-srgb","astc-10x10-unorm","astc-10x10-unorm-srgb","astc-12x10-unorm","astc-12x10-unorm-srgb","astc-12x12-unorm","astc-12x12-unorm-srgb"],TextureSampleType:[,"float","unfilterable-float","depth","sint","uint"],TextureViewDimension:[,"1d","2d","2d-array","cube","cube-array","3d"],VertexFormat:[,"uint8x2","uint8x4","sint8x2","sint8x4","unorm8x2","unorm8x4","snorm8x2","snorm8x4","uint16x2","uint16x4","sint16x2","sint16x4","unorm16x2","unorm16x4","snorm16x2","snorm16x4","float16x2","float16x4","float32","float32x2","float32x3","float32x4","uint32","uint32x2","uint32x3","uint32x4","sint32","sint32x2","sint32x3","sint32x4"],VertexStepMode:["vertex","instance"]};
+      },DeviceLostReason:{undefined:0,destroyed:1},PreferredFormat:{rgba8unorm:18,bgra8unorm:23},AddressMode:["repeat","mirror-repeat","clamp-to-edge"],BlendFactor:["zero","one","src","one-minus-src","src-alpha","one-minus-src-alpha","dst","one-minus-dst","dst-alpha","one-minus-dst-alpha","src-alpha-saturated","constant","one-minus-constant"],BlendOperation:["add","subtract","reverse-subtract","min","max"],BufferBindingType:[,"uniform","storage","read-only-storage"],CompareFunction:[,"never","less","less-equal","greater","greater-equal","equal","not-equal","always"],CompilationInfoRequestStatus:["success","error","device-lost","unknown"],CullMode:["none","front","back"],ErrorFilter:["validation","out-of-memory"],FeatureName:{0:undefined,1:"depth-clip-control",2:"depth24unorm-stencil8",3:"depth32float-stencil8",4:"timestamp-query",5:"pipeline-statistics-query",6:"texture-compression-bc",7:"texture-compression-etc2",8:"texture-compression-astc",9:"indirect-first-instance",1000:"depth-clamping"},FilterMode:["nearest","linear"],FrontFace:["ccw","cw"],IndexFormat:[,"uint16","uint32"],LoadOp:[,"clear","load"],PipelineStatisticName:["vertex-shader-invocations","clipper-invocations","clipper-primitives-out","fragment-shader-invocations","compute-shader-invocations"],PowerPreference:[,"low-power","high-performance"],PredefinedColorSpace:[,"srgb"],PrimitiveTopology:["point-list","line-list","line-strip","triangle-list","triangle-strip"],QueryType:["occlusion","pipeline-statistics","timestamp"],SamplerBindingType:[,"filtering","non-filtering","comparison"],StencilOperation:["keep","zero","replace","invert","increment-clamp","decrement-clamp","increment-wrap","decrement-wrap"],StorageTextureAccess:[,"write-only"],StoreOp:[,"store","discard"],TextureAspect:["all","stencil-only","depth-only"],TextureComponentType:["float","sint","uint","depth-comparison"],TextureDimension:["1d","2d","3d"],TextureFormat:[,"r8unorm","r8snorm","r8uint","r8sint","r16uint","r16sint","r16float","rg8unorm","rg8snorm","rg8uint","rg8sint","r32float","r32uint","r32sint","rg16uint","rg16sint","rg16float","rgba8unorm","rgba8unorm-srgb","rgba8snorm","rgba8uint","rgba8sint","bgra8unorm","bgra8unorm-srgb","rgb10a2unorm","rg11b10ufloat","rgb9e5ufloat","rg32float","rg32uint","rg32sint","rgba16uint","rgba16sint","rgba16float","rgba32float","rgba32uint","rgba32sint","stencil8","depth16unorm","depth24plus","depth24plus-stencil8","depth24unorm-stencil8","depth32float","depth32float-stencil8","bc1-rgba-unorm","bc1-rgba-unorm-srgb","bc2-rgba-unorm","bc2-rgba-unorm-srgb","bc3-rgba-unorm","bc3-rgba-unorm-srgb","bc4-r-unorm","bc4-r-snorm","bc5-rg-unorm","bc5-rg-snorm","bc6h-rgb-ufloat","bc6h-rgb-float","bc7-rgba-unorm","bc7-rgba-unorm-srgb","etc2-rgb8unorm","etc2-rgb8unorm-srgb","etc2-rgb8a1unorm","etc2-rgb8a1unorm-srgb","etc2-rgba8unorm","etc2-rgba8unorm-srgb","eac-r11unorm","eac-r11snorm","eac-rg11unorm","eac-rg11snorm","astc-4x4-unorm","astc-4x4-unorm-srgb","astc-5x4-unorm","astc-5x4-unorm-srgb","astc-5x5-unorm","astc-5x5-unorm-srgb","astc-6x5-unorm","astc-6x5-unorm-srgb","astc-6x6-unorm","astc-6x6-unorm-srgb","astc-8x5-unorm","astc-8x5-unorm-srgb","astc-8x6-unorm","astc-8x6-unorm-srgb","astc-8x8-unorm","astc-8x8-unorm-srgb","astc-10x5-unorm","astc-10x5-unorm-srgb","astc-10x6-unorm","astc-10x6-unorm-srgb","astc-10x8-unorm","astc-10x8-unorm-srgb","astc-10x10-unorm","astc-10x10-unorm-srgb","astc-12x10-unorm","astc-12x10-unorm-srgb","astc-12x12-unorm","astc-12x12-unorm-srgb"],TextureSampleType:[,"float","unfilterable-float","depth","sint","uint"],TextureViewDimension:[,"1d","2d","2d-array","cube","cube-array","3d"],VertexFormat:[,"uint8x2","uint8x4","sint8x2","sint8x4","unorm8x2","unorm8x4","snorm8x2","snorm8x4","uint16x2","uint16x4","sint16x2","sint16x4","unorm16x2","unorm16x4","snorm16x2","snorm16x4","float16x2","float16x4","float32","float32x2","float32x3","float32x4","uint32","uint32x2","uint32x3","uint32x4","sint32","sint32x2","sint32x3","sint32x4"],VertexStepMode:["vertex","instance"]};
   function _emscripten_webgpu_get_device() {
       var device = Module['preinitializedWebGPUDevice'];
       var deviceWrapper = { queueId: WebGPU.mgrQueue.create(device["queue"]) };
@@ -5456,7 +5484,7 @@ function say(str){ console.log( UTF8ToString(str)); }
       if (!getEnvStrings.strings) {
         // Default values.
         // Browser language detection #8751
-        var lang = ((typeof navigator === 'object' && navigator.languages && navigator.languages[0]) || 'C').replace('-', '_') + '.UTF-8';
+        var lang = ((typeof navigator == 'object' && navigator.languages && navigator.languages[0]) || 'C').replace('-', '_') + '.UTF-8';
         var env = {
           'USER': 'web_user',
           'LOGNAME': 'web_user',
@@ -5505,30 +5533,47 @@ function say(str){ console.log( UTF8ToString(str)); }
     }
 
 
-  function _fd_close(fd) {try {
+  function _fd_close(fd) {
+  try {
   
       var stream = SYSCALLS.getStreamFromFD(fd);
       FS.close(stream);
       return 0;
     } catch (e) {
-    if (typeof FS === 'undefined' || !(e instanceof FS.ErrnoError)) throw e;
+    if (typeof FS == 'undefined' || !(e instanceof FS.ErrnoError)) throw e;
     return e.errno;
   }
   }
 
-  function _fd_read(fd, iov, iovcnt, pnum) {try {
+  /** @param {number=} offset */
+  function doReadv(stream, iov, iovcnt, offset) {
+      var ret = 0;
+      for (var i = 0; i < iovcnt; i++) {
+        var ptr = HEAPU32[((iov)>>2)];
+        var len = HEAPU32[(((iov)+(4))>>2)];
+        iov += 8;
+        var curr = FS.read(stream, HEAP8,ptr, len, offset);
+        if (curr < 0) return -1;
+        ret += curr;
+        if (curr < len) break; // nothing more to read
+      }
+      return ret;
+    }
+  function _fd_read(fd, iov, iovcnt, pnum) {
+  try {
   
       var stream = SYSCALLS.getStreamFromFD(fd);
-      var num = SYSCALLS.doReadv(stream, iov, iovcnt);
+      var num = doReadv(stream, iov, iovcnt);
       HEAP32[((pnum)>>2)] = num;
       return 0;
     } catch (e) {
-    if (typeof FS === 'undefined' || !(e instanceof FS.ErrnoError)) throw e;
+    if (typeof FS == 'undefined' || !(e instanceof FS.ErrnoError)) throw e;
     return e.errno;
   }
   }
 
-  function _fd_seek(fd, offset_low, offset_high, whence, newOffset) {try {
+  function _fd_seek(fd, offset_low, offset_high, whence, newOffset) {
+  try {
   
       
       var stream = SYSCALLS.getStreamFromFD(fd);
@@ -5539,7 +5584,7 @@ function say(str){ console.log( UTF8ToString(str)); }
       var DOUBLE_LIMIT = 0x20000000000000; // 2^53
       // we also check for equality since DOUBLE_LIMIT + 1 == DOUBLE_LIMIT
       if (offset <= -DOUBLE_LIMIT || offset >= DOUBLE_LIMIT) {
-        return -61;
+        return 61;
       }
   
       FS.llseek(stream, offset, whence);
@@ -5547,20 +5592,34 @@ function say(str){ console.log( UTF8ToString(str)); }
       if (stream.getdents && offset === 0 && whence === 0) stream.getdents = null; // reset readdir state
       return 0;
     } catch (e) {
-    if (typeof FS === 'undefined' || !(e instanceof FS.ErrnoError)) throw e;
+    if (typeof FS == 'undefined' || !(e instanceof FS.ErrnoError)) throw e;
     return e.errno;
   }
   }
 
-  function _fd_write(fd, iov, iovcnt, pnum) {try {
+  /** @param {number=} offset */
+  function doWritev(stream, iov, iovcnt, offset) {
+      var ret = 0;
+      for (var i = 0; i < iovcnt; i++) {
+        var ptr = HEAPU32[((iov)>>2)];
+        var len = HEAPU32[(((iov)+(4))>>2)];
+        iov += 8;
+        var curr = FS.write(stream, HEAP8,ptr, len, offset);
+        if (curr < 0) return -1;
+        ret += curr;
+      }
+      return ret;
+    }
+  function _fd_write(fd, iov, iovcnt, pnum) {
+  try {
   
       ;
       var stream = SYSCALLS.getStreamFromFD(fd);
-      var num = SYSCALLS.doWritev(stream, iov, iovcnt);
+      var num = doWritev(stream, iov, iovcnt);
       HEAP32[((pnum)>>2)] = num;
       return 0;
     } catch (e) {
-    if (typeof FS === 'undefined' || !(e instanceof FS.ErrnoError)) throw e;
+    if (typeof FS == 'undefined' || !(e instanceof FS.ErrnoError)) throw e;
     return e.errno;
   }
   }
@@ -5571,15 +5630,6 @@ function say(str){ console.log( UTF8ToString(str)); }
 
   function _setTempRet0(val) {
       setTempRet0(val);
-    }
-
-  function _time(ptr) {
-      ;
-      var ret = (Date.now()/1000)|0;
-      if (ptr) {
-        HEAP32[((ptr)>>2)] = ret;
-      }
-      return ret;
     }
 
   function _wgpuBindGroupLayoutRelease(id) {
@@ -5595,17 +5645,19 @@ function say(str){ console.log( UTF8ToString(str)); }
   
       function makeColorAttachment(caPtr) {
         var loadOpInt = HEAPU32[(((caPtr)+(8))>>2)];
-        var loadValue = loadOpInt ? 'load' :
-          WebGPU.makeColor(caPtr + 16);
+  
+        var storeOpInt = HEAPU32[(((caPtr)+(12))>>2)];
+  
+        var clearValue = WebGPU.makeColor(caPtr + 16);
   
         return {
           "view": WebGPU.mgrTextureView.get(
             HEAPU32[((caPtr)>>2)]),
           "resolveTarget": WebGPU.mgrTextureView.get(
             HEAPU32[(((caPtr)+(4))>>2)]),
-          "storeOp": WebGPU.StoreOp[
-            HEAPU32[(((caPtr)+(12))>>2)]],
-          "loadValue": loadValue,
+          "clearValue": clearValue,
+          "loadOp":  WebGPU.LoadOp[loadOpInt],
+          "storeOp": WebGPU.StoreOp[storeOpInt],
         };
       }
   
@@ -5620,24 +5672,20 @@ function say(str){ console.log( UTF8ToString(str)); }
       function makeDepthStencilAttachment(dsaPtr) {
         if (dsaPtr === 0) return undefined;
   
-        var depthLoadOpInt = HEAPU32[(((dsaPtr)+(4))>>2)];
-        var depthLoadValue = depthLoadOpInt ? 'load' :
-          HEAPF32[(((dsaPtr)+(12))>>2)];
-  
-        var stencilLoadOpInt = HEAPU32[(((dsaPtr)+(20))>>2)];
-        var stencilLoadValue = stencilLoadOpInt ? 'load' :
-          HEAPU32[(((dsaPtr)+(28))>>2)];
-  
         return {
           "view": WebGPU.mgrTextureView.get(
             HEAPU32[((dsaPtr)>>2)]),
+          "depthClearValue": HEAPF32[(((dsaPtr)+(12))>>2)],
+          "depthLoadOp": WebGPU.LoadOp[
+            HEAPU32[(((dsaPtr)+(4))>>2)]],
           "depthStoreOp": WebGPU.StoreOp[
             HEAPU32[(((dsaPtr)+(8))>>2)]],
-          "depthLoadValue": depthLoadValue,
           "depthReadOnly": (HEAP8[(((dsaPtr)+(16))>>0)] !== 0),
+          "stencilClearValue": HEAPU32[(((dsaPtr)+(28))>>2)],
+          "stencilLoadOp": WebGPU.LoadOp[
+            HEAPU32[(((dsaPtr)+(20))>>2)]],
           "stencilStoreOp": WebGPU.StoreOp[
             HEAPU32[(((dsaPtr)+(24))>>2)]],
-          "stencilLoadValue": stencilLoadValue,
           "stencilReadOnly": (HEAP8[(((dsaPtr)+(32))>>0)] !== 0),
         };
       }
@@ -5648,13 +5696,13 @@ function say(str){ console.log( UTF8ToString(str)); }
           "label": undefined,
           "colorAttachments": makeColorAttachments(
             HEAPU32[(((descriptor)+(8))>>2)],
-            HEAP32[(((descriptor)+(12))>>2)]),
+            HEAPU32[(((descriptor)+(12))>>2)]),
           "depthStencilAttachment": makeDepthStencilAttachment(
-            HEAP32[(((descriptor)+(16))>>2)]),
+            HEAPU32[(((descriptor)+(16))>>2)]),
           "occlusionQuerySet": WebGPU.mgrQuerySet.get(
-            HEAP32[(((descriptor)+(20))>>2)]),
+            HEAPU32[(((descriptor)+(20))>>2)]),
         };
-        var labelPtr = HEAP32[(((descriptor)+(4))>>2)];
+        var labelPtr = HEAPU32[(((descriptor)+(4))>>2)];
         if (labelPtr) desc["label"] = UTF8ToString(labelPtr);
         return desc;
       }
@@ -5725,13 +5773,13 @@ function say(str){ console.log( UTF8ToString(str)); }
       var desc = {
         "label": undefined,
         "layout": WebGPU.mgrBindGroupLayout.get(
-          HEAP32[(((descriptor)+(8))>>2)]),
+          HEAPU32[(((descriptor)+(8))>>2)]),
         "entries": makeEntries(
           HEAPU32[(((descriptor)+(12))>>2)],
-          HEAP32[(((descriptor)+(16))>>2)]
+          HEAPU32[(((descriptor)+(16))>>2)]
         ),
       };
-      var labelPtr = HEAP32[(((descriptor)+(4))>>2)];
+      var labelPtr = HEAPU32[(((descriptor)+(4))>>2)];
       if (labelPtr) desc["label"] = UTF8ToString(labelPtr);
   
       var device = WebGPU.mgrDevice.get(deviceId);
@@ -5828,10 +5876,10 @@ function say(str){ console.log( UTF8ToString(str)); }
       var desc = {
         "entries": makeEntries(
           HEAPU32[(((descriptor)+(8))>>2)],
-          HEAP32[(((descriptor)+(12))>>2)]
+          HEAPU32[(((descriptor)+(12))>>2)]
         ),
       };
-      var labelPtr = HEAP32[(((descriptor)+(4))>>2)];
+      var labelPtr = HEAPU32[(((descriptor)+(4))>>2)];
       if (labelPtr) desc["label"] = UTF8ToString(labelPtr);
   
       var device = WebGPU.mgrDevice.get(deviceId);
@@ -5849,7 +5897,7 @@ function say(str){ console.log( UTF8ToString(str)); }
         "size": HEAPU32[((((descriptor + 4))+(16))>>2)] * 0x100000000 + HEAPU32[(((descriptor)+(16))>>2)],
         "mappedAtCreation": mappedAtCreation,
       };
-      var labelPtr = HEAP32[(((descriptor)+(4))>>2)];
+      var labelPtr = HEAPU32[(((descriptor)+(4))>>2)];
       if (labelPtr) desc["label"] = UTF8ToString(labelPtr);
   
       var device = WebGPU.mgrDevice.get(deviceId);
@@ -5869,7 +5917,7 @@ function say(str){ console.log( UTF8ToString(str)); }
         desc = {
           "label": undefined,
         };
-        var labelPtr = HEAP32[(((descriptor)+(4))>>2)];
+        var labelPtr = HEAPU32[(((descriptor)+(4))>>2)];
         if (labelPtr) desc["label"] = UTF8ToString(labelPtr);
       }
       var device = WebGPU.mgrDevice.get(deviceId);
@@ -5879,17 +5927,17 @@ function say(str){ console.log( UTF8ToString(str)); }
   function _wgpuDeviceCreatePipelineLayout(deviceId, descriptor) {
       
       var bglCount = HEAPU32[(((descriptor)+(8))>>2)];
-      var bglPtr = HEAP32[(((descriptor)+(12))>>2)];
+      var bglPtr = HEAPU32[(((descriptor)+(12))>>2)];
       var bgls = [];
       for (var i = 0; i < bglCount; ++i) {
         bgls.push(WebGPU.mgrBindGroupLayout.get(
-          HEAP32[(((bglPtr)+(4 * i))>>2)]));
+          HEAPU32[(((bglPtr)+(4 * i))>>2)]));
       }
       var desc = {
         "label": undefined,
         "bindGroupLayouts": bgls,
       };
-      var labelPtr = HEAP32[(((descriptor)+(4))>>2)];
+      var labelPtr = HEAPU32[(((descriptor)+(4))>>2)];
       if (labelPtr) desc["label"] = UTF8ToString(labelPtr);
   
       var device = WebGPU.mgrDevice.get(deviceId);
@@ -5940,7 +5988,7 @@ function say(str){ console.log( UTF8ToString(str)); }
         return {
           "format": WebGPU.TextureFormat[
             HEAPU32[(((csPtr)+(4))>>2)]],
-          "blend": makeBlendState(HEAP32[(((csPtr)+(8))>>2)]),
+          "blend": makeBlendState(HEAPU32[(((csPtr)+(8))>>2)]),
           "writeMask": HEAPU32[(((csPtr)+(12))>>2)],
         };
       }
@@ -5981,7 +6029,7 @@ function say(str){ console.log( UTF8ToString(str)); }
           "stencilBack": makeStencilStateFace(dssPtr + 32),
           "stencilReadMask": HEAPU32[(((dssPtr)+(48))>>2)],
           "stencilWriteMask": HEAPU32[(((dssPtr)+(52))>>2)],
-          "depthBias": HEAP32[(((dssPtr)+(56))>>2)],
+          "depthBias": HEAPU32[(((dssPtr)+(56))>>2)],
           "depthBiasSlopeScale": HEAPF32[(((dssPtr)+(60))>>2)],
           "depthBiasClamp": HEAPF32[(((dssPtr)+(64))>>2)],
         };
@@ -6014,7 +6062,7 @@ function say(str){ console.log( UTF8ToString(str)); }
             HEAPU32[(((vbPtr)+(8))>>2)]],
           "attributes": makeVertexAttributes(
             HEAPU32[(((vbPtr)+(12))>>2)],
-            HEAP32[(((vbPtr)+(16))>>2)]),
+            HEAPU32[(((vbPtr)+(16))>>2)]),
         };
       }
   
@@ -6033,15 +6081,15 @@ function say(str){ console.log( UTF8ToString(str)); }
         
         return {
           "module": WebGPU.mgrShaderModule.get(
-            HEAP32[(((viPtr)+(4))>>2)]),
+            HEAPU32[(((viPtr)+(4))>>2)]),
           "entryPoint": UTF8ToString(
-            HEAP32[(((viPtr)+(8))>>2)]),
+            HEAPU32[(((viPtr)+(8))>>2)]),
           "constants": WebGPU.makePipelineConstants(
             HEAPU32[(((viPtr)+(12))>>2)],
-            HEAP32[(((viPtr)+(16))>>2)]),
+            HEAPU32[(((viPtr)+(16))>>2)]),
           "buffers": makeVertexBuffers(
             HEAPU32[(((viPtr)+(20))>>2)],
-            HEAP32[(((viPtr)+(24))>>2)]),
+            HEAPU32[(((viPtr)+(24))>>2)]),
         };
       }
   
@@ -6060,34 +6108,34 @@ function say(str){ console.log( UTF8ToString(str)); }
         
         return {
           "module": WebGPU.mgrShaderModule.get(
-            HEAP32[(((fsPtr)+(4))>>2)]),
+            HEAPU32[(((fsPtr)+(4))>>2)]),
           "entryPoint": UTF8ToString(
-            HEAP32[(((fsPtr)+(8))>>2)]),
+            HEAPU32[(((fsPtr)+(8))>>2)]),
           "constants": WebGPU.makePipelineConstants(
             HEAPU32[(((fsPtr)+(12))>>2)],
-            HEAP32[(((fsPtr)+(16))>>2)]),
+            HEAPU32[(((fsPtr)+(16))>>2)]),
           "targets": makeColorStates(
             HEAPU32[(((fsPtr)+(20))>>2)],
-            HEAP32[(((fsPtr)+(24))>>2)]),
+            HEAPU32[(((fsPtr)+(24))>>2)]),
         };
       }
   
       var desc = {
         "label": undefined,
         "layout": WebGPU.mgrPipelineLayout.get(
-          HEAP32[(((descriptor)+(8))>>2)]),
+          HEAPU32[(((descriptor)+(8))>>2)]),
         "vertex": makeVertexState(
           descriptor + 12),
         "primitive": makePrimitiveState(
           descriptor + 40),
         "depthStencil": makeDepthStencilState(
-          HEAP32[(((descriptor)+(60))>>2)]),
+          HEAPU32[(((descriptor)+(60))>>2)]),
         "multisample": makeMultisampleState(
           descriptor + 64),
         "fragment": makeFragmentState(
-          HEAP32[(((descriptor)+(80))>>2)]),
+          HEAPU32[(((descriptor)+(80))>>2)]),
       };
-      var labelPtr = HEAP32[(((descriptor)+(4))>>2)];
+      var labelPtr = HEAPU32[(((descriptor)+(4))>>2)];
       if (labelPtr) desc["label"] = UTF8ToString(labelPtr);
   
       var device = WebGPU.mgrDevice.get(deviceId);
@@ -6116,7 +6164,7 @@ function say(str){ console.log( UTF8ToString(str)); }
         "compare": WebGPU.CompareFunction[
             HEAPU32[(((descriptor)+(40))>>2)]],
       };
-      var labelPtr = HEAP32[(((descriptor)+(4))>>2)];
+      var labelPtr = HEAPU32[(((descriptor)+(4))>>2)];
       if (labelPtr) desc["label"] = UTF8ToString(labelPtr);
   
       var device = WebGPU.mgrDevice.get(deviceId);
@@ -6125,25 +6173,25 @@ function say(str){ console.log( UTF8ToString(str)); }
 
   function _wgpuDeviceCreateShaderModule(deviceId, descriptor) {
       
-      var nextInChainPtr = HEAP32[((descriptor)>>2)];
+      var nextInChainPtr = HEAPU32[((descriptor)>>2)];
       var sType = HEAPU32[(((nextInChainPtr)+(4))>>2)];
   
       var desc = {
         "label": undefined,
         "code": "",
       };
-      var labelPtr = HEAP32[(((descriptor)+(4))>>2)];
+      var labelPtr = HEAPU32[(((descriptor)+(4))>>2)];
       if (labelPtr) desc["label"] = UTF8ToString(labelPtr);
   
       switch (sType) {
         case 5: {
           var count = HEAPU32[(((nextInChainPtr)+(8))>>2)];
-          var start = HEAP32[(((nextInChainPtr)+(12))>>2)];
+          var start = HEAPU32[(((nextInChainPtr)+(12))>>2)];
           desc["code"] = HEAPU32.subarray(start >> 2, (start >> 2) + count);
           break;
         }
         case 6: {
-          var sourcePtr = HEAP32[(((nextInChainPtr)+(8))>>2)];
+          var sourcePtr = HEAPU32[(((nextInChainPtr)+(8))>>2)];
           if (sourcePtr) {
             desc["code"] = UTF8ToString(sourcePtr);
           }
@@ -6189,7 +6237,7 @@ function say(str){ console.log( UTF8ToString(str)); }
           HEAPU32[(((descriptor)+(28))>>2)]],
         "usage": HEAPU32[(((descriptor)+(8))>>2)],
       };
-      var labelPtr = HEAP32[(((descriptor)+(4))>>2)];
+      var labelPtr = HEAPU32[(((descriptor)+(4))>>2)];
       if (labelPtr) desc["label"] = UTF8ToString(labelPtr);
   
       var device = WebGPU.mgrDevice.get(deviceId);
@@ -6207,17 +6255,17 @@ function say(str){ console.log( UTF8ToString(str)); }
   function _wgpuInstanceCreateSurface(instanceId, descriptor) {
       
       
-      var nextInChainPtr = HEAP32[((descriptor)>>2)];
+      var nextInChainPtr = HEAPU32[((descriptor)>>2)];
       var descriptorFromCanvasHTMLSelector = nextInChainPtr;
   
       
-      var selectorPtr = HEAP32[(((descriptorFromCanvasHTMLSelector)+(8))>>2)];
+      var selectorPtr = HEAPU32[(((descriptorFromCanvasHTMLSelector)+(8))>>2)];
       
       var canvas = findCanvasEventTarget(selectorPtr);
       const context = canvas.getContext('webgpu');
       if (!context) return 0;
   
-      var labelPtr = HEAP32[(((descriptor)+(4))>>2)];
+      var labelPtr = HEAPU32[(((descriptor)+(4))>>2)];
       if (labelPtr) context.surfaceLabelWebGPU = UTF8ToString(labelPtr);
   
       return WebGPU.mgrSurface.create(context);
@@ -6263,9 +6311,9 @@ function say(str){ console.log( UTF8ToString(str)); }
       pass["drawIndexed"](indexCount, instanceCount, firstIndex, baseVertex, firstInstance);
     }
 
-  function _wgpuRenderPassEncoderEndPass(passId) {
+  function _wgpuRenderPassEncoderEnd(passId) {
       var pass = WebGPU.mgrRenderPassEncoder.get(passId);
-      pass["endPass"]();
+      pass["end"]();
     }
 
   function _wgpuRenderPassEncoderRelease(id) {
@@ -6341,7 +6389,7 @@ function say(str){ console.log( UTF8ToString(str)); }
           "aspect": WebGPU.TextureAspect[
             HEAPU32[(((descriptor)+(32))>>2)]],
         };
-        var labelPtr = HEAP32[(((descriptor)+(4))>>2)];
+        var labelPtr = HEAPU32[(((descriptor)+(4))>>2)];
         if (labelPtr) desc["label"] = UTF8ToString(labelPtr);
       }
   
@@ -6358,8 +6406,11 @@ Module["requestFullscreen"] = function Module_requestFullscreen(lockPointer, res
   Module["setCanvasSize"] = function Module_setCanvasSize(width, height, noUpdates) { Browser.setCanvasSize(width, height, noUpdates) };
   Module["pauseMainLoop"] = function Module_pauseMainLoop() { Browser.mainLoop.pause() };
   Module["resumeMainLoop"] = function Module_resumeMainLoop() { Browser.mainLoop.resume() };
-  Module["getUserMedia"] = function Module_getUserMedia() { Browser.getUserMedia() }
+  Module["getUserMedia"] = function Module_getUserMedia() { Browser.getUserMedia() };
   Module["createContext"] = function Module_createContext(canvas, useWebGL, setInModule, webGLContextAttributes) { return Browser.createContext(canvas, useWebGL, setInModule, webGLContextAttributes) };
+  var preloadedImages = {};
+  var preloadedAudios = {};
+  ;
 
   var FSNode = /** @constructor */ function(parent, name, mode, rdev) {
     if (!parent) {
@@ -6406,7 +6457,7 @@ Module["requestFullscreen"] = function Module_requestFullscreen(lockPointer, res
    }
   });
   FS.FSNode = FSNode;
-  FS.staticInit();Module["FS_createPath"] = FS.createPath;Module["FS_createDataFile"] = FS.createDataFile;Module["FS_createPreloadedFile"] = FS.createPreloadedFile;Module["FS_createLazyFile"] = FS.createLazyFile;Module["FS_createDevice"] = FS.createDevice;Module["FS_unlink"] = FS.unlink;;
+  FS.staticInit();Module["FS_createPath"] = FS.createPath;Module["FS_createDataFile"] = FS.createDataFile;Module["FS_createPreloadedFile"] = FS.createPreloadedFile;Module["FS_unlink"] = FS.unlink;Module["FS_createLazyFile"] = FS.createLazyFile;Module["FS_createDevice"] = FS.createDevice;;
 WebGPU.initManagers();;
 var ASSERTIONS = false;
 
@@ -6447,7 +6498,7 @@ function intArrayToString(array) {
  * Decodes a base64 string.
  * @param {string} input The string to decode.
  */
-var decodeBase64 = typeof atob === 'function' ? atob : function (input) {
+var decodeBase64 = typeof atob == 'function' ? atob : function (input) {
   var keyStr = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
 
   var output = '';
@@ -6481,7 +6532,7 @@ var decodeBase64 = typeof atob === 'function' ? atob : function (input) {
 // Converts a string of base64 into a byte array.
 // Throws error on invalid input.
 function intArrayFromBase64(s) {
-  if (typeof ENVIRONMENT_IS_NODE === 'boolean' && ENVIRONMENT_IS_NODE) {
+  if (typeof ENVIRONMENT_IS_NODE == 'boolean' && ENVIRONMENT_IS_NODE) {
     var buf = Buffer.from(s, 'base64');
     return new Uint8Array(buf['buffer'], buf['byteOffset'], buf['byteLength']);
   }
@@ -6513,20 +6564,23 @@ var asmLibraryArg = {
   "__assert_fail": ___assert_fail,
   "__syscall_fcntl64": ___syscall_fcntl64,
   "__syscall_ioctl": ___syscall_ioctl,
-  "__syscall_open": ___syscall_open,
+  "__syscall_openat": ___syscall_openat,
+  "_emscripten_date_now": __emscripten_date_now,
+  "_emscripten_get_now_is_monotonic": __emscripten_get_now_is_monotonic,
   "_emscripten_throw_longjmp": __emscripten_throw_longjmp,
   "_localtime_js": __localtime_js,
   "_tzset_js": __tzset_js,
   "abort": _abort,
-  "clock": _clock,
   "emscripten_get_now": _emscripten_get_now,
   "emscripten_get_preloaded_image_data": _emscripten_get_preloaded_image_data,
   "emscripten_get_preloaded_image_data_from_FILE": _emscripten_get_preloaded_image_data_from_FILE,
   "emscripten_has_asyncify": _emscripten_has_asyncify,
   "emscripten_memcpy_big": _emscripten_memcpy_big,
+  "emscripten_random": _emscripten_random,
   "emscripten_request_animation_frame_loop": _emscripten_request_animation_frame_loop,
   "emscripten_resize_heap": _emscripten_resize_heap,
   "emscripten_set_click_callback_on_thread": _emscripten_set_click_callback_on_thread,
+  "emscripten_set_keypress_callback_on_thread": _emscripten_set_keypress_callback_on_thread,
   "emscripten_set_mousemove_callback_on_thread": _emscripten_set_mousemove_callback_on_thread,
   "emscripten_sleep": _emscripten_sleep,
   "emscripten_webgpu_get_device": _emscripten_webgpu_get_device,
@@ -6556,7 +6610,6 @@ var asmLibraryArg = {
   "jsprint": jsprint,
   "say": say,
   "setTempRet0": _setTempRet0,
-  "time": _time,
   "wgpuBindGroupLayoutRelease": _wgpuBindGroupLayoutRelease,
   "wgpuCommandBufferRelease": _wgpuCommandBufferRelease,
   "wgpuCommandEncoderBeginRenderPass": _wgpuCommandEncoderBeginRenderPass,
@@ -6579,7 +6632,7 @@ var asmLibraryArg = {
   "wgpuQueueWriteBuffer": _wgpuQueueWriteBuffer,
   "wgpuQueueWriteTexture": _wgpuQueueWriteTexture,
   "wgpuRenderPassEncoderDrawIndexed": _wgpuRenderPassEncoderDrawIndexed,
-  "wgpuRenderPassEncoderEndPass": _wgpuRenderPassEncoderEndPass,
+  "wgpuRenderPassEncoderEnd": _wgpuRenderPassEncoderEnd,
   "wgpuRenderPassEncoderRelease": _wgpuRenderPassEncoderRelease,
   "wgpuRenderPassEncoderSetBindGroup": _wgpuRenderPassEncoderSetBindGroup,
   "wgpuRenderPassEncoderSetIndexBuffer": _wgpuRenderPassEncoderSetIndexBuffer,
@@ -6683,157 +6736,157 @@ var dynCall_jiji = Module["dynCall_jiji"] = function() {
 
 
 function invoke_ii(index,a1) {
-var sp = stackSave();
-try {
-  return getWasmTableEntry(index)(a1);
-} catch(e) {
-  stackRestore(sp);
-  if (e !== e+0 && e !== 'longjmp') throw e;
-  _setThrew(1, 0);
-}
+  var sp = stackSave();
+  try {
+    return getWasmTableEntry(index)(a1);
+  } catch(e) {
+    stackRestore(sp);
+    if (e !== e+0) throw e;
+    _setThrew(1, 0);
+  }
 }
 
 function invoke_vi(index,a1) {
-var sp = stackSave();
-try {
-  getWasmTableEntry(index)(a1);
-} catch(e) {
-  stackRestore(sp);
-  if (e !== e+0 && e !== 'longjmp') throw e;
-  _setThrew(1, 0);
-}
+  var sp = stackSave();
+  try {
+    getWasmTableEntry(index)(a1);
+  } catch(e) {
+    stackRestore(sp);
+    if (e !== e+0) throw e;
+    _setThrew(1, 0);
+  }
 }
 
 function invoke_iii(index,a1,a2) {
-var sp = stackSave();
-try {
-  return getWasmTableEntry(index)(a1,a2);
-} catch(e) {
-  stackRestore(sp);
-  if (e !== e+0 && e !== 'longjmp') throw e;
-  _setThrew(1, 0);
-}
+  var sp = stackSave();
+  try {
+    return getWasmTableEntry(index)(a1,a2);
+  } catch(e) {
+    stackRestore(sp);
+    if (e !== e+0) throw e;
+    _setThrew(1, 0);
+  }
 }
 
 function invoke_viii(index,a1,a2,a3) {
-var sp = stackSave();
-try {
-  getWasmTableEntry(index)(a1,a2,a3);
-} catch(e) {
-  stackRestore(sp);
-  if (e !== e+0 && e !== 'longjmp') throw e;
-  _setThrew(1, 0);
-}
+  var sp = stackSave();
+  try {
+    getWasmTableEntry(index)(a1,a2,a3);
+  } catch(e) {
+    stackRestore(sp);
+    if (e !== e+0) throw e;
+    _setThrew(1, 0);
+  }
 }
 
 function invoke_iiii(index,a1,a2,a3) {
-var sp = stackSave();
-try {
-  return getWasmTableEntry(index)(a1,a2,a3);
-} catch(e) {
-  stackRestore(sp);
-  if (e !== e+0 && e !== 'longjmp') throw e;
-  _setThrew(1, 0);
-}
+  var sp = stackSave();
+  try {
+    return getWasmTableEntry(index)(a1,a2,a3);
+  } catch(e) {
+    stackRestore(sp);
+    if (e !== e+0) throw e;
+    _setThrew(1, 0);
+  }
 }
 
 function invoke_iiiiiiiii(index,a1,a2,a3,a4,a5,a6,a7,a8) {
-var sp = stackSave();
-try {
-  return getWasmTableEntry(index)(a1,a2,a3,a4,a5,a6,a7,a8);
-} catch(e) {
-  stackRestore(sp);
-  if (e !== e+0 && e !== 'longjmp') throw e;
-  _setThrew(1, 0);
-}
+  var sp = stackSave();
+  try {
+    return getWasmTableEntry(index)(a1,a2,a3,a4,a5,a6,a7,a8);
+  } catch(e) {
+    stackRestore(sp);
+    if (e !== e+0) throw e;
+    _setThrew(1, 0);
+  }
 }
 
 function invoke_iiiii(index,a1,a2,a3,a4) {
-var sp = stackSave();
-try {
-  return getWasmTableEntry(index)(a1,a2,a3,a4);
-} catch(e) {
-  stackRestore(sp);
-  if (e !== e+0 && e !== 'longjmp') throw e;
-  _setThrew(1, 0);
-}
+  var sp = stackSave();
+  try {
+    return getWasmTableEntry(index)(a1,a2,a3,a4);
+  } catch(e) {
+    stackRestore(sp);
+    if (e !== e+0) throw e;
+    _setThrew(1, 0);
+  }
 }
 
 function invoke_vii(index,a1,a2) {
-var sp = stackSave();
-try {
-  getWasmTableEntry(index)(a1,a2);
-} catch(e) {
-  stackRestore(sp);
-  if (e !== e+0 && e !== 'longjmp') throw e;
-  _setThrew(1, 0);
-}
+  var sp = stackSave();
+  try {
+    getWasmTableEntry(index)(a1,a2);
+  } catch(e) {
+    stackRestore(sp);
+    if (e !== e+0) throw e;
+    _setThrew(1, 0);
+  }
 }
 
 function invoke_iiiiiiiiii(index,a1,a2,a3,a4,a5,a6,a7,a8,a9) {
-var sp = stackSave();
-try {
-  return getWasmTableEntry(index)(a1,a2,a3,a4,a5,a6,a7,a8,a9);
-} catch(e) {
-  stackRestore(sp);
-  if (e !== e+0 && e !== 'longjmp') throw e;
-  _setThrew(1, 0);
-}
+  var sp = stackSave();
+  try {
+    return getWasmTableEntry(index)(a1,a2,a3,a4,a5,a6,a7,a8,a9);
+  } catch(e) {
+    stackRestore(sp);
+    if (e !== e+0) throw e;
+    _setThrew(1, 0);
+  }
 }
 
 function invoke_iiiiii(index,a1,a2,a3,a4,a5) {
-var sp = stackSave();
-try {
-  return getWasmTableEntry(index)(a1,a2,a3,a4,a5);
-} catch(e) {
-  stackRestore(sp);
-  if (e !== e+0 && e !== 'longjmp') throw e;
-  _setThrew(1, 0);
-}
+  var sp = stackSave();
+  try {
+    return getWasmTableEntry(index)(a1,a2,a3,a4,a5);
+  } catch(e) {
+    stackRestore(sp);
+    if (e !== e+0) throw e;
+    _setThrew(1, 0);
+  }
 }
 
 function invoke_i(index) {
-var sp = stackSave();
-try {
-  return getWasmTableEntry(index)();
-} catch(e) {
-  stackRestore(sp);
-  if (e !== e+0 && e !== 'longjmp') throw e;
-  _setThrew(1, 0);
-}
+  var sp = stackSave();
+  try {
+    return getWasmTableEntry(index)();
+  } catch(e) {
+    stackRestore(sp);
+    if (e !== e+0) throw e;
+    _setThrew(1, 0);
+  }
 }
 
 function invoke_viiii(index,a1,a2,a3,a4) {
-var sp = stackSave();
-try {
-  getWasmTableEntry(index)(a1,a2,a3,a4);
-} catch(e) {
-  stackRestore(sp);
-  if (e !== e+0 && e !== 'longjmp') throw e;
-  _setThrew(1, 0);
-}
+  var sp = stackSave();
+  try {
+    getWasmTableEntry(index)(a1,a2,a3,a4);
+  } catch(e) {
+    stackRestore(sp);
+    if (e !== e+0) throw e;
+    _setThrew(1, 0);
+  }
 }
 
 function invoke_ji(index,a1) {
-var sp = stackSave();
-try {
-  return dynCall_ji(index,a1);
-} catch(e) {
-  stackRestore(sp);
-  if (e !== e+0 && e !== 'longjmp') throw e;
-  _setThrew(1, 0);
-}
+  var sp = stackSave();
+  try {
+    return dynCall_ji(index,a1);
+  } catch(e) {
+    stackRestore(sp);
+    if (e !== e+0) throw e;
+    _setThrew(1, 0);
+  }
 }
 
 function invoke_jiji(index,a1,a2,a3,a4) {
-var sp = stackSave();
-try {
-  return dynCall_jiji(index,a1,a2,a3,a4);
-} catch(e) {
-  stackRestore(sp);
-  if (e !== e+0 && e !== 'longjmp') throw e;
-  _setThrew(1, 0);
-}
+  var sp = stackSave();
+  try {
+    return dynCall_jiji(index,a1,a2,a3,a4);
+  } catch(e) {
+    stackRestore(sp);
+    if (e !== e+0) throw e;
+    _setThrew(1, 0);
+  }
 }
 
 
@@ -6956,8 +7009,7 @@ Module['run'] = run;
 function exit(status, implicit) {
   EXITSTATUS = status;
 
-  if (keepRuntimeAlive()) {
-  } else {
+  if (!keepRuntimeAlive()) {
     exitRuntime();
   }
 

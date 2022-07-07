@@ -4,6 +4,7 @@ INC_DIR = inc
 SRC_DIR = src
 WEB_DIR = out
 EXE=out/new_template.js
+#EXE=out/simpletexture.js
 EMS_DIR = $(SRC_DIR)/ems
 SOURCES = main.cpp $(SRC_DIR)/Camera.cpp $(SRC_DIR)/CameraController.cpp $(EMS_DIR)/glue.cpp $(EMS_DIR)/webgpu.cpp $(EMS_DIR)/window.cpp
 OBJS = $(addsuffix .o, $(basename $(notdir $(SOURCES))))

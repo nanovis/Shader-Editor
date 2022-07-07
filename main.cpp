@@ -74,12 +74,12 @@ glm::vec2 resolution=glm::vec2(800.0f,600.0f);
 
 static char const triangle_vert_wgsl[] = R"(
 	struct VertexIn {
-		@location(0) aPos : vec2<f32>;
-	};
+		@location(0) aPos : vec2<f32>,
+	}
 	struct VertexOut {
-		@builtin(position) Position : vec4<f32>;
-	};
-	@stage(vertex)
+		@builtin(position) Position : vec4<f32>,
+	}
+	@vertex
 	fn main(input : VertexIn) -> VertexOut {
 		var output : VertexOut;
 		output.Position = vec4<f32>(input.aPos,0.0, 1.0);
@@ -102,21 +102,18 @@ static char const triangle_frag_wgsl[] = R"(@group(0) @binding(0) var<uniform> T
 @group(1) @binding(2) var texture3: texture_2d<f32>;
 @group(1) @binding(3) var texture4: texture_2d<f32>;
 @group(1) @binding(4) var sampler_: sampler;
-@stage(fragment)
+@fragment
 fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
-
-    if(position.x>Position_dino.x && position.x< Position_dino.x+30.0 && position.y>Position_dino.y && position.y<Position_dino.y+20.0)
-    {
-    var tempx:f32=position.x-Position_dino.x;
-    var tempy:f32=position.y-Position_dino.y;
-    return textureSample(texture2, sampler_, vec2<f32>(tempx/30.0,tempy/20.0));
-    }
-    else
-    {
+  var uv:vec2<f32>=vec2<f32>(position.xy/Resolution);
+  if (distance(uv,vec2<f32>(0.5,0.5))<0.5)
+  {
       return textureSample(texture1, sampler_, position.xy/Resolution);
-    }
-}
-)"; // fragment shader end
+  }
+  else
+  {
+      return vec4<f32>(0.0,0.0,0.0,1.0);
+  }
+})"; // fragment shader end
 
 /*
 [[group(0),binding(0)]] var<uniform> Time : f32;
@@ -729,7 +726,7 @@ void image_init()
 		img_1=new unsigned char[imgw_1 * imgh_1*4];
 		load_images(image,imgw_1,imgh_1,img_1);
 
-		image=IMG_Load("out/texture/admin_happytree.jpg");//texture2
+		image=IMG_Load("out/texture/admin_black.jpg");//texture2
 		imgw_2=image->w;
 		imgh_2=image->h;
 		img_2=new unsigned char[imgw_2 * imgh_2*4];
