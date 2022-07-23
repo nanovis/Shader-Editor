@@ -1,0 +1,273 @@
+{
+  "line_comments": {
+      "comment": "single line comment",
+      "name": "comment.line.double-slash.wgsl",
+      "match": "\\s*//.*"
+  },
+  "attributes": {
+      "comment": "attribute declaration",
+      "name": "meta.attribute.wgsl",
+      "match": "(@)([A-Za-z_]+)",
+      "captures": {
+          "1": {
+              "name": "keyword.operator.attribute.at"
+          },
+          "2": {
+              "name": "entity.name.attribute.wgsl"
+          }
+      }
+  },
+  "functions": {
+      "comment": "function definition",
+      "name": "meta.function.definition.wgsl",
+      "match": "\b(fn)\\s+([A-Za-z0-9_]+)((\\()|(<))",
+      "beginCaptures": {
+          "1": {
+              "name": "keyword.other.fn.wgsl"
+          },
+          "2": {
+              "name": "entity.name.function.wgsl"
+          },
+          "4": {
+              "name": "punctuation.brackets.round.wgsl"
+          }
+      },
+      "end": "\\{",
+      "endCaptures": {
+          "0": {
+              "name": "punctuation.brackets.curly.wgsl"
+          }
+      },
+      "patterns": [
+          {
+              "include": "#line_comments"
+          },
+          {
+              "include": "#keywords"
+          },
+          {
+              "include": "#attributes"
+          },
+          {
+              "include": "#function_calls"
+          },
+          {
+              "include": "#constants"
+          },
+          {
+              "include": "#types"
+          },
+          {
+              "include": "#variables"
+          },
+          {
+              "include": "#punctuation"
+          }
+      ]
+  },
+  "function_calls": {
+      "comment": "function/method calls",
+      "name": "meta.function.call.wgsl",
+      "match": "([A-Za-z0-9_]+)(\\()",
+      "beginCaptures": {
+          "1": {
+              "name": "entity.name.function.wgsl"
+          },
+          "2": {
+              "name": "punctuation.brackets.round.wgsl"
+          }
+      },
+      "end": "\\)",
+      "endCaptures": {
+          "0": {
+              "name": "punctuation.brackets.round.wgsl"
+          }
+      },
+      "patterns": [
+          {
+              "include": "#line_comments"
+          },
+          {
+              "include": "#keywords"
+          },
+          {
+              "include": "#attributes"
+          },
+          {
+              "include": "#function_calls"
+          },
+          {
+              "include": "#constants"
+          },
+          {
+              "include": "#types"
+          },
+          {
+              "include": "#variables"
+          },
+          {
+              "include": "#punctuation"
+          }
+      ]
+  },
+  "decimal_float": {
+      "comment": "decimal float literal",
+      "name": "constant.numeric.float.wgsl",
+      "match": "(-?\b[0-9][0-9]*\\.[0-9][0-9]*)([eE][+-]?[0-9]+)?\b"
+  },
+  "int_literal": {
+      "comment": "int literal",
+      "name": "constant.numeric.decimal.wgsl",
+      "match": "-?\b0x[0-9a-fA-F]+\b|\b0\b|-?\b[1-9][0-9]*\b"
+  },
+  "uint_literal": {
+      "comment": "uint literal",
+      "name": "constant.numeric.decimal.wgsl",
+      "match": "\b0x[0-9a-fA-F]+u\b|\b0u\b|\b[1-9][0-9]*u\b"
+  },
+  "boolean_constant": {
+      "comment": "boolean constant",
+      "name": "constant.language.boolean.wgsl",
+      "match": "\b(true|false)\b"
+  },
+  "scalar_type": {
+      "comment": "scalar Types",
+      "name": "storage.type.wgsl",
+      "match": "\b(bool|i32|u32|f32)\b"
+  },
+  "res_scalar_type": {
+      "comment": "reserved scalar Types",
+      "name": "storage.type.wgsl",
+      "match": "\b(i64|u64|f64)\b"
+  },
+  "vec/mat_type": {
+      "comment": "vector/matrix types",
+      "name": "storage.type.wgsl",
+      "match": "\b(vec[2-4]|mat[2-4]x[2-4])\b"
+  },
+  "atomic_type": {
+      "comment": "atomic types",
+      "name": "storage.type.wgsl",
+      "match": "\b(atomic)\b"
+  },
+  "arr_type": {
+      "comment": "array types",
+      "name": "storage.type.wgsl",
+      "match": "\b(array)\b"
+  },
+  "custom_type": {
+      "comment": "Custom type",
+      "name": "entity.name.type.wgsl",
+      "match": "\b([A-Z][A-Za-z0-9]*)\b"
+  },
+  "variables": {
+      "comment": "variables",
+      "name": "variable.other.wgsl",
+      "match": "\b(?<!(?<!\\.)\\.)(?:r#(?!(crate|[Ss]elf|super)))?[a-z0-9_]+\b"
+  },
+  "pun_comma": {
+      "comment": "comma",
+      "name": "punctuation.comma.wgsl",
+      "match": ","
+  },
+  "pun_curly_brace": {
+      "comment": "curly braces",
+      "name": "punctuation.brackets.curly.wgsl",
+      "match": "[{}]"
+  },
+  "pun_round_brace": {
+      "comment": "parentheses, round brackets",
+      "name": "punctuation.brackets.round.wgsl",
+      "match": "[()]"
+  },
+  "pun_semicolon": {
+      "comment": "semicolon",
+      "name": "punctuation.semi.wgsl",
+      "match": ";"
+  },
+  "pun_square_bracket": {
+      "comment": "square brackets",
+      "name": "punctuation.brackets.square.wgsl",
+      "match": "[\\[\\]]"
+  },
+  "pun_angle_bracket": {
+      "comment": "angle brackets",
+      "name": "punctuation.brackets.angle.wgsl",
+      "match": "(?<!=)[<>]"
+  },
+  "other_keyword": {
+      "comment": "other",
+      "name": "keyword.control.wgsl",
+      "match": "\b(bitcast|block|break|case|continue|continuing|default|discard|else|elseif|enable|fallthrough|for|function|if|loop|private|read|read_write|return|storage|switch|uniform|workgroup|write)\b"
+  },
+  "res_keyword": {
+      "comment": "reserved",
+      "name": "keyword.control.wgsl",
+      "match": "\b(asm|const|do|enum|handle|mat|premerge|regardless|typedef|unless|using|vec|void|while)\b"
+  },
+  "storage_keyword": {
+      "comment": "storage",
+      "name": "keyword.other.wgsl storage.type.wgsl",
+      "match": "\b(let|var)\b"
+  },
+  "type_keyword": {
+      "comment": "type",
+      "name": "keyword.declaration.type.wgsl storage.type.wgsl",
+      "match": "\b(type)\b"
+  },
+  "enum_keyword": {
+      "comment": "enum",
+      "name": "keyword.declaration.enum.wgsl storage.type.wgsl",
+      "match": "\b(enum)\b"
+  },
+  "test_1": {
+      "comment": "struct",
+      "name": "keyword.declaration.struct.wgsl storage.type.wgsl",
+      "match": "\b(struct)\b"
+  },
+  "test_2": {
+      "comment": "fn",
+      "name": "keyword.other.fn.wgsl",
+      "match": "\bfn\b"
+  },
+  "easter_egg": {
+      "comment": "logical",
+      "name": "keyword.operator.logical.wgsl",
+      "match": "(\\^|\\||\\|\\||&&|<<|>>|!)(?!=)"
+  },
+  "created_by_Rocky43007": {
+      "comment": "logical_and_borrow",
+      "name": "keyword.operator.borrow.and.wgsl",
+      "match": "&(?![&=])"
+  },
+  "Testing": {
+      "comment": "assignment",
+      "name": "keyword.operator.assignment.wgsl",
+      "match": "(\\+=|-=|\\*=|/=|%=|\\^=|&=|\\|=|<<=|>>=)"
+  },
+  "idk": {
+      "comment": "single",
+      "name": "keyword.operator.assignment.equal.wgsl",
+      "match": "(?<![<>])=(?!=|>)"
+  },
+  "memes": {
+      "comment": "comparison operators",
+      "name": "keyword.operator.comparison.wgsl",
+      "match": "(=(=)?(?!>)|!=|<=|(?<!=)>=)"
+  },
+  "test": {
+      "comment": "math operators",
+      "name": "keyword.operator.math.wgsl",
+      "match": "(([+%]|(\\*(?!\\w)))(?!=))|(-(?!>))|(/(?!/))"
+  },
+  "test_5": {
+      "comment": "dot access",
+      "name": "keyword.operator.access.dot.wgsl",
+      "match": "\\.(?!\\.)"
+  },
+  "test_6": {
+      "comment": "dashrocket, skinny arrow",
+      "name": "keyword.operator.arrow.skinny.wgsl",
+      "match": "->"
+  }
+}
