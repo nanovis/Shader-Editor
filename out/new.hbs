@@ -1,188 +1,197 @@
 <!doctype html>
 <html lang="en-us">
-  <head>
-    <meta http-equiv="origin-trial" content="AiiqErPPIECW3smg0ZrmkBorbURWiOcf1tn4ge/XORQdLjo8OK+lM8WgWT8fDh905BmSi9he8uji55p/rnf1UgUAAABseyJvcmlnaW4iOiJodHRwczovL3NoYWRlcmVkaXRvci5rYXVzdC5lZHUuc2E6NDQzIiwiZmVhdHVyZSI6IldlYkdQVSIsImV4cGlyeSI6MTY2MzcxODM5OSwiaXNTdWJkb21haW4iOnRydWV9">
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"/>
-    <title>shader editor</title>
-    <!-- Load Bootstrap and jquery -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <script src="./assets/js/jquery.min.js" ></script>
-    <script src="./assets/js/bootstrap.min.js" ></script>
-    <link rel="stylesheet" type="text/css" href="./assets/css/jquery.dataTables.css" rel="stylesheet" >
-    <script type="text/javascript" charset="utf8" src="./assets/js/jquery.dataTables.js" ></script>
-    <!-- Default css, js file -->
-    <link rel="stylesheet" type="text/css" href="./assets/css/main.css">
-    <script src="./assets/monaco-editor/min/vs/loader.js"></script>
-    <script src="./assets/js/editor.js"></script>
-    
 
-  </head>
-  <body>
-    <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e3eff8;" >
-      <div class="container">
-        <div class="navbar-header">
-          <a class="navbar-brand" href="https://www.nanovis.org/"><B>NanoVis</B></a>
-          <a class="navbar-brand" href="/">Shader Editor</a>
-        </div>
-        <div id="navbar" class="navbar-collapse collapse">
-            <ul class="nav navbar-nav">
-                <li><a href="/">Home</a></li>
-                <li><a href="/about">About</a></li>
-                </ul>
-                <ul class="nav navbar-nav navbar-right">
-                  <li><a id="welcome"></a></li>
-                <li><a href="/browse">Browse</a></li>
-                <li><a href="/new">New</a></li>
-                <li><a id="signin" href="/signin">Sign In</a></li>
-                </ul>
-        </div>
-      </div>
-    </nav>
+<head>
+  <meta http-equiv="origin-trial"
+    content="AiiqErPPIECW3smg0ZrmkBorbURWiOcf1tn4ge/XORQdLjo8OK+lM8WgWT8fDh905BmSi9he8uji55p/rnf1UgUAAABseyJvcmlnaW4iOiJodHRwczovL3NoYWRlcmVkaXRvci5rYXVzdC5lZHUuc2E6NDQzIiwiZmVhdHVyZSI6IldlYkdQVSIsImV4cGlyeSI6MTY2MzcxODM5OSwiaXNTdWJkb21haW4iOnRydWV9">
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no" />
+  <title>shader editor</title>
+  <!-- Load Bootstrap and jquery -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+    integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <script src="./assets/js/jquery.min.js"></script>
+  <script src="./assets/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="./assets/css/jquery.dataTables.css" rel="stylesheet">
+  <script type="text/javascript" charset="utf8" src="./assets/js/jquery.dataTables.js"></script>
+  <!-- Default css, js file -->
+  <link rel="stylesheet" type="text/css" href="./assets/css/main.css">
+  <script src="./assets/monaco-editor/min/vs/loader.js"></script>
 
+
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e3eff8;">
     <div class="container">
-      <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
-      <div class="save_part" id="save_part" >
-        <div class="form-group">
-          <label for="save_name">Name of the shader</label>
-          <input  type="text" class="form-control" id="save_name" >
-        </div>
-        <div class="form-group">
-          <label for="save_select">Example select</label>
-          <select class="form-control" id="save_select" >
-            <option>Private</option>
-            <option>Public</option>
-          </select>
-        </div>
-        <button  class="btn btn-primary" onclick="save()">Save</button>
+      <div class="navbar-header">
+        <a class="navbar-brand" href="https://www.nanovis.org/"><B>NanoVis</B></a>
+        <a class="navbar-brand" href="/">Shader Editor</a>
       </div>
-      <div class="textbox">
-        <div class="description" onclick="toggle('display_desc')">
-          <span class="glyphicon glyphicon-menu-down" aria-hidden="true" >Input</span>
-          <p class="display_desc" id="display_desc">
-            uniform Time : f32; //shader playback time (in seconds) <br> 
-            uniform Resolution : vec3&lt;f32&gt;; // viewport resolution <br> 
-            uniform Mouse : vec4&lt;f32&gt;; // mouse pixel coords. xy: current, zw: click <br> 
-            uniform Date1 : vec3&lt;i32&gt;; // year, month, day <br> 
-            uniform Date2 : vec3&lt;i32&gt;; // hour, minute, second <br>
-            uniform Key : i32; // The ASCII character code of the pressed key <br>
-            uniform Position : vec2&lt;f32&gt;; <br>
-            uniform Random : f32; //random number<br>
-            var texture1..4: texture_2d&lt;f32&gt;; // input textures <br> 
-            var sampler_: sampler; // input sampler <br>
-          </p>
-        </div>
-        <br>
-        <form id="compiler" action="/compile" method="post">
-    <div id="textarea" style="width:800px;height:450px;"></div>
-    <input type="hidden" name="code" id="code" >
-    <input type="hidden" name="texture1" id="texture1" value="admin_black.jpg">
-    <input type="hidden" name="texture2" id="texture2" value="admin_black.jpg">
-    <input type="hidden" name="texture3" id="texture3" value="admin_black.jpg">
-    <input type="hidden" name="texture4" id="texture4" value="admin_black.jpg">
-    <button type="submit" class="btn btn-primary"  onclick="updatetextarea()">Compile</button>
-        </form>
-    
-    <br>
-    <br>
-    <div class="texture_image">
-    <button id="popover1" type="button" class="btn btn-default" title="Texture 1" trigger="click"
-        data-container="body" data-toggle="popover1" data-placement="top" 
-        >
-      texture_1
-    </button>
-    <button id="popover2" type="button" class="btn btn-default" title="Texture 2"  
-        data-container="body" data-toggle="popover2" data-placement="top" 
-        >
-        texture_2
-    </button>
-    <button id="popover3" type="button" class="btn btn-default" title="Texture 3"  
-        data-container="body" data-toggle="popover3" data-placement="top" 
-        >
-        texture_3
-    </button>
-    <button id="popover4" type="button" class="btn btn-default" title="Texture 4"  
-        data-container="body" data-toggle="popover4" data-placement="top" 
-        >
-        texture_4
-    </button>
-    <br>
-    <img id="img1" src="texture/admin_black.jpg" class="img-thumbnail" width="84" height="84">
-    <img id="img2" src="texture/admin_black.jpg" class="img-thumbnail" width="84" height="84">
-    <img id="img3" src="texture/admin_black.jpg" class="img-thumbnail" width="84" height="84">
-    <img id="img4" src="texture/admin_black.jpg" class="img-thumbnail" width="84" height="84">
+      <div id="navbar" class="navbar-collapse collapse">
+        <ul class="nav navbar-nav">
+          <li><a href="/">Home</a></li>
+          <li><a href="/about">About</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li><a id="welcome"></a></li>
+          <li><a href="/browse">Browse</a></li>
+          <li><a href="/new">New</a></li>
+          <li><a id="signin" href="/signin">Sign In</a></li>
+        </ul>
+      </div>
     </div>
-    <div class="upload_texture" id="upload_texture">
-      <label for="image">Upload Texture</label>
-      <input type="file" class="form-control-file" id="image" name="image" accpet=".jpg .png">
+  </nav>
+
+  <div class="container">
+    <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+    <div class="save_part" id="save_part">
+      <div class="form-group">
+        <label for="save_name">Name of the shader</label>
+        <input type="text" class="form-control" id="save_name">
+      </div>
+      <div class="form-group">
+        <label for="save_select">Example select</label>
+        <select class="form-control" id="save_select">
+          <option>Private</option>
+          <option>Public</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" onclick="save()">Save</button>
+    </div>
+    <div class="textbox">
+      <div class="description" onclick="toggle('display_desc')">
+        <span class="glyphicon glyphicon-menu-down" aria-hidden="true">Input</span>
+        <p class="display_desc" id="display_desc">
+          uniform Time : f32; //shader playback time (in seconds) <br>
+          uniform Resolution : vec3&lt;f32&gt;; // viewport resolution <br>
+          uniform Mouse : vec4&lt;f32&gt;; // mouse pixel coords. xy: current, zw: click <br>
+          uniform Date1 : vec3&lt;i32&gt;; // year, month, day <br>
+          uniform Date2 : vec3&lt;i32&gt;; // hour, minute, second <br>
+          uniform Key : i32; // The ASCII character code of the pressed key <br>
+          uniform Position : vec2&lt;f32&gt;; <br>
+          uniform Random : f32; //random number<br>
+          var texture1..4: texture_2d&lt;f32&gt;; // input textures <br>
+          var sampler_: sampler; // input sampler <br>
+        </p>
+      </div>
       <br>
-      <button  class="btn btn-primary" onclick="upload()">Upload</button>
-    </div>
-    </div>
-    </div>
-    <script>
-      var global_popover_code="{{texture_code}}"
-      var whether_decode=true
-      var jsname="new.js"
-      var username="{{{username}}}"
-      if(username.length!=0)
-      {
-        document.getElementById("save_part").hidden=false;
-        document.getElementById("upload_texture").hidden=false;
-      }
-      else
-      {
-        document.getElementById("save_part").hidden=true;
-        document.getElementById("upload_texture").hidden=true;
-      }
-      function click_texture(texture,image,image_name)
-      {
-          document.getElementById(texture).value=image_name;
-          document.getElementById(image).src="texture/"+image_name
-          document.getElementById("popover"+image[3]).click();
-      }
-    </script>
-    <div class="footer">
-<footer class="bg-dark text-center text-white">
-  <div class="container p-4">
-    <section class="mb-4">
-      <a class="btn btn-outline-light btn-floating m-1" href="https://github.com/nanovis/Shader-Editor" role="button">
-        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-github" viewBox="0 0 16 16">
-          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path>
-        </svg>
-      </a>
+      <form id="compiler" action="/compile" method="post">
+        <div id="textarea" style="width:800px;height:450px;"></div>
+        <script src="./assets/js/vs_editor/app.bundle.js"></script>
+        <input type="hidden" name="code" id="code">
+        <input type="hidden" name="texture1" id="texture1" value="admin_black.jpg">
+        <input type="hidden" name="texture2" id="texture2" value="admin_black.jpg">
+        <input type="hidden" name="texture3" id="texture3" value="admin_black.jpg">
+        <input type="hidden" name="texture4" id="texture4" value="admin_black.jpg">
+        <button type="submit" class="btn btn-primary" onclick="updatetextarea()">Compile</button>
+      </form>
 
-      <a class="btn btn-outline-light btn-floating m-1" href="https://twitter.com/nanovis_group" role="button">
-        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-twitter" viewBox="0 0 16 16">
-          <path d="M5.026 15c6.038 0 9.341-5.003 9.341-9.334 0-.14 0-.282-.006-.422A6.685 6.685 0 0 0 16 3.542a6.658 6.658 0 0 1-1.889.518 3.301 3.301 0 0 0 1.447-1.817 6.533 6.533 0 0 1-2.087.793A3.286 3.286 0 0 0 7.875 6.03a9.325 9.325 0 0 1-6.767-3.429 3.289 3.289 0 0 0 1.018 4.382A3.323 3.323 0 0 1 .64 6.575v.045a3.288 3.288 0 0 0 2.632 3.218 3.203 3.203 0 0 1-.865.115 3.23 3.23 0 0 1-.614-.057 3.283 3.283 0 0 0 3.067 2.277A6.588 6.588 0 0 1 .78 13.58a6.32 6.32 0 0 1-.78-.045A9.344 9.344 0 0 0 5.026 15z"/>
-        </svg>
-      </a>
-      <a class="btn btn-outline-light btn-floating m-1" href="https://www.nanovis.org/" role="button">
-      <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-chat-dots" viewBox="0 0 16 16">
-        <path d="M5 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
-        <path d="m2.165 15.803.02-.004c1.83-.363 2.948-.842 3.468-1.105A9.06 9.06 0 0 0 8 15c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 1.76.743 3.37 1.97 4.6a10.437 10.437 0 0 1-.524 2.318l-.003.011a10.722 10.722 0 0 1-.244.637c-.079.186.074.394.273.362a21.673 21.673 0 0 0 .693-.125zm.8-3.108a1 1 0 0 0-.287-.801C1.618 10.83 1 9.468 1 8c0-3.192 3.004-6 7-6s7 2.808 7 6c0 3.193-3.004 6-7 6a8.06 8.06 0 0 1-2.088-.272 1 1 0 0 0-.711.074c-.387.196-1.24.57-2.634.893a10.97 10.97 0 0 0 .398-2z"/>
-      </svg>
-      </a>
-      <a class="btn btn-outline-light btn-floating m-1" href="mailto:donggang.jia@kaust.edu.sa" role="button">
-        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-envelope" viewBox="0 0 16 16">
-          <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2Zm13 2.383-4.708 2.825L15 11.105V5.383Zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741ZM1 11.105l4.708-2.897L1 5.383v5.722Z"/>
-        </svg>
-        </a>
-    </section>
-    <section class="mb-4">
-      <p>
-        If you have any questions, please contact us using the above links.
-      </p>
-    </section>
+      <br>
+      <br>
+      <div class="texture_image">
+        <button id="popover1" type="button" class="btn btn-default" title="Texture 1" trigger="click"
+          data-container="body" data-toggle="popover1" data-placement="top">
+          texture_1
+        </button>
+        <button id="popover2" type="button" class="btn btn-default" title="Texture 2" data-container="body"
+          data-toggle="popover2" data-placement="top">
+          texture_2
+        </button>
+        <button id="popover3" type="button" class="btn btn-default" title="Texture 3" data-container="body"
+          data-toggle="popover3" data-placement="top">
+          texture_3
+        </button>
+        <button id="popover4" type="button" class="btn btn-default" title="Texture 4" data-container="body"
+          data-toggle="popover4" data-placement="top">
+          texture_4
+        </button>
+        <br>
+        <img id="img1" src="texture/admin_black.jpg" class="img-thumbnail" width="84" height="84">
+        <img id="img2" src="texture/admin_black.jpg" class="img-thumbnail" width="84" height="84">
+        <img id="img3" src="texture/admin_black.jpg" class="img-thumbnail" width="84" height="84">
+        <img id="img4" src="texture/admin_black.jpg" class="img-thumbnail" width="84" height="84">
+      </div>
+      <div class="upload_texture" id="upload_texture">
+        <label for="image">Upload Texture</label>
+        <input type="file" class="form-control-file" id="image" name="image" accpet=".jpg .png">
+        <br>
+        <button class="btn btn-primary" onclick="upload()">Upload</button>
+      </div>
+    </div>
   </div>
-  <div class="text-center p-3">
-    © Nanovis
-  </div>
+  <script>
+    var global_popover_code = "{{texture_code}}"
+    var whether_decode = true
+    var jsname = "new.js"
+    var username = "{{{username}}}"
+    if (username.length != 0) {
+      document.getElementById("save_part").hidden = false;
+      document.getElementById("upload_texture").hidden = false;
+    }
+    else {
+      document.getElementById("save_part").hidden = true;
+      document.getElementById("upload_texture").hidden = true;
+    }
+    function click_texture(texture, image, image_name) {
+      document.getElementById(texture).value = image_name;
+      document.getElementById(image).src = "texture/" + image_name
+      document.getElementById("popover" + image[3]).click();
+    }
+  </script>
+  <div class="footer">
+    <footer class="bg-dark text-center text-white">
+      <div class="container p-4">
+        <section class="mb-4">
+          <a class="btn btn-outline-light btn-floating m-1" href="https://github.com/nanovis/Shader-Editor"
+            role="button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-github"
+              viewBox="0 0 16 16">
+              <path
+                d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z">
+              </path>
+            </svg>
+          </a>
 
-</footer>
-</div>
-  </body>
-<script src="./assets/js/tool.js" ></script>
-<script src="./assets/js/popover.js" ></script>
+          <a class="btn btn-outline-light btn-floating m-1" href="https://twitter.com/nanovis_group" role="button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-twitter"
+              viewBox="0 0 16 16">
+              <path
+                d="M5.026 15c6.038 0 9.341-5.003 9.341-9.334 0-.14 0-.282-.006-.422A6.685 6.685 0 0 0 16 3.542a6.658 6.658 0 0 1-1.889.518 3.301 3.301 0 0 0 1.447-1.817 6.533 6.533 0 0 1-2.087.793A3.286 3.286 0 0 0 7.875 6.03a9.325 9.325 0 0 1-6.767-3.429 3.289 3.289 0 0 0 1.018 4.382A3.323 3.323 0 0 1 .64 6.575v.045a3.288 3.288 0 0 0 2.632 3.218 3.203 3.203 0 0 1-.865.115 3.23 3.23 0 0 1-.614-.057 3.283 3.283 0 0 0 3.067 2.277A6.588 6.588 0 0 1 .78 13.58a6.32 6.32 0 0 1-.78-.045A9.344 9.344 0 0 0 5.026 15z" />
+            </svg>
+          </a>
+          <a class="btn btn-outline-light btn-floating m-1" href="https://www.nanovis.org/" role="button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-chat-dots"
+              viewBox="0 0 16 16">
+              <path
+                d="M5 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" />
+              <path
+                d="m2.165 15.803.02-.004c1.83-.363 2.948-.842 3.468-1.105A9.06 9.06 0 0 0 8 15c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 1.76.743 3.37 1.97 4.6a10.437 10.437 0 0 1-.524 2.318l-.003.011a10.722 10.722 0 0 1-.244.637c-.079.186.074.394.273.362a21.673 21.673 0 0 0 .693-.125zm.8-3.108a1 1 0 0 0-.287-.801C1.618 10.83 1 9.468 1 8c0-3.192 3.004-6 7-6s7 2.808 7 6c0 3.193-3.004 6-7 6a8.06 8.06 0 0 1-2.088-.272 1 1 0 0 0-.711.074c-.387.196-1.24.57-2.634.893a10.97 10.97 0 0 0 .398-2z" />
+            </svg>
+          </a>
+          <a class="btn btn-outline-light btn-floating m-1" href="mailto:donggang.jia@kaust.edu.sa" role="button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-envelope"
+              viewBox="0 0 16 16">
+              <path
+                d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2Zm13 2.383-4.708 2.825L15 11.105V5.383Zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741ZM1 11.105l4.708-2.897L1 5.383v5.722Z" />
+            </svg>
+          </a>
+        </section>
+        <section class="mb-4">
+          <p>
+            If you have any questions, please contact us using the above links.
+          </p>
+        </section>
+      </div>
+      <div class="text-center p-3">
+        © Nanovis
+      </div>
+
+    </footer>
+  </div>
+</body>
+<script src="./assets/js/tool.js"></script>
+<script src="./assets/js/popover.js"></script>
 
 </html>
