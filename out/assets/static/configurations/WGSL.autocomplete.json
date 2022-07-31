@@ -1,0 +1,16 @@
+{
+  "builtin": [
+    {
+			"label": "vertex_index",
+			"documentation": "Index of the current vertex within the current API-level draw command, independent of draw instancing.",
+			"insertText": "vertex_index",
+      "kind": 1
+    },
+    {
+      "label": "instance_index",
+      "documentation": "Instance index of the current vertex within the current API-level draw command.",
+      "insertText": "instance_index",
+      "kind": 1
+    }
+  ]
+}

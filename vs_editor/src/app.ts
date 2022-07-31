@@ -17,12 +17,26 @@ import { SimpleLanguageInfoProvider } from './providers';
 import { registerLanguages } from './register';
 import { rehydrateRegexps } from './configuration';
 import VsCodeDarkTheme from './vs-light-plus-theme';
+import { startValidationServer } from './autocomplete/validator';
+import { addHoverText } from './hover_text';
 
 interface DemoScopeNameInfo extends ScopeNameInfo {
   path: string;
 }
 
 main('wgsl');
+
+
+
+declare global {
+  interface Window { MonacoEnvironment: any, editor: monaco.editor.IStandaloneCodeEditor }
+}
+
+self.MonacoEnvironment = {
+  getWorkerUrl: function () {
+    return './assets/js/vs_editor/editor.worker.bundle.js';
+  }
+}
 
 async function main(language: LanguageId) {
   const languages: monaco.languages.ILanguageExtensionPoint[] = [
@@ -115,41 +129,11 @@ async function main(language: LanguageId) {
     throw Error(`could not find element #textarea`);
   }
 
+  let model = monaco.editor.createModel(
+    'This line is okay.\nThis line has a warning.\nThis line has an error.'
+  );
 
-  // TODO: Add Autocomplete
-  /*monaco.languages.registerCompletionItemProvider('wgsl', {
-    provideCompletionItems: (model, position) => {
-      return {
-        suggestions: () => {
-          const suggestions = []
-          const textUntilPosition = model.getValueInRange({ startLineNumber: position.lineNumber, startColumn: 1, endLineNumber: position.lineNumber, endColumn: position.column })
-          const word = model.getWordUntilPosition(position)
-          const range = {
-            startLineNumber: position.lineNumber,
-            endLineNumber: position.lineNumber,
-            startColumn: word.startColumn,
-            endColumn: word.endColumn
-          }
-          if (textUntilPosition.match(/.*{{#?>\\s?$/m)) {
-            for (const snippet of handlebarsSnippets) {
-              // Push handlebars snippets
-              suggestions.push(
-                {
-                  label: snippet.name,
-                  kind: monaco.languages.CompletionItemKind.Snippet,
-                  insertText: ` ${snippet.name} `,
-                  range: range,
-                  command: { id: 'editor.action.insertLineAfter' }
-                })
-            }
-            return suggestions
-          }
-        }
-      }
-    }
-  })*/
-
-  monaco.editor.create(element, {
+  window.editor = monaco.editor.create(element, {
     value: '@stage(fragment)\nfn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {\nvar uv: vec3<f32> =vec3<f32>(position.xyx/Resolution.xyx);\nvar col:vec3<f32> =0.5f+vec3<f32> ( 0.5*cos(uv+Time+vec3<f32>(0.0,2.0,4.0)));\nreturn vec4<f32>(col, 1.0);\n}',
     language,
     theme: 'vs-light',
@@ -159,6 +143,9 @@ async function main(language: LanguageId) {
     readOnly: false
   });
   provider.injectCSS();
+
+  startValidationServer();
+  //addHoverText();
 }
 
 // Taken from https://github.com/microsoft/vscode/blob/829230a5a83768a3494ebbc61144e7cde9105c73/src/vs/workbench/services/textMate/browser/textMateService.ts#L33-L40
@@ -174,3 +161,7 @@ async function loadVSCodeOnigurumWASM(): Promise<Response | ArrayBuffer> {
   // We therefore use the non-streaming compiler :(.
   return await response.arrayBuffer();
 }
+
+export function updatetextarea() {
+  (document.getElementById("code") as HTMLInputElement)!.value = window.editor.getValue();
+}; 

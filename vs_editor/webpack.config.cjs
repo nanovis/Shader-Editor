@@ -3,6 +3,7 @@ const path = require('path');
 
 module.exports = {
   target: 'web',
+  mode: 'development',
   entry: {
     app: './src/app.ts',
     // Package each language's worker and give these filenames in `getWorkerUrl`
@@ -12,10 +13,12 @@ module.exports = {
     globalObject: 'self',
     filename: '[name].bundle.js',
     path: path.resolve(__dirname, '../out/assets/js/vs_editor'),
+    publicPath: '/assets/js/vs_editor/',
   },
   resolve: {
     extensions: ['.js', '.ts', '.tsx'],
   },
+  devtool: 'eval',
   module: {
     rules: [
       {
