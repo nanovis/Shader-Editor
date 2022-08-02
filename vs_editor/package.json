@@ -15,6 +15,7 @@
     "vscode-textmate": "5.1.1"
   },
   "devDependencies": {
+    "@webgpu/types": "^0.1.21",
     "css-loader": "3.5.3",
     "file-loader": "6.0.0",
     "monaco-editor-webpack-plugin": "2.0.0",

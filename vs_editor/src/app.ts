@@ -18,15 +18,14 @@ import { registerLanguages } from './register';
 import { rehydrateRegexps } from './configuration';
 import VsCodeDarkTheme from './vs-light-plus-theme';
 import { startValidationServer } from './autocomplete/validator';
-import { addHoverText } from './hover_text';
+import { SyntaxCheck } from './syntax';
+//import { addHoverText } from './hover_text';
 
 interface DemoScopeNameInfo extends ScopeNameInfo {
   path: string;
 }
 
 main('wgsl');
-
-
 
 declare global {
   interface Window { MonacoEnvironment: any, editor: monaco.editor.IStandaloneCodeEditor }
@@ -129,10 +128,6 @@ async function main(language: LanguageId) {
     throw Error(`could not find element #textarea`);
   }
 
-  let model = monaco.editor.createModel(
-    'This line is okay.\nThis line has a warning.\nThis line has an error.'
-  );
-
   window.editor = monaco.editor.create(element, {
     value: '@stage(fragment)\nfn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {\nvar uv: vec3<f32> =vec3<f32>(position.xyx/Resolution.xyx);\nvar col:vec3<f32> =0.5f+vec3<f32> ( 0.5*cos(uv+Time+vec3<f32>(0.0,2.0,4.0)));\nreturn vec4<f32>(col, 1.0);\n}',
     language,
@@ -145,6 +140,7 @@ async function main(language: LanguageId) {
   provider.injectCSS();
 
   startValidationServer();
+  window.editor.onDidChangeModelContent(() => SyntaxCheck());
   //addHoverText();
 }
 
