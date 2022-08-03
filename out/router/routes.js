@@ -7,7 +7,6 @@ var MongoClient =require('mongodb').MongoClient;
 var url = 'mongodb://localhost:27017/';
 const tf = require('@tensorflow/tfjs-node')
 const nsfw = require('nsfwjs');
-const hasbin = require('hasbin');
 
 
 exports.header=function(req,res,next)
