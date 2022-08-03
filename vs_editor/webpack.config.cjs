@@ -14,6 +14,8 @@ module.exports = {
     filename: '[name].bundle.js',
     path: path.resolve(__dirname, '../out/assets/js/vs_editor'),
     publicPath: '/assets/js/vs_editor/',
+    libraryTarget: 'var',
+    library: 'VS_Editor'
   },
   resolve: {
     extensions: ['.js', '.ts', '.tsx'],

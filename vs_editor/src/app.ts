@@ -128,8 +128,9 @@ async function main(language: LanguageId) {
     throw Error(`could not find element #textarea`);
   }
 
+  const value = (document.getElementById('code') as HTMLInputElement).value === "" ? '@stage(fragment)\nfn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {\nvar uv: vec3<f32> =vec3<f32>(position.xyx/Resolution.xyx);\nvar col:vec3<f32> =0.5f+vec3<f32> ( 0.5*cos(uv+Time+vec3<f32>(0.0,2.0,4.0)));\nreturn vec4<f32>(col, 1.0);\n}' : (document.getElementById('code') as HTMLInputElement).value;
   window.editor = monaco.editor.create(element, {
-    value: '@stage(fragment)\nfn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {\nvar uv: vec3<f32> =vec3<f32>(position.xyx/Resolution.xyx);\nvar col:vec3<f32> =0.5f+vec3<f32> ( 0.5*cos(uv+Time+vec3<f32>(0.0,2.0,4.0)));\nreturn vec4<f32>(col, 1.0);\n}',
+    value,
     language,
     theme: 'vs-light',
     lineNumbers: 'on',
