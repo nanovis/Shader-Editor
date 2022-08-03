@@ -7,6 +7,8 @@ export async function createDependencyProposals(range: monaco.IRange, textUntilP
 	// here you could do a server side lookup
 	const autocomplete_json: any[] = await (await fetch(`/assets/static/configurations/WGSL.autocomplete.json`)).json();
 	if (textUntilPosition.match(/@(builtin)\(\s*([A-Za-z])*?\)/)) return autocomplete_json['builtin' as any];
+	if (textUntilPosition.match(/@(stage)\(\s*([A-Za-z])*?\)/)) return autocomplete_json['stage' as any];
+	
 	
 	return [];
 }
