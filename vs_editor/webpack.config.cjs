@@ -3,7 +3,7 @@ const path = require('path');
 
 module.exports = {
   target: 'web',
-  mode: 'development',
+  mode: 'production',
   entry: {
     app: './src/app.ts',
     // Package each language's worker and give these filenames in `getWorkerUrl`
