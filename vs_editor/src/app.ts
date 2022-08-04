@@ -18,7 +18,7 @@ import { registerLanguages } from './register';
 import { rehydrateRegexps } from './configuration';
 import VsCodeDarkTheme from './vs-light-plus-theme';
 import { startValidationServer } from './autocomplete/validator';
-import { SyntaxCheck } from './syntax';
+import { getErrors, SyntaxCheck } from './syntax';
 //import { addHoverText } from './hover_text';
 
 interface DemoScopeNameInfo extends ScopeNameInfo {
@@ -141,7 +141,10 @@ async function main(language: LanguageId) {
   provider.injectCSS();
 
   startValidationServer();
-  window.editor.onDidChangeModelContent(() => SyntaxCheck());
+  window.editor.onDidChangeModelContent(() => {
+    SyntaxCheck()
+    getErrors();
+  });
   //addHoverText();
 }
 

@@ -195,6 +195,16 @@ export async function SyntaxCheck() {
   device.queue.submit([gpuCommands]);
 
   // Read buffer.
-  await gpuReadBuffer.mapAsync(GPUMapMode.READ);
-  const arrayBuffer = gpuReadBuffer.getMappedRange();
+  //await gpuReadBuffer.mapAsync(GPUMapMode.READ);
+  //const arrayBuffer = gpuReadBuffer.getMappedRange();
+}
+
+export function getErrors() {
+  const errorLog = monaco.editor.getModelMarkers({ owner: 'owner' }).filter(e => e.severity === 8);
+
+  if (errorLog.length !== 0) {
+    (document.getElementById("compile_btn") as HTMLButtonElement).disabled = true;
+  } else {
+    (document.getElementById("compile_btn") as HTMLButtonElement).disabled = false;
+  }
 }
