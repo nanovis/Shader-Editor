@@ -6,7 +6,7 @@ const req = require('express/lib/request');
 var MongoClient =require('mongodb').MongoClient;
 var url = 'mongodb://localhost:27017/';
 const tf = require('@tensorflow/tfjs-node')
-const nsfw = require('nsfwjs')
+const nsfw = require('nsfwjs');
 
 
 exports.header=function(req,res,next)
@@ -27,6 +27,7 @@ exports.new=function(req,res)
       res.render(__dirname+"/../new.hbs",{texture_code:texturecode,username:req.session.username})
     });
 };
+
 exports.browse=function(req,res)
 {
     res.render(__dirname+"/../browse.hbs",{username:req.session.username})

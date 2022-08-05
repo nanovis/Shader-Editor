@@ -1,0 +1,42 @@
+{
+  "builtin": [
+    {
+			"label": "vertex_index",
+			"documentation": "Index of the current vertex within the current API-level draw command, independent of draw instancing.",
+			"insertText": "vertex_index",
+      "kind": 1
+    },
+    {
+      "label": "instance_index",
+      "documentation": "Instance index of the current vertex within the current API-level draw command.",
+      "insertText": "instance_index",
+      "kind": 1
+    },
+    {
+      "label": "position",
+      "documentation": "Output position of the current vertex, using homogeneous coordinates. After homogeneous normalization (where each of the x, y, and z components are divided by the w component), the position is in the WebGPU normalized device coordinate space.",
+      "insertText": "position",
+      "kind": 1
+    },
+    {
+      "label": "front_facing",
+      "documentation": "True when the current fragment is on a front-facing primitive. False otherwise.",
+      "insertText": "front_facing",
+      "kind": 1
+    }
+  ],
+  "stage": [
+    {
+      "label": "vertex",
+      "documentation": "TBD",
+      "insertText": "vertex",
+      "kind": 1
+    },
+    {
+      "label": "fragment",
+      "documentation": "TBD",
+      "insertText": "vertex",
+      "kind": 1
+    }
+  ]
+}

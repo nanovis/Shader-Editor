@@ -1,0 +1,12 @@
+{
+  "include": ["./src/**/*"],
+  "compilerOptions": {
+    "outDir": "./dist/",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "target": "es2019",
+    "lib": ["dom", "es5", "es2019"],
+    "strict": true,
+    "sourceMap": true,
+  },
+}

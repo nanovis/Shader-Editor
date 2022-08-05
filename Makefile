@@ -50,6 +50,9 @@ $(WEB_DIR):
 
 ## python -m SimpleHTTPServer
 serve: all
+	cd vs_editor; \
+	npm run build; \
+	cd ..; \
 	node out/server.js
 
 $(EXE): $(OBJS) $(WEB_DIR)

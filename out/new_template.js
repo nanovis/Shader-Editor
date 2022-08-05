@@ -17,6 +17,8 @@ var Module = typeof Module != 'undefined' ? Module : {};
 
 // See https://caniuse.com/mdn-javascript_builtins_object_assign
 
+// See https://caniuse.com/mdn-javascript_builtins_bigint64array
+
 // --pre-jses are emitted after the Module integration code, so that they can
 // refer to Module (if they choose; they can also define Module)
 
@@ -45,9 +47,7 @@ var Module = typeof Module != 'undefined' ? Module : {};
         err('warning: you defined Module.locateFilePackage, that has been renamed to Module.locateFile (using your locateFilePackage for now)');
       }
       var REMOTE_PACKAGE_NAME = Module['locateFile'] ? Module['locateFile'](REMOTE_PACKAGE_BASE, '') : REMOTE_PACKAGE_BASE;
-
-      var REMOTE_PACKAGE_SIZE = metadata['remote_package_size'];
-      var PACKAGE_UUID = metadata['package_uuid'];
+var REMOTE_PACKAGE_SIZE = metadata['remote_package_size'];
 
       function fetchRemotePackage(packageName, packageSize, callback, errback) {
         if (typeof process === 'object' && typeof process.versions === 'object' && typeof process.versions.node === 'string') {
@@ -205,7 +205,7 @@ Module['FS_createPath']("/out", "texture", true, true);
     }
 
     }
-    loadPackage({"files": [{"filename": "/out/texture/.DS_Store", "start": 0, "end": 6148}, {"filename": "/out/texture/admin_black.jpg", "start": 6148, "end": 11538}, {"filename": "/out/texture/admin_happytree.jpg", "start": 11538, "end": 39672}, {"filename": "/out/texture/admin_London.jpg", "start": 39672, "end": 221218}, {"filename": "/out/texture/admin_stock.jpg", "start": 221218, "end": 231745}, {"filename": "/out/texture/admin_wall.jpg", "start": 231745, "end": 253999}], "remote_package_size": 253999, "package_uuid": "aeed739d-9cdc-45cb-96b6-fc47a9e24944"});
+    loadPackage({"files": [{"filename": "/out/texture/admin_wall.jpg", "start": 0, "end": 22254}, {"filename": "/out/texture/admin_London.jpg", "start": 22254, "end": 203800}, {"filename": "/out/texture/admin_stock.jpg", "start": 203800, "end": 214327}, {"filename": "/out/texture/.DS_Store", "start": 214327, "end": 220475}, {"filename": "/out/texture/admin_black.jpg", "start": 220475, "end": 225865}, {"filename": "/out/texture/admin_happytree.jpg", "start": 225865, "end": 253999}], "remote_package_size": 253999});
 
   })();
 
@@ -485,6 +485,26 @@ function uleb128Encode(n) {
   return [(n % 128) | 128, n >> 7];
 }
 
+// Converts a signature like 'vii' into a description of the wasm types, like
+// { parameters: ['i32', 'i32'], results: [] }.
+function sigToWasmTypes(sig) {
+  var typeNames = {
+    'i': 'i32',
+    'j': 'i64',
+    'f': 'f32',
+    'd': 'f64',
+    'p': 'i32',
+  };
+  var type = {
+    parameters: [],
+    results: sig[0] == 'v' ? [] : [typeNames[sig[0]]]
+  };
+  for (var i = 1; i < sig.length; ++i) {
+    type.parameters.push(typeNames[sig[i]]);
+  }
+  return type;
+}
+
 // Wraps a JS function as a wasm function with a given signature.
 function convertJsFunctionToWasm(func, sig) {
 
@@ -493,20 +513,7 @@ function convertJsFunctionToWasm(func, sig) {
   // Otherwise, construct a minimal wasm module importing the JS function and
   // re-exporting it.
   if (typeof WebAssembly.Function == "function") {
-    var typeNames = {
-      'i': 'i32',
-      'j': 'i64',
-      'f': 'f32',
-      'd': 'f64'
-    };
-    var type = {
-      parameters: [],
-      results: sig[0] == 'v' ? [] : [typeNames[sig[0]]]
-    };
-    for (var i = 1; i < sig.length; ++i) {
-      type.parameters.push(typeNames[sig[i]]);
-    }
-    return new WebAssembly.Function(type, func);
+    return new WebAssembly.Function(sigToWasmTypes(sig), func);
   }
 
   // The module is static, with the exception of the type section, which is
@@ -519,6 +526,7 @@ function convertJsFunctionToWasm(func, sig) {
   var sigParam = sig.slice(1);
   var typeCodes = {
     'i': 0x7f, // i32
+    'p': 0x7f, // i32
     'j': 0x7e, // i64
     'f': 0x7d, // f32
     'd': 0x7c, // f64
@@ -674,50 +682,6 @@ if (typeof WebAssembly != 'object') {
   abort('no native wasm support detected');
 }
 
-// include: runtime_safe_heap.js
-
-
-// In MINIMAL_RUNTIME, setValue() and getValue() are only available when
-// building with safe heap enabled, for heap safety checking.
-// In traditional runtime, setValue() and getValue() are always available
-// (although their use is highly discouraged due to perf penalties)
-
-/** @param {number} ptr
-    @param {number} value
-    @param {string} type
-    @param {number|boolean=} noSafe */
-function setValue(ptr, value, type = 'i8', noSafe) {
-  if (type.endsWith('*')) type = 'i32';
-  switch (type) {
-    case 'i1': HEAP8[((ptr)>>0)] = value; break;
-    case 'i8': HEAP8[((ptr)>>0)] = value; break;
-    case 'i16': HEAP16[((ptr)>>1)] = value; break;
-    case 'i32': HEAP32[((ptr)>>2)] = value; break;
-    case 'i64': (tempI64 = [value>>>0,(tempDouble=value,(+(Math.abs(tempDouble))) >= 1.0 ? (tempDouble > 0.0 ? ((Math.min((+(Math.floor((tempDouble)/4294967296.0))), 4294967295.0))|0)>>>0 : (~~((+(Math.ceil((tempDouble - +(((~~(tempDouble)))>>>0))/4294967296.0)))))>>>0) : 0)],HEAP32[((ptr)>>2)] = tempI64[0],HEAP32[(((ptr)+(4))>>2)] = tempI64[1]); break;
-    case 'float': HEAPF32[((ptr)>>2)] = value; break;
-    case 'double': HEAPF64[((ptr)>>3)] = value; break;
-    default: abort('invalid type for setValue: ' + type);
-  }
-}
-
-/** @param {number} ptr
-    @param {string} type
-    @param {number|boolean=} noSafe */
-function getValue(ptr, type = 'i8', noSafe) {
-  if (type.endsWith('*')) type = 'i32';
-  switch (type) {
-    case 'i1': return HEAP8[((ptr)>>0)];
-    case 'i8': return HEAP8[((ptr)>>0)];
-    case 'i16': return HEAP16[((ptr)>>1)];
-    case 'i32': return HEAP32[((ptr)>>2)];
-    case 'i64': return HEAP32[((ptr)>>2)];
-    case 'float': return HEAPF32[((ptr)>>2)];
-    case 'double': return Number(HEAPF64[((ptr)>>3)]);
-    default: abort('invalid type for getValue: ' + type);
-  }
-}
-
-// end include: runtime_safe_heap.js
 // Wasm globals
 
 var wasmMemory;
@@ -777,7 +741,10 @@ function ccall(ident, returnType, argTypes, args, opts) {
   };
 
   function convertReturnValue(ret) {
-    if (returnType === 'string') return UTF8ToString(ret);
+    if (returnType === 'string') {
+      
+      return UTF8ToString(ret);
+    }
     if (returnType === 'boolean') return Boolean(ret);
     return ret;
   }
@@ -926,7 +893,6 @@ function UTF8ArrayToString(heapOrArray, idx, maxBytesToRead) {
  * @return {string}
  */
 function UTF8ToString(ptr, maxBytesToRead) {
-  ;
   return ptr ? UTF8ArrayToString(HEAPU8, ptr, maxBytesToRead) : '';
 }
 
@@ -1443,12 +1409,16 @@ function abort(what) {
   // Use a wasm runtime error, because a JS error might be seen as a foreign
   // exception, which means we'd run destructors on it. We need the error to
   // simply make the program stop.
+  // FIXME This approach does not work in Wasm EH because it currently does not assume
+  // all RuntimeErrors are from traps; it decides whether a RuntimeError is from
+  // a trap or not based on a hidden field within the object. So at the moment
+  // we don't have a way of throwing a wasm trap from JS. TODO Make a JS API that
+  // allows this in the wasm spec.
 
   // Suppress closure compiler warning here. Closure compiler's builtin extern
   // defintion for WebAssembly.RuntimeError claims it takes no arguments even
   // though it can.
   // TODO(https://github.com/google/closure-compiler/pull/3913): Remove if/when upstream closure gets fixed.
-
   /** @suppress {checkTypes} */
   var e = new WebAssembly.RuntimeError(what);
 
@@ -1594,6 +1564,13 @@ function createWasm() {
         !isDataURI(wasmBinaryFile) &&
         // Don't use streaming for file:// delivered objects in a webview, fetch them synchronously.
         !isFileURI(wasmBinaryFile) &&
+        // Avoid instantiateStreaming() on Node.js environment for now, as while
+        // Node.js v18.1.0 implements it, it does not have a full fetch()
+        // implementation yet.
+        //
+        // Reference:
+        //   https://github.com/emscripten-core/emscripten/pull/16917
+        !ENVIRONMENT_IS_NODE &&
         typeof fetch == 'function') {
       return fetch(wasmBinaryFile, { credentials: 'same-origin' }).then(function(response) {
         // Suppress closure warning here since the upstream definition for
@@ -1645,9 +1622,9 @@ var tempI64;
 var ASM_CONSTS = {
   
 };
-function glue_preint(){ var entry = __glue_main_; if (entry) { if (navigator["gpu"]) { navigator["gpu"]["requestAdapter"]().then(function (adapter) { adapter["requestDevice"]().then( function (device) { Module["preinitializedWebGPUDevice"] = device; entry(); }); }, function () { console.error("No WebGPU adapter; not starting"); }); } else { console.error("No support for WebGPU; not starting"); } } else { console.error("Entry point not found; unable to start"); } }
-function jsprint(x){ console.log(x); }
-function say(str){ console.log( UTF8ToString(str)); }
+function jsprint(x) { console.log(x); }
+function say(str) { console.log( UTF8ToString(str)); }
+function glue_preint() { var entry = __glue_main_; if (entry) { if (navigator["gpu"]) { navigator["gpu"]["requestAdapter"]().then(function (adapter) { adapter["requestDevice"]().then( function (device) { Module["preinitializedWebGPUDevice"] = device; entry(); }); }, function () { console.error("No WebGPU adapter; not starting"); }); } else { console.error("No support for WebGPU; not starting"); } } else { console.error("Entry point not found; unable to start"); } }
 
 
 
@@ -2476,26 +2453,8 @@ function say(str){ console.log( UTF8ToString(str)); }
 
   function callRuntimeCallbacks(callbacks) {
       while (callbacks.length > 0) {
-        var callback = callbacks.shift();
-        if (typeof callback == 'function') {
-          callback(Module); // Pass the module as the first argument.
-          continue;
-        }
-        var func = callback.func;
-        if (typeof func == 'number') {
-          if (callback.arg === undefined) {
-            // Run the wasm function ptr with signature 'v'. If no function
-            // with such signature was exported, this call does not need
-            // to be emitted (and would confuse Closure)
-            getWasmTableEntry(func)();
-          } else {
-            // If any function with signature 'vi' was exported, run
-            // the callback with that signature.
-            getWasmTableEntry(func)(callback.arg);
-          }
-        } else {
-          func(callback.arg === undefined ? null : callback.arg);
-        }
+        // Pass the module as the first argument.
+        callbacks.shift()(Module);
       }
     }
 
@@ -2520,7 +2479,7 @@ function say(str){ console.log( UTF8ToString(str)); }
     }
 
   function dynCallLegacy(sig, ptr, args) {
-      var f = Module["dynCall_" + sig];
+      var f = Module['dynCall_' + sig];
       return args && args.length ? f.apply(null, [ptr].concat(args)) : f.call(null, ptr);
     }
   
@@ -2541,7 +2500,29 @@ function say(str){ console.log( UTF8ToString(str)); }
       if (sig.includes('j')) {
         return dynCallLegacy(sig, ptr, args);
       }
-      return getWasmTableEntry(ptr).apply(null, args)
+      var rtn = getWasmTableEntry(ptr).apply(null, args);
+      return rtn;
+    }
+
+  
+    /**
+     * @param {number} ptr
+     * @param {string} type
+     */
+  function getValue(ptr, type = 'i8') {
+      if (type.endsWith('*')) type = '*';
+      switch (type) {
+        case 'i1': return HEAP8[((ptr)>>0)];
+        case 'i8': return HEAP8[((ptr)>>0)];
+        case 'i16': return HEAP16[((ptr)>>1)];
+        case 'i32': return HEAP32[((ptr)>>2)];
+        case 'i64': return HEAP32[((ptr)>>2)];
+        case 'float': return HEAPF32[((ptr)>>2)];
+        case 'double': return HEAPF64[((ptr)>>3)];
+        case '*': return HEAPU32[((ptr)>>2)];
+        default: abort('invalid type for getValue: ' + type);
+      }
+      return null;
     }
 
 
@@ -2561,6 +2542,27 @@ function say(str){ console.log( UTF8ToString(str)); }
         }
       }
       return error.stack.toString();
+    }
+
+  
+    /**
+     * @param {number} ptr
+     * @param {number} value
+     * @param {string} type
+     */
+  function setValue(ptr, value, type = 'i8') {
+      if (type.endsWith('*')) type = '*';
+      switch (type) {
+        case 'i1': HEAP8[((ptr)>>0)] = value; break;
+        case 'i8': HEAP8[((ptr)>>0)] = value; break;
+        case 'i16': HEAP16[((ptr)>>1)] = value; break;
+        case 'i32': HEAP32[((ptr)>>2)] = value; break;
+        case 'i64': (tempI64 = [value>>>0,(tempDouble=value,(+(Math.abs(tempDouble))) >= 1.0 ? (tempDouble > 0.0 ? ((Math.min((+(Math.floor((tempDouble)/4294967296.0))), 4294967295.0))|0)>>>0 : (~~((+(Math.ceil((tempDouble - +(((~~(tempDouble)))>>>0))/4294967296.0)))))>>>0) : 0)],HEAP32[((ptr)>>2)] = tempI64[0],HEAP32[(((ptr)+(4))>>2)] = tempI64[1]); break;
+        case 'float': HEAPF32[((ptr)>>2)] = value; break;
+        case 'double': HEAPF64[((ptr)>>3)] = value; break;
+        case '*': HEAPU32[((ptr)>>2)] = value; break;
+        default: abort('invalid type for setValue: ' + type);
+      }
     }
 
   function setWasmTableEntry(idx, func) {
@@ -3142,11 +3144,7 @@ function say(str){ console.log( UTF8ToString(str)); }
         },allocate:function(stream, offset, length) {
           MEMFS.expandFileStorage(stream.node, offset + length);
           stream.node.usedBytes = Math.max(stream.node.usedBytes, offset + length);
-        },mmap:function(stream, address, length, position, prot, flags) {
-          if (address !== 0) {
-            // We don't currently support location hints for the address of the mapping
-            throw new FS.ErrnoError(28);
-          }
+        },mmap:function(stream, length, position, prot, flags) {
           if (!FS.isFile(stream.node.mode)) {
             throw new FS.ErrnoError(43);
           }
@@ -3426,29 +3424,39 @@ function say(str){ console.log( UTF8ToString(str)); }
           FS.FSStream = /** @constructor */ function() {
             this.shared = { };
           };
-          FS.FSStream.prototype = {
+          FS.FSStream.prototype = {};
+          Object.defineProperties(FS.FSStream.prototype, {
             object: {
+              /** @this {FS.FSStream} */
               get: function() { return this.node; },
+              /** @this {FS.FSStream} */
               set: function(val) { this.node = val; }
             },
             isRead: {
+              /** @this {FS.FSStream} */
               get: function() { return (this.flags & 2097155) !== 1; }
             },
             isWrite: {
+              /** @this {FS.FSStream} */
               get: function() { return (this.flags & 2097155) !== 0; }
             },
             isAppend: {
+              /** @this {FS.FSStream} */
               get: function() { return (this.flags & 1024); }
             },
             flags: {
+              /** @this {FS.FSStream} */
               get: function() { return this.shared.flags; },
+              /** @this {FS.FSStream} */
               set: function(val) { this.shared.flags = val; },
             },
             position : {
-              get function() { return this.shared.position; },
+              /** @this {FS.FSStream} */
+              get: function() { return this.shared.position; },
+              /** @this {FS.FSStream} */
               set: function(val) { this.shared.position = val; },
             },
-          };
+          });
         }
         // clone it, so we can return an instance of FSStream
         stream = Object.assign(new FS.FSStream(), stream);
@@ -4095,7 +4103,7 @@ function say(str){ console.log( UTF8ToString(str)); }
           throw new FS.ErrnoError(138);
         }
         stream.stream_ops.allocate(stream, offset, length);
-      },mmap:(stream, address, length, position, prot, flags) => {
+      },mmap:(stream, length, position, prot, flags) => {
         // User requests writing to file (prot & PROT_WRITE != 0).
         // Checking if we have permissions to write to the file unless
         // MAP_PRIVATE flag is set. According to POSIX spec it is possible
@@ -4113,7 +4121,7 @@ function say(str){ console.log( UTF8ToString(str)); }
         if (!stream.stream_ops.mmap) {
           throw new FS.ErrnoError(43);
         }
-        return stream.stream_ops.mmap(stream, address, length, position, prot, flags);
+        return stream.stream_ops.mmap(stream, length, position, prot, flags);
       },msync:(stream, buffer, offset, length, mmapFlags) => {
         if (!stream || !stream.stream_ops.msync) {
           return 0;
@@ -4297,9 +4305,8 @@ function say(str){ console.log( UTF8ToString(str)); }
         FS.createStandardStreams();
       },quit:() => {
         FS.init.initialized = false;
-        // Call musl-internal function to close all stdio streams, so nothing is
-        // left in internal buffers.
-        ___stdio_exit();
+        // force-flush all streams, so we get musl std streams printed out
+        _fflush(0);
         // close all of our streams
         for (var i = 0; i < FS.streams.length; i++) {
           var stream = FS.streams[i];
@@ -4592,9 +4599,7 @@ function say(str){ console.log( UTF8ToString(str)); }
             return fn.apply(null, arguments);
           };
         });
-        // use a custom read function
-        stream_ops.read = (stream, buffer, offset, length, position) => {
-          FS.forceLoadFile(node);
+        function writeChunks(stream, buffer, offset, length, position) {
           var contents = stream.node.contents;
           if (position >= contents.length)
             return 0;
@@ -4609,6 +4614,21 @@ function say(str){ console.log( UTF8ToString(str)); }
             }
           }
           return size;
+        }
+        // use a custom read function
+        stream_ops.read = (stream, buffer, offset, length, position) => {
+          FS.forceLoadFile(node);
+          return writeChunks(stream, buffer, offset, length, position)
+        };
+        // use a custom mmap function
+        stream_ops.mmap = (stream, length, position, prot, flags) => {
+          FS.forceLoadFile(node);
+          var ptr = mmapAlloc(length);
+          if (!ptr) {
+            throw new FS.ErrnoError(48);
+          }
+          writeChunks(stream, HEAP8, ptr, length, position);
+          return { ptr: ptr, allocated: true };
         };
         node.stream_ops = stream_ops;
         return node;
@@ -4823,7 +4843,7 @@ function say(str){ console.log( UTF8ToString(str)); }
         case 8:
           return -28; // These are for sockets. We don't have them fully implemented yet.
         case 9:
-          // musl trusts getown return values, due to a bug where they must be, as they overlap with errors. just return -1 here, so fnctl() returns that, and we set errno ourselves.
+          // musl trusts getown return values, due to a bug where they must be, as they overlap with errors. just return -1 here, so fcntl() returns that, and we set errno ourselves.
           setErrNo(28);
           return -1;
         default: {
@@ -4969,11 +4989,11 @@ function say(str){ console.log( UTF8ToString(str)); }
       var summerNamePtr = allocateUTF8(summerName);
       if (summerOffset < winterOffset) {
         // Northern hemisphere
-        HEAP32[((tzname)>>2)] = winterNamePtr;
-        HEAP32[(((tzname)+(4))>>2)] = summerNamePtr;
+        HEAPU32[((tzname)>>2)] = winterNamePtr;
+        HEAPU32[(((tzname)+(4))>>2)] = summerNamePtr;
       } else {
-        HEAP32[((tzname)>>2)] = summerNamePtr;
-        HEAP32[(((tzname)+(4))>>2)] = winterNamePtr;
+        HEAPU32[((tzname)>>2)] = summerNamePtr;
+        HEAPU32[(((tzname)+(4))>>2)] = winterNamePtr;
       }
     }
   function __tzset_js(timezone, daylight, tzname) {
@@ -5020,7 +5040,7 @@ function say(str){ console.log( UTF8ToString(str)); }
     }
 
   function _emscripten_has_asyncify() {
-      return false;
+      return 0;
     }
 
   function _emscripten_memcpy_big(dest, src, num) {
@@ -5040,7 +5060,7 @@ function say(str){ console.log( UTF8ToString(str)); }
       return requestAnimationFrame(tick);
     }
 
-  function _emscripten_get_heap_max() {
+  function getHeapMax() {
       // Stay one Wasm page short of 4GB: while e.g. Chrome is able to allocate
       // full 4GB Wasm memories, the size will wrap back to 0 bytes in Wasm side
       // for any code that deals with heap sizes, which would require special
@@ -5084,7 +5104,7 @@ function say(str){ console.log( UTF8ToString(str)); }
   
       // A limit is set for how much we can grow. We should not exceed that
       // (the wasm binary specifies it, so if we tried, we'd fail anyhow).
-      var maxHeapSize = _emscripten_get_heap_max();
+      var maxHeapSize = getHeapMax();
       if (requestedSize > maxHeapSize) {
         return false;
       }
@@ -5405,10 +5425,10 @@ function say(str){ console.log( UTF8ToString(str)); }
         WebGPU.mgrRenderBundle = WebGPU.mgrRenderBundle || new Manager();
       },makeColor:function(ptr) {
         return {
-          "r": Number(HEAPF64[((ptr)>>3)]),
-          "g": Number(HEAPF64[(((ptr)+(8))>>3)]),
-          "b": Number(HEAPF64[(((ptr)+(16))>>3)]),
-          "a": Number(HEAPF64[(((ptr)+(24))>>3)]),
+          "r": HEAPF64[((ptr)>>3)],
+          "g": HEAPF64[(((ptr)+(8))>>3)],
+          "b": HEAPF64[(((ptr)+(16))>>3)],
+          "a": HEAPF64[(((ptr)+(24))>>3)],
         };
       },makeExtent3D:function(ptr) {
         return {
@@ -5453,7 +5473,7 @@ function say(str){ console.log( UTF8ToString(str)); }
         for (var i = 0; i < constantCount; ++i) {
           var entryPtr = constantsPtr + 16 * i;
           var key = UTF8ToString(HEAPU32[(((entryPtr)+(4))>>2)]);
-          constants[key] = Number(HEAPF64[(((entryPtr)+(8))>>3)]);
+          constants[key] = HEAPF64[(((entryPtr)+(8))>>3)];
         }
         return constants;
       },makeProgrammableStageDescriptor:function(ptr) {
@@ -5468,7 +5488,7 @@ function say(str){ console.log( UTF8ToString(str)); }
             HEAPU32[(((ptr)+(12))>>2)],
             HEAPU32[(((ptr)+(16))>>2)]),
         };
-      },DeviceLostReason:{undefined:0,destroyed:1},PreferredFormat:{rgba8unorm:18,bgra8unorm:23},AddressMode:["repeat","mirror-repeat","clamp-to-edge"],BlendFactor:["zero","one","src","one-minus-src","src-alpha","one-minus-src-alpha","dst","one-minus-dst","dst-alpha","one-minus-dst-alpha","src-alpha-saturated","constant","one-minus-constant"],BlendOperation:["add","subtract","reverse-subtract","min","max"],BufferBindingType:[,"uniform","storage","read-only-storage"],CompareFunction:[,"never","less","less-equal","greater","greater-equal","equal","not-equal","always"],CompilationInfoRequestStatus:["success","error","device-lost","unknown"],CullMode:["none","front","back"],ErrorFilter:["validation","out-of-memory"],FeatureName:{0:undefined,1:"depth-clip-control",2:"depth24unorm-stencil8",3:"depth32float-stencil8",4:"timestamp-query",5:"pipeline-statistics-query",6:"texture-compression-bc",7:"texture-compression-etc2",8:"texture-compression-astc",9:"indirect-first-instance",1000:"depth-clamping"},FilterMode:["nearest","linear"],FrontFace:["ccw","cw"],IndexFormat:[,"uint16","uint32"],LoadOp:[,"clear","load"],PipelineStatisticName:["vertex-shader-invocations","clipper-invocations","clipper-primitives-out","fragment-shader-invocations","compute-shader-invocations"],PowerPreference:[,"low-power","high-performance"],PredefinedColorSpace:[,"srgb"],PrimitiveTopology:["point-list","line-list","line-strip","triangle-list","triangle-strip"],QueryType:["occlusion","pipeline-statistics","timestamp"],SamplerBindingType:[,"filtering","non-filtering","comparison"],StencilOperation:["keep","zero","replace","invert","increment-clamp","decrement-clamp","increment-wrap","decrement-wrap"],StorageTextureAccess:[,"write-only"],StoreOp:[,"store","discard"],TextureAspect:["all","stencil-only","depth-only"],TextureComponentType:["float","sint","uint","depth-comparison"],TextureDimension:["1d","2d","3d"],TextureFormat:[,"r8unorm","r8snorm","r8uint","r8sint","r16uint","r16sint","r16float","rg8unorm","rg8snorm","rg8uint","rg8sint","r32float","r32uint","r32sint","rg16uint","rg16sint","rg16float","rgba8unorm","rgba8unorm-srgb","rgba8snorm","rgba8uint","rgba8sint","bgra8unorm","bgra8unorm-srgb","rgb10a2unorm","rg11b10ufloat","rgb9e5ufloat","rg32float","rg32uint","rg32sint","rgba16uint","rgba16sint","rgba16float","rgba32float","rgba32uint","rgba32sint","stencil8","depth16unorm","depth24plus","depth24plus-stencil8","depth24unorm-stencil8","depth32float","depth32float-stencil8","bc1-rgba-unorm","bc1-rgba-unorm-srgb","bc2-rgba-unorm","bc2-rgba-unorm-srgb","bc3-rgba-unorm","bc3-rgba-unorm-srgb","bc4-r-unorm","bc4-r-snorm","bc5-rg-unorm","bc5-rg-snorm","bc6h-rgb-ufloat","bc6h-rgb-float","bc7-rgba-unorm","bc7-rgba-unorm-srgb","etc2-rgb8unorm","etc2-rgb8unorm-srgb","etc2-rgb8a1unorm","etc2-rgb8a1unorm-srgb","etc2-rgba8unorm","etc2-rgba8unorm-srgb","eac-r11unorm","eac-r11snorm","eac-rg11unorm","eac-rg11snorm","astc-4x4-unorm","astc-4x4-unorm-srgb","astc-5x4-unorm","astc-5x4-unorm-srgb","astc-5x5-unorm","astc-5x5-unorm-srgb","astc-6x5-unorm","astc-6x5-unorm-srgb","astc-6x6-unorm","astc-6x6-unorm-srgb","astc-8x5-unorm","astc-8x5-unorm-srgb","astc-8x6-unorm","astc-8x6-unorm-srgb","astc-8x8-unorm","astc-8x8-unorm-srgb","astc-10x5-unorm","astc-10x5-unorm-srgb","astc-10x6-unorm","astc-10x6-unorm-srgb","astc-10x8-unorm","astc-10x8-unorm-srgb","astc-10x10-unorm","astc-10x10-unorm-srgb","astc-12x10-unorm","astc-12x10-unorm-srgb","astc-12x12-unorm","astc-12x12-unorm-srgb"],TextureSampleType:[,"float","unfilterable-float","depth","sint","uint"],TextureViewDimension:[,"1d","2d","2d-array","cube","cube-array","3d"],VertexFormat:[,"uint8x2","uint8x4","sint8x2","sint8x4","unorm8x2","unorm8x4","snorm8x2","snorm8x4","uint16x2","uint16x4","sint16x2","sint16x4","unorm16x2","unorm16x4","snorm16x2","snorm16x4","float16x2","float16x4","float32","float32x2","float32x3","float32x4","uint32","uint32x2","uint32x3","uint32x4","sint32","sint32x2","sint32x3","sint32x4"],VertexStepMode:["vertex","instance"]};
+      },DeviceLostReason:{undefined:0,destroyed:1},PreferredFormat:{rgba8unorm:18,bgra8unorm:23},AddressMode:["repeat","mirror-repeat","clamp-to-edge"],BlendFactor:["zero","one","src","one-minus-src","src-alpha","one-minus-src-alpha","dst","one-minus-dst","dst-alpha","one-minus-dst-alpha","src-alpha-saturated","constant","one-minus-constant"],BlendOperation:["add","subtract","reverse-subtract","min","max"],BufferBindingType:[,"uniform","storage","read-only-storage"],CompareFunction:[,"never","less","less-equal","greater","greater-equal","equal","not-equal","always"],CompilationInfoRequestStatus:["success","error","device-lost","unknown"],ComputePassTimestampLocation:["beginning","end"],CullMode:["none","front","back"],ErrorFilter:["validation","out-of-memory"],FeatureName:{0:undefined,1:"depth-clip-control",2:"depth24unorm-stencil8",3:"depth32float-stencil8",4:"timestamp-query",5:"pipeline-statistics-query",6:"texture-compression-bc",7:"texture-compression-etc2",8:"texture-compression-astc",9:"indirect-first-instance",1000:"depth-clamping"},FilterMode:["nearest","linear"],FrontFace:["ccw","cw"],IndexFormat:[,"uint16","uint32"],LoadOp:[,"clear","load"],PipelineStatisticName:["vertex-shader-invocations","clipper-invocations","clipper-primitives-out","fragment-shader-invocations","compute-shader-invocations"],PowerPreference:[,"low-power","high-performance"],PredefinedColorSpace:[,"srgb"],PrimitiveTopology:["point-list","line-list","line-strip","triangle-list","triangle-strip"],QueryType:["occlusion","pipeline-statistics","timestamp"],RenderPassTimestampLocation:["beginning","end"],SamplerBindingType:[,"filtering","non-filtering","comparison"],StencilOperation:["keep","zero","replace","invert","increment-clamp","decrement-clamp","increment-wrap","decrement-wrap"],StorageTextureAccess:[,"write-only"],StoreOp:[,"store","discard"],TextureAspect:["all","stencil-only","depth-only"],TextureComponentType:["float","sint","uint","depth-comparison"],TextureDimension:["1d","2d","3d"],TextureFormat:[,"r8unorm","r8snorm","r8uint","r8sint","r16uint","r16sint","r16float","rg8unorm","rg8snorm","rg8uint","rg8sint","r32float","r32uint","r32sint","rg16uint","rg16sint","rg16float","rgba8unorm","rgba8unorm-srgb","rgba8snorm","rgba8uint","rgba8sint","bgra8unorm","bgra8unorm-srgb","rgb10a2unorm","rg11b10ufloat","rgb9e5ufloat","rg32float","rg32uint","rg32sint","rgba16uint","rgba16sint","rgba16float","rgba32float","rgba32uint","rgba32sint","stencil8","depth16unorm","depth24plus","depth24plus-stencil8","depth24unorm-stencil8","depth32float","depth32float-stencil8","bc1-rgba-unorm","bc1-rgba-unorm-srgb","bc2-rgba-unorm","bc2-rgba-unorm-srgb","bc3-rgba-unorm","bc3-rgba-unorm-srgb","bc4-r-unorm","bc4-r-snorm","bc5-rg-unorm","bc5-rg-snorm","bc6h-rgb-ufloat","bc6h-rgb-float","bc7-rgba-unorm","bc7-rgba-unorm-srgb","etc2-rgb8unorm","etc2-rgb8unorm-srgb","etc2-rgb8a1unorm","etc2-rgb8a1unorm-srgb","etc2-rgba8unorm","etc2-rgba8unorm-srgb","eac-r11unorm","eac-r11snorm","eac-rg11unorm","eac-rg11snorm","astc-4x4-unorm","astc-4x4-unorm-srgb","astc-5x4-unorm","astc-5x4-unorm-srgb","astc-5x5-unorm","astc-5x5-unorm-srgb","astc-6x5-unorm","astc-6x5-unorm-srgb","astc-6x6-unorm","astc-6x6-unorm-srgb","astc-8x5-unorm","astc-8x5-unorm-srgb","astc-8x6-unorm","astc-8x6-unorm-srgb","astc-8x8-unorm","astc-8x8-unorm-srgb","astc-10x5-unorm","astc-10x5-unorm-srgb","astc-10x6-unorm","astc-10x6-unorm-srgb","astc-10x8-unorm","astc-10x8-unorm-srgb","astc-10x10-unorm","astc-10x10-unorm-srgb","astc-12x10-unorm","astc-12x10-unorm-srgb","astc-12x12-unorm","astc-12x12-unorm-srgb"],TextureSampleType:[,"float","unfilterable-float","depth","sint","uint"],TextureViewDimension:[,"1d","2d","2d-array","cube","cube-array","3d"],VertexFormat:[,"uint8x2","uint8x4","sint8x2","sint8x4","unorm8x2","unorm8x4","snorm8x2","snorm8x4","uint16x2","uint16x4","sint16x2","sint16x4","unorm16x2","unorm16x4","snorm16x2","snorm16x4","float16x2","float16x4","float32","float32x2","float32x3","float32x4","uint32","uint32x2","uint32x3","uint32x4","sint32","sint32x2","sint32x3","sint32x4"],VertexStepMode:["vertex","instance"],FeatureNameString2Enum:{undefined:"0",'depth-clip-control':"1",'depth24unorm-stencil8':"2",'depth32float-stencil8':"3",'timestamp-query':"4",'pipeline-statistics-query':"5",'texture-compression-bc':"6",'texture-compression-etc2':"7",'texture-compression-astc':"8",'indirect-first-instance':"9",'depth-clamping':"1000"}};
   function _emscripten_webgpu_get_device() {
       var device = Module['preinitializedWebGPUDevice'];
       var deviceWrapper = { queueId: WebGPU.mgrQueue.create(device["queue"]) };
@@ -5514,7 +5534,7 @@ function say(str){ console.log( UTF8ToString(str)); }
       var bufSize = 0;
       getEnvStrings().forEach(function(string, i) {
         var ptr = environ_buf + bufSize;
-        HEAP32[(((__environ)+(i * 4))>>2)] = ptr;
+        HEAPU32[(((__environ)+(i*4))>>2)] = ptr;
         writeAsciiToMemory(string, ptr);
         bufSize += string.length + 1;
       });
@@ -5523,12 +5543,12 @@ function say(str){ console.log( UTF8ToString(str)); }
 
   function _environ_sizes_get(penviron_count, penviron_buf_size) {
       var strings = getEnvStrings();
-      HEAP32[((penviron_count)>>2)] = strings.length;
+      HEAPU32[((penviron_count)>>2)] = strings.length;
       var bufSize = 0;
       strings.forEach(function(string) {
         bufSize += string.length + 1;
       });
-      HEAP32[((penviron_buf_size)>>2)] = bufSize;
+      HEAPU32[((penviron_buf_size)>>2)] = bufSize;
       return 0;
     }
 
@@ -5572,21 +5592,14 @@ function say(str){ console.log( UTF8ToString(str)); }
   }
   }
 
+  function convertI32PairToI53Checked(lo, hi) {
+      return ((hi + 0x200000) >>> 0 < 0x400001 - !!lo) ? (lo >>> 0) + hi * 4294967296 : NaN;
+    }
   function _fd_seek(fd, offset_low, offset_high, whence, newOffset) {
   try {
   
-      
+      var offset = convertI32PairToI53Checked(offset_low, offset_high); if (isNaN(offset)) return 61;
       var stream = SYSCALLS.getStreamFromFD(fd);
-      var HIGH_OFFSET = 0x100000000; // 2^32
-      // use an unsigned operator on low and shift high by 32-bits
-      var offset = offset_high * HIGH_OFFSET + (offset_low >>> 0);
-  
-      var DOUBLE_LIMIT = 0x20000000000000; // 2^53
-      // we also check for equality since DOUBLE_LIMIT + 1 == DOUBLE_LIMIT
-      if (offset <= -DOUBLE_LIMIT || offset >= DOUBLE_LIMIT) {
-        return 61;
-      }
-  
       FS.llseek(stream, offset, whence);
       (tempI64 = [stream.position>>>0,(tempDouble=stream.position,(+(Math.abs(tempDouble))) >= 1.0 ? (tempDouble > 0.0 ? ((Math.min((+(Math.floor((tempDouble)/4294967296.0))), 4294967295.0))|0)>>>0 : (~~((+(Math.ceil((tempDouble - +(((~~(tempDouble)))>>>0))/4294967296.0)))))>>>0) : 0)],HEAP32[((newOffset)>>2)] = tempI64[0],HEAP32[(((newOffset)+(4))>>2)] = tempI64[1]);
       if (stream.getdents && offset === 0 && whence === 0) stream.getdents = null; // reset readdir state
@@ -5613,10 +5626,9 @@ function say(str){ console.log( UTF8ToString(str)); }
   function _fd_write(fd, iov, iovcnt, pnum) {
   try {
   
-      ;
       var stream = SYSCALLS.getStreamFromFD(fd);
       var num = doWritev(stream, iov, iovcnt);
-      HEAP32[((pnum)>>2)] = num;
+      HEAPU32[((pnum)>>2)] = num;
       return 0;
     } catch (e) {
     if (typeof FS == 'undefined' || !(e instanceof FS.ErrnoError)) throw e;
@@ -5644,6 +5656,12 @@ function say(str){ console.log( UTF8ToString(str)); }
       
   
       function makeColorAttachment(caPtr) {
+        var viewPtr = HEAPU32[((caPtr)>>2)];
+        if (viewPtr === 0) {
+          // view could be undefined.
+          return undefined;
+        }
+  
         var loadOpInt = HEAPU32[(((caPtr)+(8))>>2)];
   
         var storeOpInt = HEAPU32[(((caPtr)+(12))>>2)];
@@ -5651,8 +5669,7 @@ function say(str){ console.log( UTF8ToString(str)); }
         var clearValue = WebGPU.makeColor(caPtr + 16);
   
         return {
-          "view": WebGPU.mgrTextureView.get(
-            HEAPU32[((caPtr)>>2)]),
+          "view": WebGPU.mgrTextureView.get(viewPtr),
           "resolveTarget": WebGPU.mgrTextureView.get(
             HEAPU32[(((caPtr)+(4))>>2)]),
           "clearValue": clearValue,
@@ -5690,6 +5707,24 @@ function say(str){ console.log( UTF8ToString(str)); }
         };
       }
   
+      function makeRenderPassTimestampWrite(twPtr) {
+        return {
+          "querySet": WebGPU.mgrQuerySet.get(
+            HEAPU32[((twPtr)>>2)]),
+          "queryIndex": HEAPU32[(((twPtr)+(4))>>2)],
+          "location": WebGPU.RenderPassTimestampLocation[
+            HEAPU32[(((twPtr)+(8))>>2)]],
+        };
+      }
+  
+      function makeRenderPassTimestampWrites(count, twPtr) {
+        var timestampWrites = [];
+        for (var i = 0; i < count; ++i) {
+          timestampWrites.push(makeRenderPassTimestampWrite(twPtr + 12 * i));
+        }
+        return timestampWrites;
+      }
+  
       function makeRenderPassDescriptor(descriptor) {
         
         var desc = {
@@ -5704,6 +5739,13 @@ function say(str){ console.log( UTF8ToString(str)); }
         };
         var labelPtr = HEAPU32[(((descriptor)+(4))>>2)];
         if (labelPtr) desc["label"] = UTF8ToString(labelPtr);
+  
+        var timestampWriteCount = HEAPU32[(((descriptor)+(24))>>2)];
+        if (timestampWriteCount) {
+          desc["timestampWrites"] = makeRenderPassTimestampWrites(
+            timestampWriteCount,
+            HEAPU32[(((descriptor)+(28))>>2)]);
+        }
         return desc;
       }
   
@@ -5985,9 +6027,9 @@ function say(str){ console.log( UTF8ToString(str)); }
   
       function makeColorState(csPtr) {
         
-        return {
-          "format": WebGPU.TextureFormat[
-            HEAPU32[(((csPtr)+(4))>>2)]],
+        var formatInt = HEAPU32[(((csPtr)+(4))>>2)];
+        return formatInt === 0 ? undefined : {
+          "format": WebGPU.TextureFormat[formatInt],
           "blend": makeBlendState(HEAPU32[(((csPtr)+(8))>>2)]),
           "writeMask": HEAPU32[(((csPtr)+(12))>>2)],
         };
@@ -6240,6 +6282,13 @@ function say(str){ console.log( UTF8ToString(str)); }
       var labelPtr = HEAPU32[(((descriptor)+(4))>>2)];
       if (labelPtr) desc["label"] = UTF8ToString(labelPtr);
   
+      var viewFormatCount = HEAPU32[(((descriptor)+(40))>>2)];
+      if (viewFormatCount) {
+        var viewFormatsPtr = HEAPU32[(((descriptor)+(44))>>2)];
+        desc["viewFormats"] = Array.from(HEAP32.subarray(viewFormatsPtr >> 2, (viewFormatsPtr >> 2) + viewFormatCount),
+          function(format) { return WebGPU.TextureFormat[format]; });
+      }
+  
       var device = WebGPU.mgrDevice.get(deviceId);
       return WebGPU.mgrTexture.create(device["createTexture"](desc));
     }
@@ -6262,7 +6311,7 @@ function say(str){ console.log( UTF8ToString(str)); }
       var selectorPtr = HEAPU32[(((descriptorFromCanvasHTMLSelector)+(8))>>2)];
       
       var canvas = findCanvasEventTarget(selectorPtr);
-      const context = canvas.getContext('webgpu');
+      var context = canvas.getContext('webgpu');
       if (!context) return 0;
   
       var labelPtr = HEAPU32[(((descriptor)+(4))>>2)];
@@ -6290,7 +6339,10 @@ function say(str){ console.log( UTF8ToString(str)); }
       var buffer = WebGPU.mgrBuffer.get(bufferId);
       var bufferOffset = (bufferOffset_high * 0x100000000 + bufferOffset_low)
   ;
-      queue["writeBuffer"](buffer, bufferOffset, HEAPU8, data, size);
+      // There is a size limitation for ArrayBufferView. Work around by passing in a subarray
+      // instead of the whole heap. crbug.com/1201109
+      var subarray = HEAPU8.subarray(data, data + size);
+      queue["writeBuffer"](buffer, bufferOffset, subarray, 0, size);
     }
 
   function _wgpuQueueWriteTexture(queueId,
@@ -6377,15 +6429,17 @@ function say(str){ console.log( UTF8ToString(str)); }
       var desc;
       if (descriptor) {
         
+        var mipLevelCount = HEAPU32[(((descriptor)+(20))>>2)];
+        var arrayLayerCount = HEAPU32[(((descriptor)+(28))>>2)];
         desc = {
           "format": WebGPU.TextureFormat[
             HEAPU32[(((descriptor)+(8))>>2)]],
           "dimension": WebGPU.TextureViewDimension[
             HEAPU32[(((descriptor)+(12))>>2)]],
           "baseMipLevel": HEAPU32[(((descriptor)+(16))>>2)],
-          "mipLevelCount": HEAPU32[(((descriptor)+(20))>>2)],
+          "mipLevelCount": mipLevelCount === 4294967295 ? undefined : mipLevelCount,
           "baseArrayLayer": HEAPU32[(((descriptor)+(24))>>2)],
-          "arrayLayerCount": HEAPU32[(((descriptor)+(28))>>2)],
+          "arrayLayerCount": arrayLayerCount === 4294967295 ? undefined : arrayLayerCount,
           "aspect": WebGPU.TextureAspect[
             HEAPU32[(((descriptor)+(32))>>2)]],
         };
@@ -6661,7 +6715,7 @@ var __glue_main_ = Module["__glue_main_"] = function() {
 
 /** @type {function(...*):?} */
 var _main = Module["_main"] = function() {
-  return (_main = Module["_main"] = Module["asm"]["main"]).apply(null, arguments);
+  return (_main = Module["_main"] = Module["asm"]["__main_argc_argv"]).apply(null, arguments);
 };
 
 /** @type {function(...*):?} */
@@ -6685,8 +6739,8 @@ var ___errno_location = Module["___errno_location"] = function() {
 };
 
 /** @type {function(...*):?} */
-var ___stdio_exit = Module["___stdio_exit"] = function() {
-  return (___stdio_exit = Module["___stdio_exit"] = Module["asm"]["__stdio_exit"]).apply(null, arguments);
+var _fflush = Module["_fflush"] = function() {
+  return (_fflush = Module["_fflush"] = Module["asm"]["fflush"]).apply(null, arguments);
 };
 
 /** @type {function(...*):?} */
@@ -6928,14 +6982,15 @@ function callMain(args) {
   var entryFunction = Module['_main'];
 
   args = args || [];
+  args.unshift(thisProgram);
 
-  var argc = args.length+1;
+  var argc = args.length;
   var argv = stackAlloc((argc + 1) * 4);
-  HEAP32[argv >> 2] = allocateUTF8OnStack(thisProgram);
-  for (var i = 1; i < argc; i++) {
-    HEAP32[(argv >> 2) + i] = allocateUTF8OnStack(args[i - 1]);
-  }
-  HEAP32[(argv >> 2) + argc] = 0;
+  var argv_ptr = argv >> 2;
+  args.forEach((arg) => {
+    HEAP32[argv_ptr++] = allocateUTF8OnStack(arg);
+  });
+  HEAP32[argv_ptr] = 0;
 
   try {
 

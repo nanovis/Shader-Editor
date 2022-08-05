@@ -1,0 +1,6 @@
+out/package-lock.json
+node_modules/
+*.o
+vs_editor/dist/
+out/assets/js/vs_editor/*
+*.cpp
