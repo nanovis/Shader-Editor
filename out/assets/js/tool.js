@@ -33,6 +33,10 @@
  // Initialize the graphics adapter
  {
      const adapter = await navigator.gpu.requestAdapter();
+     if (!adapter) {
+      console.error('[Shader Editor] GPU Not Found')
+      return;
+    }
      const device = await adapter.requestDevice();
      Module.preinitializedWebGPUDevice = device;
  }

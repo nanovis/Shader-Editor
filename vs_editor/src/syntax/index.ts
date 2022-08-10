@@ -14,7 +14,7 @@ const MarkerSeverity = {
 export async function SyntaxCheck() {
   const adapter = await window.navigator.gpu.requestAdapter();
   if (!adapter) {
-    console.log('[Syntax Checker] GPU Not Found')
+    console.error('[Syntax Checker] GPU Not Found')
     return;
   }
   const device = await adapter.requestDevice();
@@ -137,6 +137,13 @@ export async function SyntaxCheck() {
     code: window.editor.getValue(),
   });
 
+  const comments = window.editor.getValue().split('\n').map((e, index) => {
+    if (e.includes('//syntax-check disable')) return {
+      id: index,
+      value: e
+    };
+  }).filter((el) => el?.value !== undefined);
+
   const compInfo = await shaderModule.compilationInfo();
 
   const errorMsgs = compInfo.messages.map(e => {
@@ -150,8 +157,19 @@ export async function SyntaxCheck() {
     }
   });
 
+  const finalArr = errorMsgs.map((err) => {
+    const t = comments.flatMap((a) => {
+      if ((a?.id! + 1) === err.startLineNumber) {
+        return undefined;
+      } else return err;
+    });
+    return t;
+  }).filter(e => !e.includes(undefined)).flatMap(o => o);
+
+  const commentedErrorMsgs = [...new Set(finalArr) as any];
+
   if (window.editor.getModel() !== null) {
-    monaco.editor.setModelMarkers(window.editor.getModel()!, "owner", errorMsgs);
+    monaco.editor.setModelMarkers(window.editor.getModel()!, "owner", (commentedErrorMsgs.length === 0 ? errorMsgs : commentedErrorMsgs));
   }
   const computePipeline = device.createComputePipeline({
     layout: device.createPipelineLayout({
