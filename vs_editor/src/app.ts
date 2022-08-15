@@ -129,7 +129,7 @@ async function main(language: LanguageId) {
     throw Error(`could not find element #textarea`);
   }
 
-  const value = (document.getElementById('code') as HTMLInputElement).value === "" ? '@group(0) @binding(0) var<uniform> Time : f32;\n@group(0) @binding(1) var<uniform> Resolution : vec2<f32>;\n@group(0) @binding(2) var<uniform> Mouse : vec4<f32>;\n@group(0) @binding(3) var<uniform> Date1 : vec3<i32>;\n@group(0) @binding(4) var<uniform> Date2 : vec3<i32>;\n@group(0) @binding(5) var<uniform> Key : i32;\n@group(0) @binding(6) var<uniform> Position : vec2<f32>;\n@group(0) @binding(7) var<uniform> Random : f32;\n@group(0) @binding(8) var<uniform> randomarray: array<vec4<f32>,25>;\n@group(0) @binding(9) var<uniform> Position_dino : vec2<f32>;\n@group(1) @binding(0) var texture1: texture_2d<f32>;\n@group(1) @binding(1) var texture2: texture_2d<f32>;\n@group(1) @binding(2) var texture3: texture_2d<f32>;\n@group(1) @binding(3) var texture4: texture_2d<f32>;\n@group(1) @binding(4) var sampler_: sampler;\n\n@stage(fragment)\nfn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {\nvar uv: vec3<f32> =vec3<f32>(position.xyx/Resolution.xyx);\nvar col:vec3<f32> =0.5f+vec3<f32> ( 0.5*cos(uv+Time+vec3<f32>(0.0,2.0,4.0)));\nreturn vec4<f32>(col, 1.0);\n}' : (document.getElementById('code') as HTMLInputElement).value;
+  const value = (document.getElementById('code') as HTMLInputElement).value === "" ? '@fragment\nfn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {\nvar uv: vec3<f32> =vec3<f32>(position.xyx/Resolution.xyx);\nvar col:vec3<f32> =0.5f+vec3<f32> ( 0.5*cos(uv+Time+vec3<f32>(0.0,2.0,4.0)));\nreturn vec4<f32>(col, 1.0);\n}' : (document.getElementById('code') as HTMLInputElement).value;
   window.editor = monaco.editor.create(element, {
     value,
     language,
@@ -144,7 +144,7 @@ async function main(language: LanguageId) {
   startValidationServer();
   window.editor.onDidChangeModelContent(() => {
     SyntaxCheck()
-    getErrors();
+    //getErrors();
   });
   //addHoverText();
 }
