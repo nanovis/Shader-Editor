@@ -1,6 +1,7 @@
 out/package-lock.json
 node_modules/
 out/node_modules
+out/texutre
 *.o
 vs_editor/dist/
 out/assets/js/vs_editor/*

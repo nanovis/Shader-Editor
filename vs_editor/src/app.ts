@@ -85,7 +85,7 @@ async function main(language: LanguageId) {
 
   const fetchGrammar = async (scopeName: ScopeName): Promise<TextMateGrammar> => {
     const { path } = grammars[scopeName];
-    const uri = `/assets/static/langs/${path}`;
+    const uri = `https://shadereditor.kaust.edu.sa/assets/static/langs/${path}`
     const response = await fetch(uri);
     const grammar = await response.text();
     const type = path.endsWith('.json') ? 'json' : 'plist';
@@ -97,7 +97,6 @@ async function main(language: LanguageId) {
   ): Promise<monaco.languages.LanguageConfiguration> => {
     const uri = `https://shadereditor.kaust.edu.sa/assets/static/configurations/${language}.json`;
     const response = await fetch(uri);
-    console.log(response);
     const rawConfiguration = await response.text();
     return rehydrateRegexps(rawConfiguration);
   };
