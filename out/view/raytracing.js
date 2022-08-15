@@ -38,8 +38,8 @@ var Module = typeof Module != 'undefined' ? Module : {};
         // web worker
         PACKAGE_PATH = encodeURIComponent(location.pathname.toString().substring(0, location.pathname.toString().lastIndexOf('/')) + '/');
       }
-      var PACKAGE_NAME = 'out/new_template.data';
-      var REMOTE_PACKAGE_BASE = 'new_template.data';
+      var PACKAGE_NAME = 'out/raytracing.data';
+      var REMOTE_PACKAGE_BASE = 'raytracing.data';
       if (typeof Module['locateFilePackage'] === 'function' && !Module['locateFile']) {
         Module['locateFile'] = Module['locateFilePackage'];
         err('warning: you defined Module.locateFilePackage, that has been renamed to Module.locateFile (using your locateFilePackage for now)');
@@ -181,10 +181,10 @@ Module['FS_createPath']("/out", "texture", true, true);
           var files = metadata['files'];
           for (var i = 0; i < files.length; ++i) {
             DataRequest.prototype.requests[files[i].filename].onload();
-          }          Module['removeRunDependency']('datafile_out/new_template.data');
+          }          Module['removeRunDependency']('datafile_out/raytracing.data');
 
       };
-      Module['addRunDependency']('datafile_out/new_template.data');
+      Module['addRunDependency']('datafile_out/raytracing.data');
 
       if (!Module.preloadResults) Module.preloadResults = {};
 
@@ -1483,7 +1483,7 @@ function isFileURI(filename) {
 
 // end include: URIUtils.js
 var wasmBinaryFile;
-  wasmBinaryFile = 'new_template.wasm';
+  wasmBinaryFile = 'raytracing.wasm';
   if (!isDataURI(wasmBinaryFile)) {
     wasmBinaryFile = locateFile(wasmBinaryFile);
   }
