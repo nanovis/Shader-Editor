@@ -18,6 +18,8 @@ Tested with Chrome Dev (version 103.0.5060.13) with the `--enable-unsafe-webgpu`
 $ git clone https://github.com/nanovis/Shader-Editor.git
 $ cd Shader-Editor/out
 $ npm install
+$ cd ../vs_editor
+$ npm install
 $ cd .. && make serve
 ```
 Access http://localhost:8080 on [Chorme Dev](https://www.google.com/chrome/dev/) and access `chrome://flags` to enable `--enable-unsafe-webgpu`.
