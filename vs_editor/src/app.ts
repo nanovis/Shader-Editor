@@ -95,14 +95,15 @@ async function main(language: LanguageId) {
   const fetchConfiguration = async (
     language: LanguageId,
   ): Promise<monaco.languages.LanguageConfiguration> => {
-    const uri = `/assets/static/configurations/${language}.json`;
+    const uri = `https://shadereditor.kaust.edu.sa/assets/static/configurations/${language}.json`;
     const response = await fetch(uri);
+    console.log(response);
     const rawConfiguration = await response.text();
     return rehydrateRegexps(rawConfiguration);
   };
 
   const data: ArrayBuffer | Response = await loadVSCodeOnigurumWASM();
-  loadWASM(data);
+  await loadWASM(data);
   const onigLib = Promise.resolve({
     createOnigScanner,
     createOnigString,
@@ -150,7 +151,7 @@ async function main(language: LanguageId) {
 
 // Taken from https://github.com/microsoft/vscode/blob/829230a5a83768a3494ebbc61144e7cde9105c73/src/vs/workbench/services/textMate/browser/textMateService.ts#L33-L40
 async function loadVSCodeOnigurumWASM(): Promise<Response | ArrayBuffer> {
-  const response = await fetch('assets/static/vs_editor/onig.wasm');
+  const response = await fetch('https://shadereditor.kaust.edu.sa/assets/static/vs_editor/onig.wasm');
   const contentType = response.headers.get('content-type');
   if (contentType === 'application/wasm') {
     return response;
