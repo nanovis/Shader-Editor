@@ -38,8 +38,8 @@ var Module = typeof Module != 'undefined' ? Module : {};
         // web worker
         PACKAGE_PATH = encodeURIComponent(location.pathname.toString().substring(0, location.pathname.toString().lastIndexOf('/')) + '/');
       }
-      var PACKAGE_NAME = 'out/gino.data';
-      var REMOTE_PACKAGE_BASE = 'gino.data';
+      var PACKAGE_NAME = 'out/dino.data';
+      var REMOTE_PACKAGE_BASE = 'dino.data';
       if (typeof Module['locateFilePackage'] === 'function' && !Module['locateFile']) {
         Module['locateFile'] = Module['locateFilePackage'];
         err('warning: you defined Module.locateFilePackage, that has been renamed to Module.locateFile (using your locateFilePackage for now)');
@@ -181,10 +181,10 @@ Module['FS_createPath']("/out", "texture", true, true);
           var files = metadata['files'];
           for (var i = 0; i < files.length; ++i) {
             DataRequest.prototype.requests[files[i].filename].onload();
-          }          Module['removeRunDependency']('datafile_out/gino.data');
+          }          Module['removeRunDependency']('datafile_out/dino.data');
 
       };
-      Module['addRunDependency']('datafile_out/gino.data');
+      Module['addRunDependency']('datafile_out/dino.data');
 
       if (!Module.preloadResults) Module.preloadResults = {};
 
