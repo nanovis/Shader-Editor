@@ -32,7 +32,7 @@ exports.index = function (req, res) {
       throw err
     };
     const dbo = db.db('shadereditor');
-    const _data = await dbo.collection('shader').find({ "status": "Public" }).toArray();
+    const _data = await dbo.collection('shader').find({$or:[{ "status": "Public" }, { "status": "Public" }]}).toArray();
     const _chunked = chunkArray(_data, Math.ceil(_data.length / 4));
     res.render(__dirname + "/../browse.hbs", { username: req.session.username, data: JSON.stringify(_chunked) })
   })
