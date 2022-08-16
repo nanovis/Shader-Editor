@@ -26,8 +26,8 @@
          // no run dependencies to log
      }
    };
-   window.onerror = function() {
-     console.log("onerror: " + event);
+   window.onerror = function(e) {
+     console.error(e);
    };
  
  // Initialize the graphics adapter
