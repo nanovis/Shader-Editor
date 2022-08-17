@@ -3,6 +3,9 @@ node_modules/
 out/node_modules
 out/texutre
 *.o
+*.cpp
 vs_editor/dist/
 out/assets/js/vs_editor/*
-*.cpp
+out/new_template.data
+out/new_template.js
+out/new_template.wasm

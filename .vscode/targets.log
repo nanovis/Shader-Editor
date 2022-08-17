@@ -1,0 +1,444 @@
+make.exe all --print-data-base --no-builtin-variables --no-builtin-rules --question
+# GNU Make 3.81
+# Copyright (C) 2006  Free Software Foundation, Inc.
+# This is free software; see the source for copying conditions.
+# There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE.
+
+# This program built for i386-pc-mingw32
+ 
+
+# Make data base, printed on Wed Aug 17 12:39:02 2022
+
+# Variables
+
+# environment
+POWERSHELL_DISTRIBUTION_CHANNEL = MSI:Windows 10 Education
+# automatic
+?F = $(notdir $?)
+# environment
+QTMSBUILD = C:\Users\jiad\AppData\Local\QtMsBuild
+# automatic
+<D = $(patsubst %/,%,$(dir $<))
+# makefile
+MAKEFLAGS = Rrqp
+# automatic
+?D = $(patsubst %/,%,$(dir $?))
+# makefile (from `makefile', line 31)
+CPPFLAGS = -I$(INC_DIR) -Ilib/glm  -Wall -Wformat -Os $(EMS)
+# automatic
+@D = $(patsubst %/,%,$(dir $@))
+# environment
+HOMEDRIVE = P:
+# automatic
+@F = $(notdir $@)
+# automatic
+^D = $(patsubst %/,%,$(dir $^))
+# makefile
+CURDIR := d:/Github/Shader-Editor
+# default
+SHELL := sh.exe
+# environment
+WINDIR = C:\Windows
+# environment
+VSCODE_NLS_CONFIG = {"locale":"en-us","availableLanguages":{},"_languagePackSupport":true}
+# environment
+PYCHARM COMMUNITY EDITION = C:\Program Files\JetBrains\PyCharm Community Edition 2022.1.1\bin;
+# environment
+BPPDOMAIN_MANAGER_TYPE = EdrDotNet.EdrAppDomainManager
+# environment
+ONEDRIVE = C:\Users\jiad\OneDrive - KAUST
+# environment
+PATHEXT = .COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC
+# makefile (from `makefile', line 1)
+MAKEFILE_LIST :=  makefile
+# environment
+TMP = C:\Users\jiad\AppData\Local\Temp
+# makefile (from `makefile', line 9)
+SOURCES = main.cpp $(SRC_DIR)/Camera.cpp $(SRC_DIR)/CameraController.cpp $(EMS_DIR)/glue.cpp $(EMS_DIR)/webgpu.cpp $(EMS_DIR)/window.cpp
+# environment
+PROMPT = $P$G
+# environment
+PROGRAMW6432 = C:\Program Files
+# makefile (from `makefile', line 10)
+OBJS = $(addsuffix .o, $(basename $(notdir $(SOURCES))))
+# environment
+PROGRAMDATA = C:\ProgramData
+# environment
+VSCODE_CWD = D:\Microsoft VS Code
+# environment
+PATH = C:\VulkanSDK\1.3.216.0\Bin;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.7\bin;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.7\libnvvp;D:\Dawn\depot_tools;C:\Program Files (x86)\Intel\iCLS Client\;C:\Program Files\Intel\iCLS Client\;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Windows\CCM;C:\Program Files (x86)\PharosSystems\Core;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\nodejs\;C:\ProgramData\chocolatey\bin;C:\Program Files\CMake\bin;C:\Program Files\Bandizip\;C:\Program Files\PowerShell\7\;C:\MinGW\bin;C:\Program Files (x86)\GnuWin32\bin;D:\emsdk;D:\emsdk\node\14.18.2_64bit\bin;D:\emsdk\upstream\emscripten;C:\Program Files\MongoDB\Server\4.4\bin;C:\Program Files\Git\cmd;C:\ProgramData\Anaconda3\Scripts;C:\Program Files\NVIDIA Corporation\Nsight Compute 2022.2.0\;C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\VC\Tools\MSVC\14.29.30133\bin\Hostx86\x86;C:\Users\jiad\.cargo\bin;D:\Dawn\depot_tools;D:\emsdk;D:\emsdk\node\14.18.2_64bit\bin;D:\emsdk\upstream\emscripten;C:\Users\jiad\scoop\apps\oh-my-posh\current\bin;C:\Users\jiad\scoop\shims;C:\Qt\5.15.2\msvc2019_64\bin;C:\Users\jiad\AppData\Local\Programs\Python\Python310\Scripts\;C:\Users\jiad\AppData\Local\Programs\Python\Python310\;C:\Users\jiad\AppData\Local\Microsoft\WindowsApps;D:\Microsoft VS Code\bin;C:\Users\jiad\AppData\Local\GitHubDesktop\bin;C:\Users\jiad\AppData\Roaming\npm;C:\MinGW\bin;C:\Program Files (x86)\GnuWin32\bin;;C:\Program Files\JetBrains\PyCharm Community Edition 2022.1.1\bin;
+# environment
+COMMONPROGRAMW6432 = C:\Program Files\Common Files
+# environment
+CHOCOLATEYLASTPATHUPDATE = 132949314546606210
+# environment
+PROCESSOR_ARCHITECTURE = x86
+# environment
+USERPROFILE = C:\Users\jiad
+# environment
+CHOCOLATEYINSTALL = C:\ProgramData\chocolatey
+# environment
+ALLUSERSPROFILE = C:\ProgramData
+# environment
+NUMBER_OF_PROCESSORS = 48
+# environment
+ELECTRON_RUN_AS_NODE = 1
+# makefile (from `makefile', line 22)
+LDFLAGS = --no-heap-copy --preload-file out/texture
+# default
+.FEATURES := target-specific order-only second-expansion else-if archives
+# environment
+NVTOOLSEXT_PATH = C:\Program Files\NVIDIA Corporation\NvToolsExt\
+# environment
+VK_SDK_PATH = C:\VulkanSDK\1.3.216.0
+# automatic
+%F = $(notdir $%)
+# environment
+CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_34096_NSXBNCMJWUWYXKUO
+# environment
+COMPUTERNAME = PC-KW-14056
+# environment
+PROGRAMFILES = C:\Program Files (x86)
+# environment
+USERDNSDOMAIN = KAUST.EDU.SA
+# environment
+DRIVERDATA = C:\Windows\System32\Drivers\DriverData
+# makefile (from `makefile', line 8)
+EMS_DIR = $(SRC_DIR)/ems
+# environment
+ORIGINAL_XDG_CURRENT_DESKTOP = undefined
+# makefile (from `makefile', line 3)
+INC_DIR = inc
+# environment
+USERNAME = jiad
+# environment
+PUBLIC = C:\Users\Public
+# environment
+VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
+# environment
+VSCODE_CODE_CACHE_PATH = C:\Users\jiad\AppData\Roaming\Code\CachedData\6d9b74a70ca9c7733b29f0456fd8195364076dda
+# environment
+APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = 1
+# environment
+COMMONPROGRAMFILES = C:\Program Files (x86)\Common Files
+# environment
+LOGONSERVER = \\WTHDC1SR01
+# environment
+VSCODE_HANDLES_UNCAUGHT_ERRORS = true
+# environment
+USERDOMAIN = KAUST
+# default
+MAKE = $(MAKE_COMMAND)
+# default
+MAKECMDGOALS := all
+# makefile (from `makefile', line 1)
+CC = emcc
+# environment
+ONEDRIVECOMMERCIAL = C:\Users\jiad\OneDrive - KAUST
+# default
+MAKE_VERSION := 3.81
+# makefile
+.DEFAULT_GOAL := all
+# environment
+PROGRAMFILES(X86) = C:\Program Files (x86)
+# automatic
+%D = $(patsubst %/,%,$(dir $%))
+# environment
+LOCALAPPDATA = C:\Users\jiad\AppData\Local
+# environment
+PSMODULEPATH = C:\Program Files\WindowsPowerShell\Modules;C:\Windows\system32\WindowsPowerShell\v1.0\Modules
+# default
+MAKE_COMMAND := make.exe
+# environment
+PROCESSOR_ARCHITEW6432 = AMD64
+# makefile (from `makefile', line 21)
+EMS = -s USE_WEBGPU=1 -s WASM=1 -s ALLOW_MEMORY_GROWTH=1 -s DISABLE_EXCEPTION_CATCHING=1 -s EXIT_RUNTIME=1 -s ASSERTIONS=0 -s FILESYSTEM=1 -s --use-preload-plugins -s USE_SDL=2 -s USE_LIBJPEG=1 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS='["bmp","png","jpg"]'
+# default
+.VARIABLES := 
+# automatic
+*F = $(notdir $*)
+# environment
+PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 62 Stepping 4, GenuineIntel
+# environment
+OS = Windows_NT
+# environment
+VSCODE_IPC_HOOK = \\.\pipe\460dff16ec35d5cb99b2adea840acd10-1.70.1-main-sock
+# environment
+HOMEPATH = \
+# environment
+COMMONPROGRAMFILES(X86) = C:\Program Files (x86)\Common Files
+# environment
+HOMESHARE = \\myFiles.kaust.edu.sa\jiad
+# environment
+MFLAGS = -Rrqp
+# automatic
+*D = $(patsubst %/,%,$(dir $*))
+# environment
+BPPDOMAIN_MANAGER_ASM = EdrDotNet, Version=7.6.2.50705, Culture=neutral, PublicKeyToken=da1b3922653ea916
+# environment
+SYSTEMROOT = C:\Windows
+# automatic
++D = $(patsubst %/,%,$(dir $+))
+# automatic
++F = $(notdir $+)
+# environment
+APPDATA = C:\Users\jiad\AppData\Roaming
+# environment
+TEMP = C:\Users\jiad\AppData\Local\Temp
+# environment
+COMSPEC = C:\Windows\system32\cmd.exe
+# default
+MAKEFILES := 
+# makefile (from `makefile', line 4)
+SRC_DIR = src
+# automatic
+<F = $(notdir $<)
+# makefile (from `makefile', line 2)
+CXX = em++
+# makefile (from `makefile', line 5)
+WEB_DIR = out
+# environment
+LC_ALL = C
+# environment
+UATDATA = C:\Windows\CCM\UATData\D9F8C395-CAB8-491d-B8AC-179A1FE1BE77
+# makefile (from `makefile', line 32)
+LIBS = $(EMS)
+# automatic
+^F = $(notdir $^)
+# environment
+CUDA_PATH = C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.7
+# default
+SUFFIXES := 
+# environment
+SYSTEMDRIVE = C:
+# environment
+SESSIONNAME = Console
+# environment
+PROCESSOR_REVISION = 3e04
+# environment
+MAKELEVEL := 0
+# environment
+VULKAN_SDK = C:\VulkanSDK\1.3.216.0
+# environment
+CUDA_PATH_V11_7 = C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.7
+# makefile (from `makefile', line 6)
+EXE = out/new_template.js
+# environment
+LANG = C
+# environment
+PROCESSOR_LEVEL = 6
+# environment
+VSCODE_PID = 34096
+# environment
+USERDOMAIN_ROAMINGPROFILE = KAUST
+# variable set hash-table stats:
+# Load=110/1024=11%, Rehash=0, Collisions=16/160=10%
+
+# Pattern-specific Variable Values
+
+# No pattern-specific variable values.
+
+# Directories
+
+# C:\Users\jiad\AppData\Roaming\npm (key C:/Users/jiad/AppData/Roaming/npm, mtime 1660554539): 12 files, no impossibilities.
+# : could not be stat'd.
+# C:\Program Files\Intel\iCLS Client\ (key C:/Program Files/Intel/iCLS Client/, mtime 1650366995): 22 files, no impossibilities.
+# C:\Program Files\Bandizip\ (key C:/Program Files/Bandizip/, mtime 1653378754): 21 files, no impossibilities.
+# C:\Users\jiad\scoop\apps\oh-my-posh\current\bin (key C:/Users/jiad/scoop/apps/oh-my-posh/current/bin, mtime 1651060769): 3 files, no impossibilities.
+# C:\Program Files\JetBrains\PyCharm Community Edition 2022.1.1\bin (key C:/Program Files/JetBrains/PyCharm Community Edition 2022.1.1/bin, mtime 1653495571): 28 files, no impossibilities.
+# C:\Users\jiad\.cargo\bin (key C:/Users/jiad/.cargo/bin, mtime 1656425570): 14 files, no impossibilities.
+# C:\Windows\System32\WindowsPowerShell\v1.0\ (key C:/Windows/System32/WindowsPowerShell/v1.0/, mtime 1633528646): 30 files, no impossibilities.
+# C:\Windows\System32\Wbem (key C:/Windows/System32/Wbem, mtime 1658656981): 169 files, no impossibilities.
+# . (key d:/Github/Shader-Editor, mtime 1660568628): 19 files, no impossibilities.
+# C:\Users\jiad\scoop\shims (key C:/Users/jiad/scoop/shims, mtime 1651062937): 12 files, no impossibilities.
+# C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.7\libnvvp (key C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.7/libnvvp, mtime 1653996188): 14 files, no impossibilities.
+# C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common (key C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common, mtime 1650368493): 10 files, no impossibilities.
+# C:\Users\jiad\AppData\Local\GitHubDesktop\bin (key C:/Users/jiad/AppData/Local/GitHubDesktop/bin, mtime 1650454454): 4 files, no impossibilities.
+# C:\Users\jiad\AppData\Local\Microsoft\WindowsApps (key C:/Users/jiad/AppData/Local/Microsoft/WindowsApps, mtime 1658414313): 21 files, no impossibilities.
+# C:\Pr 
+ogramData\chocolatey\bin (key C:/ProgramData/chocolatey/bin, mtime 1650457855): 11 files, no impossibilities.
+# C:\Program Files\nodejs\ (key C:/Program Files/nodejs/, mtime 1650457805): 13 files, no impossibilities.
+# src/ems (key d:/Github/Shader-Editor/src/ems, mtime 1660565341): 6 files, 1 impossibilities.
+# D:\Microsoft VS Code\bin (key D:/Microsoft VS Code/bin, mtime 1660554330): 4 files, no impossibilities.
+# C:\Program Files\NVIDIA Corporation\Nsight Compute 2022.2.0\ (key C:/Program Files/NVIDIA Corporation/Nsight Compute 2022.2.0/, mtime 1653996081): 12 files, no impossibilities.
+# C:\MinGW\bin (key C:/MinGW/bin, mtime 1653833018): 124 files, no impossibilities.
+# D:\Dawn\depot_tools (key D:/Dawn/depot_tools, mtime 1652598656): 239 files, no impossibilities.
+# C:\Program Files\PowerShell\7\ (key C:/Program Files/PowerShell/7/, mtime 1651060060): 478 files, no impossibilities.
+# C:\Qt\5.15.2\msvc2019_64\bin (key C:/Qt/5.15.2/msvc2019_64/bin, mtime 1650736255): 180 files, no impossibilities.
+# C:\Program Files\Intel\Intel(R) Management Engine Components\IPT (key C:/Program Files/Intel/Intel(R) Management Engine Components/IPT, mtime 1650366984): 5 files, no impossibilities.
+# C:\Windows\System32\OpenSSH\: could not be stat'd.
+# C:\ProgramData\Anaconda3\Scripts (key C:/ProgramData/Anaconda3/Scripts, mtime 1653494809): 354 files, no impossibilities.
+# C:\Program Files (x86)\Intel\iCLS Client\ (key C:/Program Files (x86)/Intel/iCLS Client/, mtime 1650366995): 20 files, no impossibilities.
+# C:\Windows\CCM (key C:/Windows/CCM, mtime 1654605994): 594 files, no impossibilities.
+# D:\emsdk (key D:/emsdk, mtime 1652609501): 36 files, no impossibilities.
+# C:\Program Files (x86)\PharosSystems\Core (key C:/Program Files (x86)/PharosSystems/Core, mtime 1650280828): 7 files, no impossibilities.
+# C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.7\bin (key C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.7/bin, mtime 1653996548): 52 files, no impossibilities.
+# C:\Program Files\Intel\Intel(R) Management Engine Components\DAL (key C:/Program Files/Intel/Intel(R) Management Engine Components/DAL, mtime 1650366984): 4 files, no impossibilities.
+# C:\Windows (key C:/Windows, mtime 1660226548): 138 files, no impossibilities.
+# C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\VC\Tools\MSVC\14.29.30133\bin\Hostx86\x86 (key C:/Program Files (x86)/Microsoft Visual Studio/2019/BuildTools/VC/Tools/MSVC/14.29.30133/bin/Hostx86/x86, mtime 1650458616): 70 files, no impossibilities.
+# C:\Program Files\CMake\bin (key C:/Program Files/CMake/bin, mtime 1650736581): 7 files, no impossibilities.
+# src (key d:/Github/Shader-Editor/src, mtime 1660565341): 8 files, 1 impossibilities.
+# D:\emsdk\node\14.18.2_64bit\bin (key D:/emsdk/node/14.18.2_64bit/bin, mtime 1652184417): 14 files, no impossibilities.
+# C:\VulkanSDK\1.3.216.0\Bin (key C:/VulkanSDK/1.3.216.0/Bin, mtime 1658751736): 52 files, no impossibilities.
+# C:\Users\jiad\AppData\Local\Programs\Python\Python310\ (key C:/Users/jiad/AppData/Local/Programs/Python/Python310/, mtime 1650460469): 18 files, no impossibilities.
+# C:\Program Files\Git\cmd (key C:/Program Files/Git/cmd, mtime 1650457475): 8 files, no impossibilities.
+# C:\Windows\system32 (key C:/Windows/system32, mtime 1660551334): 3114 files, no impossibilities.
+# C:\Program Files\MongoDB\Server\4.4\bin (key C:/Program Files/MongoDB/Server/4.4/bin, mtime 1652186141): 9 files, no impossibilities.
+# C:\Users\jiad\AppData\Local\Programs\Python\Python310\Scripts\ (key C:/Users/jiad/AppData/Local/Programs/Python/Python310/Scripts/, mtime 1650455345): 5 files, no impossibilities.
+# C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\IPT (key C:/Program Files (x86)/Intel/Intel(R) Management Engine Components/IPT, mtime 1650366984): 6 files, no impossibilities.
+# D:\emsdk\upstream\emscripten (key D:/emsdk/upstream/emscripten, mtime 1652609339): 76 files, no impossibilities.
+# C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR (key C:/Program Files/NVIDIA Corporation/NVIDIA NvDLISR, mtime 1650368104): 5 
+ files, no impossibilities.
+# C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\DAL (key C:/Program Files (x86)/Intel/Intel(R) Management Engine Components/DAL, mtime 1650366984): 10 files, no impossibilities.
+# C:\Program Files (x86)\GnuWin32\bin (key C:/Program Files (x86)/GnuWin32/bin, mtime 1652184155): 5 files, no impossibilities.
+
+# 6063 files, 2 impossibilities in 49 directories.
+
+# Implicit Rules
+
+%.o: src/%.cpp
+#  commands to execute (from `makefile', line 39):
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS)  -o $@ -c $<
+	
+
+%.o: src/ems/%.cpp
+#  commands to execute (from `makefile', line 42):
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -o $@  -c $<
+	
+
+# 2 implicit rules, 0 (0.0%) terminal.
+
+# Files
+
+# Not a target:
+CameraController.o:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+webgpu.o:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+all: out/new_template.js
+#  Command-line target.
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/0=0%
+#  commands to execute (from `makefile', line 45):
+	@echo Build complete for $(EXE)
+	
+
+# Not a target:
+glue.o:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.DEFAULT:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+window.o:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+Camera.o:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+makefile:
+#  Implicit rule search has been done.
+#  Last modified 2022-08-15 15:40:15
+#  File has been updated.
+#  Successfully updated.
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/0=0%
+
+out:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `makefile', line 48):
+	mkdir $@
+	
+
+# Not a target:
+.SUFFIXES:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+clean:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `makefile', line 62):
+	rm -f $(OBJS)
+	rm -f out/temp/*
+	rm -rf out/texture
+	cp  -r texture out/
+	rm -rf out/node_modules
+	find . -name ‘.DS_Store’ -type f -delete
+	
+
+# Not a target:
+main.o:
+#  Implicit rule search has been done.
+#  File does not exist.
+#  File has not been updated.
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/0=0%
+
+out/new_template.js: main.o Camera.o CameraController.o glue.o webgpu.o window.o out
+#  Implicit rule search has not been done.
+#  Last modified 2022-08-16 14:06:50
+#  File has not been updated.
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/0=0%
+#  commands to execute (from `makefile', line 59):
+	$(CXX) -o $@ $(OBJS) $(LIBS) $(LDFLAGS)
+	
+
+serve: all
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `makefile', line 53):
+	cd vs_editor && \
+	npm run build && \
+	cd .. && \
+	pm2 start out/server.js
+	
+
+# files hash-table stats:
+# Load=14/1024=1%, Rehash=0, Collisions=0/39 
+make.exe: *** No rule to make target `main.o', needed by `out/new_template.js'.  Stop.
+
+=0%
+# VPATH Search Paths
+
+# No `vpath' search paths.
+
+# No general (`VPATH' variable) search path.
+
+# # of strings in strcache: 1
+# # of strcache buffers: 1
+# strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
+# strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
+
+# Finished Make data base on Wed Aug 17 12:39:02 2022
+
+ 
