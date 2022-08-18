@@ -9,3 +9,4 @@ out/assets/js/vs_editor/*
 out/new_template.data
 out/new_template.js
 out/new_template.wasm
+.vscode/
