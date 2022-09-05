@@ -94,7 +94,7 @@ static char const triangle_frag_wgsl[] = R"(@group(0) @binding(0) var<uniform> T
 @group(0) @binding(4) var<uniform> Date2 : vec3<i32>;
 @group(0) @binding(5) var<uniform> Key : i32;
 @group(0) @binding(6) var<uniform> Position : vec2<f32>;
-@group(0) @binding(7) var<uniform> Random : f32;
+@group(0) @binding(7) var<storage> Random : f32;
 @group(0) @binding(8) var<uniform> randomarray: array<vec4<f32>,25>;
 @group(0) @binding(9) var<uniform> Position_dino : vec2<f32>;
 @group(1) @binding(0) var texture1: texture_2d<f32>;
@@ -102,12 +102,7 @@ static char const triangle_frag_wgsl[] = R"(@group(0) @binding(0) var<uniform> T
 @group(1) @binding(2) var texture3: texture_2d<f32>;
 @group(1) @binding(3) var texture4: texture_2d<f32>;
 @group(1) @binding(4) var sampler_: sampler;
-@fragment
-fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
-  var uv: vec3<f32> =vec3<f32>(position.xyx/Resolution.xyx);
-  var col:vec3<f32> =0.5f+vec3<f32> ( 0.5*cos(uv+Time+vec3<f32>(0.0,2.0,4.0)));
-  return vec4<f32>(col, 1.0);
-})"; // fragment shader end
+)"; // fragment shader end
 
 /*
 @group(0) @binding(0) var<uniform> Time : f32;
@@ -192,6 +187,9 @@ static void createPipelineAndBuffers() {
 	WGPUBufferBindingLayout buf = {};
 	buf.type = WGPUBufferBindingType_Uniform;
 
+	WGPUBufferBindingLayout buf_storage = {};
+	buf_storage.type = WGPUBufferBindingType_Storage;
+
 	// bind group layout (used by both the pipeline layout and uniform bind group, released at the end of this function)
 	WGPUBindGroupLayoutEntry timelEntry = {};
 	timelEntry.binding = 0;
@@ -231,7 +229,7 @@ static void createPipelineAndBuffers() {
 	WGPUBindGroupLayoutEntry randomlEntry = {};
 	randomlEntry.binding = 7;
 	randomlEntry.visibility = WGPUShaderStage_Fragment;
-	randomlEntry.buffer = buf;
+	randomlEntry.buffer = buf_storage;
 
 	WGPUBindGroupLayoutEntry randomArraylEntry = {};
 	randomArraylEntry.binding = 8;
@@ -433,7 +431,7 @@ static void createPipelineAndBuffers() {
 	date2Buf = createBuffer(&date2, sizeof(date2), WGPUBufferUsage_Uniform);
 	keypressBuf= createBuffer(&keypress,sizeof(keypress), WGPUBufferUsage_Uniform);
 	positionBuf= createBuffer(&position,sizeof(position), WGPUBufferUsage_Uniform);
-	randomBuf= createBuffer(&random_num,sizeof(random_num), WGPUBufferUsage_Uniform);
+	randomBuf= createBuffer(&random_num,sizeof(random_num), WGPUBufferUsage_Storage);
 	randomArrayBuf= createBuffer(&randomArray,sizeof(randomArray), WGPUBufferUsage_Uniform);
 	positionDinoBuf = createBuffer(&position_dino,sizeof(position_dino), WGPUBufferUsage_Uniform);
 	WGPUBindGroupEntry timeEntry = {};
