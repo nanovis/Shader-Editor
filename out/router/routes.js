@@ -76,24 +76,24 @@ exports.compile = function (req, res) {
   if (req.body.texture4 != "") {
     texture4_code = "image=IMG_Load(\"out/texture/" + req.body.texture4 + "\");//texture4"
   }
-  description ="@group(0) @binding(0) var<uniform> Time : f32;\n"
-  "@group(0) @binding(1) var<uniform> Resolution : vec2<f32>;\n"
-  "@group(0) @binding(2) var<uniform> Mouse : vec4<f32>;\n"
-  "@group(0) @binding(3) var<uniform> Date1 : vec3<i32>;\n"
-  "@group(0) @binding(4) var<uniform> Date2 : vec3<i32>;\n"
-  "@group(0) @binding(5) var<uniform> Key : i32;\n"
-  "@group(0) @binding(6) var<uniform> Position : vec2<f32>;\n"
-  "@group(0) @binding(7) var<uniform> Random : f32;\n"
-  "@group(0) @binding(8) var<uniform> randomarray: array<vec4<f32>,25>;\n"
-  "@group(0) @binding(9) var<uniform> Position_dino : vec2<f32>;\@"
-  "group(1) @binding(0) var texture1: texture_2d<f32>;\n"
-  "@group(1) @binding(1) var texture2: texture_2d<f32>;\n"
-  "@group(1) @binding(2) var texture3: texture_2d<f32>;\n"
-  "@group(1) @binding(3) var texture4: texture_2d<f32>;\n"
-  "@group(1) @binding(4) var sampler_: sampler;\n"
-  "@group(2) @binding(0) var<storage> floatBuffer: array<f32,50>;\n"
-  "@group(2) @binding(1) var<storage> intBuffer: array<i32,50>;\n"
-  "@group(2) @binding(2) var<storage> matrixBuffer: array<mat4x4<f32>,50>;\n"
+  description ="@group(0) @binding(0) var<uniform> Time : f32;\n"+
+  "@group(0) @binding(1) var<uniform> Resolution : vec2<f32>;\n"+
+  "@group(0) @binding(2) var<uniform> Mouse : vec4<f32>;\n"+
+  "@group(0) @binding(3) var<uniform> Date1 : vec3<i32>;\n"+
+  "@group(0) @binding(4) var<uniform> Date2 : vec3<i32>;\n"+
+  "@group(0) @binding(5) var<uniform> Key : i32;\n"+
+  "@group(0) @binding(6) var<uniform> Position : vec2<f32>;\n"+
+  "@group(0) @binding(7) var<uniform> Random : f32;\n"+
+  "@group(0) @binding(8) var<uniform> randomarray: array<vec4<f32>,25>;\n"+
+  "@group(0) @binding(9) var<uniform> Position_dino : vec2<f32>;\@"+
+  "group(1) @binding(0) var texture1: texture_2d<f32>;\n"+
+  "@group(1) @binding(1) var texture2: texture_2d<f32>;\n"+
+  "@group(1) @binding(2) var texture3: texture_2d<f32>;\n"+
+  "@group(1) @binding(3) var texture4: texture_2d<f32>;\n"+
+  "@group(1) @binding(4) var sampler_: sampler;\n"+
+  "@group(2) @binding(0) var<storage,read_write> floatBuffer: array<f32,50>;\n"+
+  "@group(2) @binding(1) var<storage,read_write> intBuffer: array<i32,50>;\n"+
+  "@group(2) @binding(2) var<storage,read_write> matrixBuffer: array<mat4x4<f32>,50>;\n"
   fragment_code = description + req.body.code
   fragment_code = "static char const triangle_frag_wgsl[] = R\"(" + fragment_code + ")\"; // fragment shader end"
   fs.readFile(__dirname + '/../../main.cpp', function (err, data) {
@@ -268,24 +268,24 @@ exports.view_user = function (req, res) {
         if (texture4 != "") {
           texture4_code = "image=IMG_Load(\"out/texture/" + texture4 + "\");//texture4"
         }
-        description = "@group(0) @binding(0) var<uniform> Time : f32;\n"
-        "@group(0) @binding(1) var<uniform> Resolution : vec2<f32>;\n"
-        "@group(0) @binding(2) var<uniform> Mouse : vec4<f32>;\n"
-        "@group(0) @binding(3) var<uniform> Date1 : vec3<i32>;\n"
-        "@group(0) @binding(4) var<uniform> Date2 : vec3<i32>;\n"
-        "@group(0) @binding(5) var<uniform> Key : i32;\n"
-        "@group(0) @binding(6) var<uniform> Position : vec2<f32>;\n"
-        "@group(0) @binding(7) var<uniform> Random : f32;\n"
-        "@group(0) @binding(8) var<uniform> randomarray: array<vec4<f32>,25>;\n"
-        "@group(0) @binding(9) var<uniform> Position_dino : vec2<f32>;\@"
-        "group(1) @binding(0) var texture1: texture_2d<f32>;\n"
-        "@group(1) @binding(1) var texture2: texture_2d<f32>;\n"
-        "@group(1) @binding(2) var texture3: texture_2d<f32>;\n"
-        "@group(1) @binding(3) var texture4: texture_2d<f32>;\n"
-        "@group(1) @binding(4) var sampler_: sampler;\n"
-        "@group(2) @binding(0) var<storage> floatBuffer: array<f32,50>;\n"
-        "@group(2) @binding(1) var<storage> intBuffer: array<i32,50>;\n"
-        "@group(2) @binding(2) var<storage> matrixBuffer: array<mat4x4<f32>,50>;\n"
+        description = "@group(0) @binding(0) var<uniform> Time : f32;\n"+
+        "@group(0) @binding(1) var<uniform> Resolution : vec2<f32>;\n"+
+        "@group(0) @binding(2) var<uniform> Mouse : vec4<f32>;\n"+
+        "@group(0) @binding(3) var<uniform> Date1 : vec3<i32>;\n"+
+        "@group(0) @binding(4) var<uniform> Date2 : vec3<i32>;\n"+
+        "@group(0) @binding(5) var<uniform> Key : i32;\n"+
+        "@group(0) @binding(6) var<uniform> Position : vec2<f32>;\n"+
+        "@group(0) @binding(7) var<uniform> Random : f32;\n"+
+        "@group(0) @binding(8) var<uniform> randomarray: array<vec4<f32>,25>;\n"+
+        "@group(0) @binding(9) var<uniform> Position_dino : vec2<f32>;\@"+
+        "group(1) @binding(0) var texture1: texture_2d<f32>;\n"+
+        "@group(1) @binding(1) var texture2: texture_2d<f32>;\n"+
+        "@group(1) @binding(2) var texture3: texture_2d<f32>;\n"+
+        "@group(1) @binding(3) var texture4: texture_2d<f32>;\n"+
+        "@group(1) @binding(4) var sampler_: sampler;\n"+
+        "@group(2) @binding(0) var<storage,read_write> floatBuffer: array<f32,50>;\n"+
+        "@group(2) @binding(1) var<storage,read_write> intBuffer: array<i32,50>;\n"+
+        "@group(2) @binding(2) var<storage,read_write> matrixBuffer: array<mat4x4<f32>,50>;\n"
         fragment_code = description + code
         fragment_code = "static char const triangle_frag_wgsl[] = R\"(" + fragment_code + ")\"; // fragment shader end"
         fs.readFile(__dirname + '/../../main.cpp', function (err, data) {

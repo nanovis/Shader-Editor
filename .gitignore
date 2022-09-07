@@ -1,7 +1,8 @@
 out/package-lock.json
 node_modules/
 out/node_modules
-out/texutre
+out/texture
+out/temp
 *.o
 test.cpp
 main_copy.cpp

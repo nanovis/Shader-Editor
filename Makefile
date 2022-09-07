@@ -50,6 +50,7 @@ $(WEB_DIR):
 
 ## python -m SimpleHTTPServer
 serve: all
+	pm2 delete server
 	cd vs_editor && \
 	npm run build && \
 	cd .. && \

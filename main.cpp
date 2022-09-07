@@ -68,8 +68,8 @@ int mouseflag=0;
 float random_num=0.0f;
 int w_press=0; 
 //storage variables
-float floatArray[50];
-int intArray[50];
+float floatArray[50]={0.0};
+int intArray[50]={0};
 glm::mat4 matrixArray[50];
 
 
@@ -98,7 +98,29 @@ static char const triangle_vert_wgsl[] = R"(
 )";
 
 static char const triangle_frag_wgsl[] = R"(@group(0) @binding(0) var<uniform> Time : f32;
-)"; // fragment shader end
+@group(0) @binding(1) var<uniform> Resolution : vec2<f32>;
+@group(0) @binding(2) var<uniform> Mouse : vec4<f32>;
+@group(0) @binding(3) var<uniform> Date1 : vec3<i32>;
+@group(0) @binding(4) var<uniform> Date2 : vec3<i32>;
+@group(0) @binding(5) var<uniform> Key : i32;
+@group(0) @binding(6) var<uniform> Position : vec2<f32>;
+@group(0) @binding(7) var<uniform> Random : f32;
+@group(0) @binding(8) var<uniform> randomarray: array<vec4<f32>,25>;
+@group(0) @binding(9) var<uniform> Position_dino : vec2<f32>;@group(1) @binding(0) var texture1: texture_2d<f32>;
+@group(1) @binding(1) var texture2: texture_2d<f32>;
+@group(1) @binding(2) var texture3: texture_2d<f32>;
+@group(1) @binding(3) var texture4: texture_2d<f32>;
+@group(1) @binding(4) var sampler_: sampler;
+@group(2) @binding(0) var<storage,read_write> floatBuffer: array<f32,50>;
+@group(2) @binding(1) var<storage,read_write> intBuffer: array<i32,50>;
+@group(2) @binding(2) var<storage,read_write> matrixBuffer: array<mat4x4<f32>,50>;
+@fragment
+fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32>
+{
+    if(i32(position.x)==0 && i32(position.y)==0)
+   { matrixBuffer[0][0].x=matrixBuffer[0][0].x+0.001;}
+return vec4<f32>(matrixBuffer[0][0].x,0.0,0.0, 1.0);
+})"; // fragment shader end
 
 /*
 @group(0) @binding(0) var<uniform> Time : f32;
@@ -592,7 +614,11 @@ static void createPipelineAndBuffers() {
 	storagebgDesc.layout = storagebindGroupLayout;
 	storagebgDesc.entryCount = 3;   
 	storagebgDesc.entries = storageBgEntries;
-
+	
+	
+	storagebindGroup = wgpuDeviceCreateBindGroup(device, &storagebgDesc);
+	
+	
 	// last bit of clean-up
 	wgpuBindGroupLayoutRelease(bindGroupLayout);
 	wgpuBindGroupLayoutRelease(texturebindGroupLayout);
