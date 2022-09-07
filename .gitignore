@@ -3,7 +3,8 @@ node_modules/
 out/node_modules
 out/texutre
 *.o
-*.cpp
+test.cpp
+main_copy.cpp
 vs_editor/dist/
 out/assets/js/vs_editor/*
 out/new_template.data

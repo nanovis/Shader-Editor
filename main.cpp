@@ -36,8 +36,13 @@ WGPUBuffer positionBuf;
 WGPUBuffer positionDinoBuf;
 WGPUBuffer randomBuf;
 WGPUBuffer randomArrayBuf;
-WGPUBindGroup bindGroup;
+//storage buffer
+WGPUBuffer floatBuf;
+WGPUBuffer intBuf;
+WGPUBuffer matrixBuf;
+WGPUBindGroup bindGroup;     // bind group for uniform buffers
 WGPUBindGroup texturebindGroup;  //bindgroup for textures
+WGPUBindGroup storagebindGroup; // bindgroup for storage buffers
 
 
 unsigned char* img_1;
@@ -62,6 +67,11 @@ int keypress=100; //ascii
 int mouseflag=0;
 float random_num=0.0f;
 int w_press=0; 
+//storage variables
+float floatArray[50];
+int intArray[50];
+glm::mat4 matrixArray[50];
+
 
 /**
  * Current rotation angle (in degrees, updated per frame).
@@ -88,20 +98,6 @@ static char const triangle_vert_wgsl[] = R"(
 )";
 
 static char const triangle_frag_wgsl[] = R"(@group(0) @binding(0) var<uniform> Time : f32;
-@group(0) @binding(1) var<uniform> Resolution : vec2<f32>;
-@group(0) @binding(2) var<uniform> Mouse : vec4<f32>;
-@group(0) @binding(3) var<uniform> Date1 : vec3<i32>;
-@group(0) @binding(4) var<uniform> Date2 : vec3<i32>;
-@group(0) @binding(5) var<uniform> Key : i32;
-@group(0) @binding(6) var<uniform> Position : vec2<f32>;
-@group(0) @binding(7) var<storage> Random : f32;
-@group(0) @binding(8) var<uniform> randomarray: array<vec4<f32>,25>;
-@group(0) @binding(9) var<uniform> Position_dino : vec2<f32>;
-@group(1) @binding(0) var texture1: texture_2d<f32>;
-@group(1) @binding(1) var texture2: texture_2d<f32>;
-@group(1) @binding(2) var texture3: texture_2d<f32>;
-@group(1) @binding(3) var texture4: texture_2d<f32>;
-@group(1) @binding(4) var sampler_: sampler;
 )"; // fragment shader end
 
 /*
@@ -176,6 +172,8 @@ static WGPUTexture createTexture(unsigned char* data, unsigned int w, unsigned i
 
 
 
+
+
 /**
  * Draws using the above pipeline and buffers.
  */
@@ -187,8 +185,7 @@ static void createPipelineAndBuffers() {
 	WGPUBufferBindingLayout buf = {};
 	buf.type = WGPUBufferBindingType_Uniform;
 
-	WGPUBufferBindingLayout buf_storage = {};
-	buf_storage.type = WGPUBufferBindingType_Storage;
+	
 
 	// bind group layout (used by both the pipeline layout and uniform bind group, released at the end of this function)
 	WGPUBindGroupLayoutEntry timelEntry = {};
@@ -229,7 +226,7 @@ static void createPipelineAndBuffers() {
 	WGPUBindGroupLayoutEntry randomlEntry = {};
 	randomlEntry.binding = 7;
 	randomlEntry.visibility = WGPUShaderStage_Fragment;
-	randomlEntry.buffer = buf_storage;
+	randomlEntry.buffer = buf;
 
 	WGPUBindGroupLayoutEntry randomArraylEntry = {};
 	randomArraylEntry.binding = 8;
@@ -332,15 +329,46 @@ static void createPipelineAndBuffers() {
 	texturebglDesc.entryCount = 5;  
 	texturebglDesc.entries = textureBgLayoutEntries;
 	WGPUBindGroupLayout texturebindGroupLayout = wgpuDeviceCreateBindGroupLayout(device, &texturebglDesc);
+
+	WGPUBufferBindingLayout buf_storage = {};
+	buf_storage.type = WGPUBufferBindingType_Storage;
+// Storage buffer bind group
+
+	WGPUBindGroupLayoutEntry floatBufferlEntry = {};
+	floatBufferlEntry.binding = 0;
+	floatBufferlEntry.visibility = WGPUShaderStage_Fragment;
+	floatBufferlEntry.buffer = buf_storage;
+
+	WGPUBindGroupLayoutEntry intBufferlEntry = {};
+	intBufferlEntry.binding = 1;
+	intBufferlEntry.visibility = WGPUShaderStage_Fragment;
+	intBufferlEntry.buffer = buf_storage;
+
+	WGPUBindGroupLayoutEntry matrixBufferlEntry = {};
+	matrixBufferlEntry.binding = 2;
+	matrixBufferlEntry.visibility = WGPUShaderStage_Fragment;
+	matrixBufferlEntry.buffer = buf_storage;
+
+	WGPUBindGroupLayoutEntry* storageBgLayoutEntries = new WGPUBindGroupLayoutEntry[3];
+	storageBgLayoutEntries[0] = floatBufferlEntry;
+	storageBgLayoutEntries[1] = intBufferlEntry;
+	storageBgLayoutEntries[2] = matrixBufferlEntry;
+	WGPUBindGroupLayoutDescriptor storagebglDesc = {};
+	storagebglDesc.entryCount = 3;  
+	storagebglDesc.entries = storageBgLayoutEntries;
+	WGPUBindGroupLayout storagebindGroupLayout = wgpuDeviceCreateBindGroupLayout(device, &storagebglDesc);
+
+
 	
-	WGPUBindGroupLayout* bindGroupLayouts= new WGPUBindGroupLayout[2];
+	WGPUBindGroupLayout* bindGroupLayouts= new WGPUBindGroupLayout[3];
 	bindGroupLayouts[0]=bindGroupLayout;
 	bindGroupLayouts[1]=texturebindGroupLayout;
+	bindGroupLayouts[2]=storagebindGroupLayout;
 
 
 	// pipeline layout (used by the render pipeline, released after its creation)
 	WGPUPipelineLayoutDescriptor layoutDesc = {};
-	layoutDesc.bindGroupLayoutCount = 2;
+	layoutDesc.bindGroupLayoutCount = 3;
 	layoutDesc.bindGroupLayouts = bindGroupLayouts;
 	WGPUPipelineLayout pipelineLayout = wgpuDeviceCreatePipelineLayout(device, &layoutDesc);
 
@@ -431,9 +459,12 @@ static void createPipelineAndBuffers() {
 	date2Buf = createBuffer(&date2, sizeof(date2), WGPUBufferUsage_Uniform);
 	keypressBuf= createBuffer(&keypress,sizeof(keypress), WGPUBufferUsage_Uniform);
 	positionBuf= createBuffer(&position,sizeof(position), WGPUBufferUsage_Uniform);
-	randomBuf= createBuffer(&random_num,sizeof(random_num), WGPUBufferUsage_Storage);
+	randomBuf= createBuffer(&random_num,sizeof(random_num), WGPUBufferUsage_Uniform); 
 	randomArrayBuf= createBuffer(&randomArray,sizeof(randomArray), WGPUBufferUsage_Uniform);
 	positionDinoBuf = createBuffer(&position_dino,sizeof(position_dino), WGPUBufferUsage_Uniform);
+	floatBuf=createBuffer(&floatArray,sizeof(floatArray), WGPUBufferUsage_Storage);
+	intBuf=createBuffer(&intArray,sizeof(intArray), WGPUBufferUsage_Storage);
+	matrixBuf=createBuffer(&matrixArray,sizeof(matrixArray), WGPUBufferUsage_Storage);
 	WGPUBindGroupEntry timeEntry = {};
 	timeEntry.binding = 0;
 	timeEntry.buffer = timeBuf;
@@ -443,7 +474,6 @@ static void createPipelineAndBuffers() {
 	WGPUBindGroupEntry resolutionEntry = {};
 	resolutionEntry.binding = 1;
 	resolutionEntry.buffer = resolutionBuf;
-	//bgEntry.offset = 0;
 	resolutionEntry.size = sizeof(resolution);
 
 	WGPUBindGroupEntry mouseEntry = {};
@@ -537,9 +567,36 @@ static void createPipelineAndBuffers() {
 	texturebindGroup = wgpuDeviceCreateBindGroup(device, &texturebgDesc);
 
 
+	WGPUBindGroupEntry floatBufferEntry = {};
+	floatBufferEntry.binding = 0;
+	floatBufferEntry.buffer = floatBuf;
+	floatBufferEntry.offset = 0;
+	floatBufferEntry.size = sizeof(floatArray);
+	
+	WGPUBindGroupEntry intBufferEntry = {};
+	intBufferEntry.binding = 1;
+	intBufferEntry.buffer = intBuf;
+	intBufferEntry.size = sizeof(intArray);
+
+	WGPUBindGroupEntry matrixBufferEntry = {};
+	matrixBufferEntry.binding = 2;
+	matrixBufferEntry.buffer = matrixBuf;
+	matrixBufferEntry.size = sizeof(matrixArray);
+
+
+	WGPUBindGroupEntry* storageBgEntries = new WGPUBindGroupEntry[3];
+	storageBgEntries[0] = floatBufferEntry;
+	storageBgEntries[1] = intBufferEntry;
+	storageBgEntries[2] = matrixBufferEntry;
+	WGPUBindGroupDescriptor storagebgDesc = {};
+	storagebgDesc.layout = storagebindGroupLayout;
+	storagebgDesc.entryCount = 3;   
+	storagebgDesc.entries = storageBgEntries;
+
 	// last bit of clean-up
 	wgpuBindGroupLayoutRelease(bindGroupLayout);
 	wgpuBindGroupLayoutRelease(texturebindGroupLayout);
+	wgpuBindGroupLayoutRelease(storagebindGroupLayout);
 }
 EM_JS(void, jsprint, ( float x), {
   console.log(x);
@@ -686,6 +743,7 @@ static bool redraw() {
 	wgpuRenderPassEncoderSetPipeline(pass, pipeline);
 	wgpuRenderPassEncoderSetBindGroup(pass, 0, bindGroup, 0, 0);
 	wgpuRenderPassEncoderSetBindGroup(pass, 1, texturebindGroup, 0, 0);
+	wgpuRenderPassEncoderSetBindGroup(pass, 2, storagebindGroup, 0, 0);
 	wgpuRenderPassEncoderSetVertexBuffer(pass, 0, vertBuf, 0, WGPU_WHOLE_SIZE);
 	wgpuRenderPassEncoderSetIndexBuffer(pass, indxBuf, WGPUIndexFormat_Uint16, 0, WGPU_WHOLE_SIZE);
 	wgpuRenderPassEncoderDrawIndexed(pass, 6, 1, 0, 0, 0);
