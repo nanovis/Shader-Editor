@@ -375,7 +375,7 @@ static void createPipelineAndBuffers() {
 	matrixBufferlEntry.buffer = buf_storage;
 
 	WGPUBindGroupLayoutEntry vec4BufferlEntry = {};
-	vec4BufferlEntry.binding = 2;
+	vec4BufferlEntry.binding = 3;
 	vec4BufferlEntry.visibility = WGPUShaderStage_Fragment;
 	vec4BufferlEntry.buffer = buf_storage;
 
