@@ -46,7 +46,6 @@ WGPUBuffer vec4Buf;
 WGPUBindGroup bindGroup;     // bind group for uniform buffers
 WGPUBindGroup texturebindGroup;  //bindgroup for textures
 WGPUBindGroup storagebindGroup; // bindgroup for storage buffers
-WGPUBindGroup storagebindGroup2;
 
 unsigned char* img_1;
 unsigned char* img_2;
@@ -369,15 +368,15 @@ static void createPipelineAndBuffers() {
 	intBufferlEntry.visibility = WGPUShaderStage_Fragment;
 	intBufferlEntry.buffer = buf_storage;
 
-	WGPUBindGroupLayoutEntry matrixBufferlEntry = {};
-	matrixBufferlEntry.binding = 2;
-	matrixBufferlEntry.visibility = WGPUShaderStage_Fragment;
-	matrixBufferlEntry.buffer = buf_storage;
+	WGPUBindGroupLayoutEntry vec4BufferlEntry = {};
+	vec4BufferlEntry.binding = 2;
+	vec4BufferlEntry.visibility = WGPUShaderStage_Fragment;
+	vec4BufferlEntry.buffer = buf_storage;
 
 	WGPUBindGroupLayoutEntry* storageBgLayoutEntries = new WGPUBindGroupLayoutEntry[3];
 	storageBgLayoutEntries[0] = floatBufferlEntry;
 	storageBgLayoutEntries[1] = intBufferlEntry;
-	storageBgLayoutEntries[2] = matrixBufferlEntry;
+	storageBgLayoutEntries[2] = vec4BufferlEntry;
 	WGPUBindGroupLayoutDescriptor storagebglDesc = {};
 	storagebglDesc.entryCount = 3;  
 	storagebglDesc.entries = storageBgLayoutEntries;
@@ -387,13 +386,15 @@ static void createPipelineAndBuffers() {
 	buf_storage2.type = WGPUBufferBindingType_Storage;
 
 
-	WGPUBindGroupLayoutEntry vec4BufferlEntry = {};
-	vec4BufferlEntry.binding = 0;
-	vec4BufferlEntry.visibility = WGPUShaderStage_Fragment;
-	vec4BufferlEntry.buffer = buf_storage;
+	
+	WGPUBindGroupLayoutEntry matrixBufferlEntry = {};
+	matrixBufferlEntry.binding = 2;
+	matrixBufferlEntry.visibility = WGPUShaderStage_Fragment;
+	matrixBufferlEntry.buffer = buf_storage;
 
 	WGPUBindGroupLayoutEntry* storageBgLayoutEntries2 = new WGPUBindGroupLayoutEntry[1];
-	storageBgLayoutEntries2[0] = vec4BufferlEntry;
+	storageBgLayoutEntries2[0] = matrixBufferlEntry;
+
 	WGPUBindGroupLayoutDescriptor storagebglDesc2 = {};
 	storagebglDesc2.entryCount = 1;  
 	storagebglDesc2.entries = storageBgLayoutEntries2;
@@ -618,16 +619,17 @@ static void createPipelineAndBuffers() {
 	intBufferEntry.buffer = intBuf;
 	intBufferEntry.size = sizeof(intArray);
 
-	WGPUBindGroupEntry matrixBufferEntry = {};
-	matrixBufferEntry.binding = 2;
-	matrixBufferEntry.buffer = matrixBuf;
-	matrixBufferEntry.size = sizeof(matrixArray);
+	WGPUBindGroupEntry vec4BufferEntry = {};
+	vec4BufferEntry.binding = 2;
+	vec4BufferEntry.buffer = vec4Buf;
+	vec4BufferEntry.size = sizeof(vec4Buf);
 
 
 	WGPUBindGroupEntry* storageBgEntries = new WGPUBindGroupEntry[3];
 	storageBgEntries[0] = floatBufferEntry;
 	storageBgEntries[1] = intBufferEntry;
-	storageBgEntries[2] = matrixBufferEntry;
+	storageBgEntries[2] = vec4BufferEntry;
+
 	WGPUBindGroupDescriptor storagebgDesc = {};
 	storagebgDesc.layout = storagebindGroupLayout;
 	storagebgDesc.entryCount = 3;   
@@ -637,15 +639,15 @@ static void createPipelineAndBuffers() {
 	storagebindGroup = wgpuDeviceCreateBindGroup(device, &storagebgDesc);
 	
 
-
-	WGPUBindGroupEntry vec4BufferEntry = {};
-	vec4BufferEntry.binding = 0;
-	vec4BufferEntry.buffer = vec4Buf;
-	vec4BufferEntry.size = sizeof(vec4Buf);
+	WGPUBindGroupEntry matrixBufferEntry = {};
+	matrixBufferEntry.offset = 0;
+	matrixBufferEntry.binding = 0;
+	matrixBufferEntry.buffer = matrixBuf;
+	matrixBufferEntry.size = sizeof(matrixArray);
 
 
 	WGPUBindGroupEntry* storageBgEntries2 = new WGPUBindGroupEntry[1];
-	storageBgEntries2[0] = vec4BufferEntry;
+	storageBgEntries2[0] = matrixBufferEntry;
 
 	WGPUBindGroupDescriptor storagebgDesc2 = {};
 	storagebgDesc2.layout = storagebindGroupLayout2;
