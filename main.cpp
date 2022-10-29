@@ -40,6 +40,9 @@ WGPUBuffer randomArrayBuf;
 WGPUBuffer floatBuf;
 WGPUBuffer intBuf;
 WGPUBuffer matrixBuf;
+WGPUBuffer vec4Buf;
+
+
 WGPUBindGroup bindGroup;     // bind group for uniform buffers
 WGPUBindGroup texturebindGroup;  //bindgroup for textures
 WGPUBindGroup storagebindGroup; // bindgroup for storage buffers
@@ -71,7 +74,7 @@ int w_press=0;
 float floatArray[50]={0.0};
 int intArray[50]={0};
 glm::mat4 matrixArray[50];
-
+glm::vec4 vec4Array[50];
 
 /**
  * Current rotation angle (in degrees, updated per frame).
@@ -371,12 +374,18 @@ static void createPipelineAndBuffers() {
 	matrixBufferlEntry.visibility = WGPUShaderStage_Fragment;
 	matrixBufferlEntry.buffer = buf_storage;
 
-	WGPUBindGroupLayoutEntry* storageBgLayoutEntries = new WGPUBindGroupLayoutEntry[3];
+	WGPUBindGroupLayoutEntry vec4BufferlEntry = {};
+	vec4BufferlEntry.binding = 2;
+	vec4BufferlEntry.visibility = WGPUShaderStage_Fragment;
+	vec4BufferlEntry.buffer = buf_storage;
+
+	WGPUBindGroupLayoutEntry* storageBgLayoutEntries = new WGPUBindGroupLayoutEntry[4];
 	storageBgLayoutEntries[0] = floatBufferlEntry;
 	storageBgLayoutEntries[1] = intBufferlEntry;
 	storageBgLayoutEntries[2] = matrixBufferlEntry;
+	storageBgLayoutEntries[3] = vec4BufferlEntry;
 	WGPUBindGroupLayoutDescriptor storagebglDesc = {};
-	storagebglDesc.entryCount = 3;  
+	storagebglDesc.entryCount = 4;  
 	storagebglDesc.entries = storageBgLayoutEntries;
 	WGPUBindGroupLayout storagebindGroupLayout = wgpuDeviceCreateBindGroupLayout(device, &storagebglDesc);
 
@@ -487,6 +496,7 @@ static void createPipelineAndBuffers() {
 	floatBuf=createBuffer(&floatArray,sizeof(floatArray), WGPUBufferUsage_Storage);
 	intBuf=createBuffer(&intArray,sizeof(intArray), WGPUBufferUsage_Storage);
 	matrixBuf=createBuffer(&matrixArray,sizeof(matrixArray), WGPUBufferUsage_Storage);
+	vec4Buf=createBuffer(&vec4Array,sizeof(vec4Array), WGPUBufferUsage_Storage);
 	WGPUBindGroupEntry timeEntry = {};
 	timeEntry.binding = 0;
 	timeEntry.buffer = timeBuf;
@@ -605,14 +615,20 @@ static void createPipelineAndBuffers() {
 	matrixBufferEntry.buffer = matrixBuf;
 	matrixBufferEntry.size = sizeof(matrixArray);
 
+	WGPUBindGroupEntry vec4BufferEntry = {};
+	vec4BufferEntry.binding = 3;
+	vec4BufferEntry.buffer = vec4Buf;
+	vec4BufferEntry.size = sizeof(vec4Buf);
 
-	WGPUBindGroupEntry* storageBgEntries = new WGPUBindGroupEntry[3];
+
+	WGPUBindGroupEntry* storageBgEntries = new WGPUBindGroupEntry[4];
 	storageBgEntries[0] = floatBufferEntry;
 	storageBgEntries[1] = intBufferEntry;
 	storageBgEntries[2] = matrixBufferEntry;
+	storageBgEntries[3] = vec4BufferEntry;
 	WGPUBindGroupDescriptor storagebgDesc = {};
 	storagebgDesc.layout = storagebindGroupLayout;
-	storagebgDesc.entryCount = 3;   
+	storagebgDesc.entryCount = 4;   
 	storagebgDesc.entries = storageBgEntries;
 	
 	
