@@ -46,7 +46,7 @@ WGPUBuffer vec4Buf;
 WGPUBindGroup bindGroup;     // bind group for uniform buffers
 WGPUBindGroup texturebindGroup;  //bindgroup for textures
 WGPUBindGroup storagebindGroup; // bindgroup for storage buffers
-
+WGPUBindGroup storagebindGroup2;
 
 unsigned char* img_1;
 unsigned char* img_2;
@@ -374,32 +374,40 @@ static void createPipelineAndBuffers() {
 	matrixBufferlEntry.visibility = WGPUShaderStage_Fragment;
 	matrixBufferlEntry.buffer = buf_storage;
 
-	WGPUBindGroupLayoutEntry vec4BufferlEntry = {};
-	vec4BufferlEntry.binding = 3;
-	vec4BufferlEntry.visibility = WGPUShaderStage_Fragment;
-	vec4BufferlEntry.buffer = buf_storage;
-
-	WGPUBindGroupLayoutEntry* storageBgLayoutEntries = new WGPUBindGroupLayoutEntry[4];
+	WGPUBindGroupLayoutEntry* storageBgLayoutEntries = new WGPUBindGroupLayoutEntry[3];
 	storageBgLayoutEntries[0] = floatBufferlEntry;
 	storageBgLayoutEntries[1] = intBufferlEntry;
 	storageBgLayoutEntries[2] = matrixBufferlEntry;
-	storageBgLayoutEntries[3] = vec4BufferlEntry;
 	WGPUBindGroupLayoutDescriptor storagebglDesc = {};
-	storagebglDesc.entryCount = 4;  
+	storagebglDesc.entryCount = 3;  
 	storagebglDesc.entries = storageBgLayoutEntries;
 	WGPUBindGroupLayout storagebindGroupLayout = wgpuDeviceCreateBindGroupLayout(device, &storagebglDesc);
 
+	WGPUBufferBindingLayout buf_storage2 = {};
+	buf_storage2.type = WGPUBufferBindingType_Storage;
 
+
+	WGPUBindGroupLayoutEntry vec4BufferlEntry = {};
+	vec4BufferlEntry.binding = 0;
+	vec4BufferlEntry.visibility = WGPUShaderStage_Fragment;
+	vec4BufferlEntry.buffer = buf_storage;
+
+	WGPUBindGroupLayoutEntry* storageBgLayoutEntries2 = new WGPUBindGroupLayoutEntry[1];
+	storageBgLayoutEntries2[0] = vec4BufferlEntry;
+	WGPUBindGroupLayoutDescriptor storagebglDesc2 = {};
+	storagebglDesc2.entryCount = 1;  
+	storagebglDesc2.entries = storageBgLayoutEntries2;
+	WGPUBindGroupLayout storagebindGroupLayout2 = wgpuDeviceCreateBindGroupLayout(device, &storagebglDesc2);
 	
-	WGPUBindGroupLayout* bindGroupLayouts= new WGPUBindGroupLayout[3];
+	WGPUBindGroupLayout* bindGroupLayouts= new WGPUBindGroupLayout[4];
 	bindGroupLayouts[0]=bindGroupLayout;
 	bindGroupLayouts[1]=texturebindGroupLayout;
 	bindGroupLayouts[2]=storagebindGroupLayout;
-
+	bindGroupLayouts[3]=storagebindGroupLayout2;
 
 	// pipeline layout (used by the render pipeline, released after its creation)
 	WGPUPipelineLayoutDescriptor layoutDesc = {};
-	layoutDesc.bindGroupLayoutCount = 3;
+	layoutDesc.bindGroupLayoutCount = 4;
 	layoutDesc.bindGroupLayouts = bindGroupLayouts;
 	WGPUPipelineLayout pipelineLayout = wgpuDeviceCreatePipelineLayout(device, &layoutDesc);
 
@@ -615,30 +623,42 @@ static void createPipelineAndBuffers() {
 	matrixBufferEntry.buffer = matrixBuf;
 	matrixBufferEntry.size = sizeof(matrixArray);
 
-	WGPUBindGroupEntry vec4BufferEntry = {};
-	vec4BufferEntry.binding = 3;
-	vec4BufferEntry.buffer = vec4Buf;
-	vec4BufferEntry.size = sizeof(vec4Buf);
 
-
-	WGPUBindGroupEntry* storageBgEntries = new WGPUBindGroupEntry[4];
+	WGPUBindGroupEntry* storageBgEntries = new WGPUBindGroupEntry[3];
 	storageBgEntries[0] = floatBufferEntry;
 	storageBgEntries[1] = intBufferEntry;
 	storageBgEntries[2] = matrixBufferEntry;
-	storageBgEntries[3] = vec4BufferEntry;
 	WGPUBindGroupDescriptor storagebgDesc = {};
 	storagebgDesc.layout = storagebindGroupLayout;
-	storagebgDesc.entryCount = 4;   
+	storagebgDesc.entryCount = 3;   
 	storagebgDesc.entries = storageBgEntries;
 	
 	
 	storagebindGroup = wgpuDeviceCreateBindGroup(device, &storagebgDesc);
 	
+
+
+	WGPUBindGroupEntry vec4BufferEntry = {};
+	vec4BufferEntry.binding = 0;
+	vec4BufferEntry.buffer = vec4Buf;
+	vec4BufferEntry.size = sizeof(vec4Buf);
+
+
+	WGPUBindGroupEntry* storageBgEntries2 = new WGPUBindGroupEntry[1];
+	storageBgEntries2[0] = vec4BufferEntry;
+
+	WGPUBindGroupDescriptor storagebgDesc2 = {};
+	storagebgDesc2.layout = storagebindGroupLayout2;
+	storagebgDesc2.entryCount = 1;   
+	storagebgDesc2.entries = storageBgEntries2;
 	
+	
+	storagebindGroup2 = wgpuDeviceCreateBindGroup(device, &storagebgDesc2);
 	// last bit of clean-up
 	wgpuBindGroupLayoutRelease(bindGroupLayout);
 	wgpuBindGroupLayoutRelease(texturebindGroupLayout);
 	wgpuBindGroupLayoutRelease(storagebindGroupLayout);
+	wgpuBindGroupLayoutRelease(storagebindGroupLayout2);
 }
 EM_JS(void, jsprint, ( float x), {
   console.log(x);
@@ -786,6 +806,7 @@ static bool redraw() {
 	wgpuRenderPassEncoderSetBindGroup(pass, 0, bindGroup, 0, 0);
 	wgpuRenderPassEncoderSetBindGroup(pass, 1, texturebindGroup, 0, 0);
 	wgpuRenderPassEncoderSetBindGroup(pass, 2, storagebindGroup, 0, 0);
+	wgpuRenderPassEncoderSetBindGroup(pass, 3, storagebindGroup2, 0, 0);
 	wgpuRenderPassEncoderSetVertexBuffer(pass, 0, vertBuf, 0, WGPU_WHOLE_SIZE);
 	wgpuRenderPassEncoderSetIndexBuffer(pass, indxBuf, WGPUIndexFormat_Uint16, 0, WGPU_WHOLE_SIZE);
 	wgpuRenderPassEncoderDrawIndexed(pass, 6, 1, 0, 0, 0);
@@ -873,6 +894,8 @@ extern "C" int __main__(int /*argc*/, char* /*argv*/[]) {
 		#ifndef __EMSCRIPTEN__
 			wgpuBindGroupRelease(bindGroup);
 			wgpuBindGroupRelease(texturebindGroup);
+			wgpuBindGroupRelease(storagebindGroup);
+			wgpuBindGroupRelease(storagebindGroup2);
 			wgpuBufferRelease(resolutionBuf);
 			wgpuBufferRelease(timeBuf);
 			wgpuBufferRelease(dateBuf);
@@ -883,6 +906,10 @@ extern "C" int __main__(int /*argc*/, char* /*argv*/[]) {
 			wgpuBufferRelease(positionBuf);
 			wgpuBufferRelease(randomBuf);
 			wgpuBufferRelease(randomArrayBuf);
+			wgpuBufferRelease(floatBuf);
+			wgpuBufferRelease(intBuf);
+			wgpuBufferRelease(matrixBuf);
+			wgpuBufferRelease(vec4Buf);
 			wgpuRenderPipelineRelease(pipeline);
 			wgpuSwapChainRelease(swapchain);
 			wgpuQueueRelease(queue);
