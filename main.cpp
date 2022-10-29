@@ -46,7 +46,7 @@ WGPUBuffer vec4Buf;
 WGPUBindGroup bindGroup;     // bind group for uniform buffers
 WGPUBindGroup texturebindGroup;  //bindgroup for textures
 WGPUBindGroup storagebindGroup; // bindgroup for storage buffers
-
+WGPUBindGroup storagebindGroup2; // bindgroup for storage buffers
 unsigned char* img_1;
 unsigned char* img_2;
 unsigned char* img_3;
@@ -358,27 +358,27 @@ static void createPipelineAndBuffers() {
 	buf_storage.type = WGPUBufferBindingType_Storage;
 // Storage buffer bind group
 
+	WGPUBindGroupLayoutEntry vec4BufferlEntry = {};
+	vec4BufferlEntry.binding = 0;
+	vec4BufferlEntry.visibility = WGPUShaderStage_Fragment;
+	vec4BufferlEntry.buffer = buf_storage;
+
 	WGPUBindGroupLayoutEntry floatBufferlEntry = {};
-	floatBufferlEntry.binding = 0;
+	floatBufferlEntry.binding = 1;
 	floatBufferlEntry.visibility = WGPUShaderStage_Fragment;
 	floatBufferlEntry.buffer = buf_storage;
 
 	WGPUBindGroupLayoutEntry intBufferlEntry = {};
-	intBufferlEntry.binding = 1;
+	intBufferlEntry.binding = 2;
 	intBufferlEntry.visibility = WGPUShaderStage_Fragment;
 	intBufferlEntry.buffer = buf_storage;
 
-	WGPUBindGroupLayoutEntry vec4BufferlEntry = {};
-	vec4BufferlEntry.binding = 2;
-	vec4BufferlEntry.visibility = WGPUShaderStage_Fragment;
-	vec4BufferlEntry.buffer = buf_storage;
-
 	WGPUBindGroupLayoutEntry* storageBgLayoutEntries = new WGPUBindGroupLayoutEntry[3];
-	storageBgLayoutEntries[0] = floatBufferlEntry;
-	storageBgLayoutEntries[1] = intBufferlEntry;
-	storageBgLayoutEntries[2] = vec4BufferlEntry;
+	storageBgLayoutEntries[0] = vec4BufferlEntry;
+	storageBgLayoutEntries[1] = floatBufferlEntry;
+	storageBgLayoutEntries[2] = intBufferlEntry;
 	WGPUBindGroupLayoutDescriptor storagebglDesc = {};
-	storagebglDesc.entryCount = 3;  
+	storagebglDesc.entryCount = 3; 
 	storagebglDesc.entries = storageBgLayoutEntries;
 	WGPUBindGroupLayout storagebindGroupLayout = wgpuDeviceCreateBindGroupLayout(device, &storagebglDesc);
 
@@ -388,7 +388,7 @@ static void createPipelineAndBuffers() {
 
 	
 	WGPUBindGroupLayoutEntry matrixBufferlEntry = {};
-	matrixBufferlEntry.binding = 2;
+	matrixBufferlEntry.binding = 0;
 	matrixBufferlEntry.visibility = WGPUShaderStage_Fragment;
 	matrixBufferlEntry.buffer = buf_storage;
 
@@ -607,28 +607,30 @@ static void createPipelineAndBuffers() {
 
 	texturebindGroup = wgpuDeviceCreateBindGroup(device, &texturebgDesc);
 
-
-	WGPUBindGroupEntry floatBufferEntry = {};
-	floatBufferEntry.binding = 0;
-	floatBufferEntry.buffer = floatBuf;
-	floatBufferEntry.offset = 0;
-	floatBufferEntry.size = sizeof(floatArray);
-	
-	WGPUBindGroupEntry intBufferEntry = {};
-	intBufferEntry.binding = 1;
-	intBufferEntry.buffer = intBuf;
-	intBufferEntry.size = sizeof(intArray);
-
 	WGPUBindGroupEntry vec4BufferEntry = {};
-	vec4BufferEntry.binding = 2;
+	vec4BufferEntry.binding = 0;
+	vec4BufferEntry.offset = 0;
 	vec4BufferEntry.buffer = vec4Buf;
 	vec4BufferEntry.size = sizeof(vec4Buf);
 
+	WGPUBindGroupEntry floatBufferEntry = {};
+	floatBufferEntry.binding = 1;
+	floatBufferEntry.buffer = floatBuf;
+	floatBufferEntry.size = sizeof(floatArray);
+	
+	WGPUBindGroupEntry intBufferEntry = {};
+	intBufferEntry.binding = 2;
+	intBufferEntry.buffer = intBuf;
+	intBufferEntry.size = sizeof(intArray);
+
+	
+
 
 	WGPUBindGroupEntry* storageBgEntries = new WGPUBindGroupEntry[3];
-	storageBgEntries[0] = floatBufferEntry;
-	storageBgEntries[1] = intBufferEntry;
-	storageBgEntries[2] = vec4BufferEntry;
+	storageBgEntries[0] = vec4BufferEntry;
+	storageBgEntries[1] = floatBufferEntry;
+	storageBgEntries[2] = intBufferEntry;
+	
 
 	WGPUBindGroupDescriptor storagebgDesc = {};
 	storagebgDesc.layout = storagebindGroupLayout;

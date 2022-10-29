@@ -91,9 +91,9 @@ exports.compile = function (req, res) {
         "@group(1) @binding(2) var texture3: texture_2d<f32>;\n"+
         "@group(1) @binding(3) var texture4: texture_2d<f32>;\n"+
         "@group(1) @binding(4) var sampler_: sampler;\n"+
-        "@group(2) @binding(0) var<storage,read_write> floatBuffer: array<f32,50>;\n"+
-        "@group(2) @binding(1) var<storage,read_write> intBuffer: array<i32,50>;\n"+
-        "@group(2) @binding(2) var<storage,read_write> vec4Buffer: array<vec4<f32>,50>;\n"+
+        "@group(2) @binding(0) var<storage,read_write> vec4Buffer: array<vec4<f32>,50>;\n"+
+        "@group(2) @binding(1) var<storage,read_write> floatBuffer: array<f32,50>;\n"+
+        "@group(2) @binding(2) var<storage,read_write> intBuffer: array<i32,50>;\n"+
         "@group(3) @binding(0) var<storage,read_write> matrixBuffer: array<mat4x4<f32>,50>;\n"
   fragment_code = description + req.body.code
   fragment_code = "static char const triangle_frag_wgsl[] = R\"(" + fragment_code + ")\"; // fragment shader end"
@@ -284,9 +284,9 @@ exports.view_user = function (req, res) {
         "@group(1) @binding(2) var texture3: texture_2d<f32>;\n"+
         "@group(1) @binding(3) var texture4: texture_2d<f32>;\n"+
         "@group(1) @binding(4) var sampler_: sampler;\n"+
-        "@group(2) @binding(0) var<storage,read_write> floatBuffer: array<f32,50>;\n"+
-        "@group(2) @binding(1) var<storage,read_write> intBuffer: array<i32,50>;\n"+
-        "@group(2) @binding(2) var<storage,read_write> vec4Buffer: array<vec4<f32>,50>;\n"+
+        "@group(2) @binding(0) var<storage,read_write> vec4Buffer: array<vec4<f32>,50>;\n"+
+        "@group(2) @binding(1) var<storage,read_write> floatBuffer: array<f32,50>;\n"+
+        "@group(2) @binding(2) var<storage,read_write> intBuffer: array<i32,50>;\n"+
         "@group(3) @binding(0) var<storage,read_write> matrixBuffer: array<mat4x4<f32>,50>;\n"
         
         fragment_code = description + code
