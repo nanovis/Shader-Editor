@@ -16,6 +16,7 @@
 #include<ctime>
 #include<math.h>
 #include<vector>
+#include <chrono>
 
 WGPUDevice device;
 WGPUQueue queue;
@@ -113,16 +114,11 @@ static char const triangle_frag_wgsl[] = R"(@group(0) @binding(0) var<uniform> T
 @group(1) @binding(2) var texture3: texture_2d<f32>;
 @group(1) @binding(3) var texture4: texture_2d<f32>;
 @group(1) @binding(4) var sampler_: sampler;
-@group(2) @binding(0) var<storage,read_write> floatBuffer: array<f32,50>;
-@group(2) @binding(1) var<storage,read_write> intBuffer: array<i32,50>;
-@group(2) @binding(2) var<storage,read_write> matrixBuffer: array<mat4x4<f32>,50>;
-@fragment
-fn main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32>
-{
-    if(i32(position.x)==0 && i32(position.y)==0)
-   { matrixBuffer[0][0].x=matrixBuffer[0][0].x+0.001;}
-return vec4<f32>(matrixBuffer[0][0].x,0.0,0.0, 1.0);
-})"; // fragment shader end
+@group(2) @binding(0) var<storage,read_write> vec4Buffer: array<vec4<f32>,50>;
+@group(2) @binding(1) var<storage,read_write> floatBuffer: array<f32,50>;
+@group(2) @binding(2) var<storage,read_write> intBuffer: array<i32,50>;
+@group(3) @binding(0) var<storage,read_write> matrixBuffer: array<mat4x4<f32>,50>;
+)"; // fragment shader end
 
 /*
 @group(0) @binding(0) var<uniform> Time : f32;
@@ -611,7 +607,7 @@ static void createPipelineAndBuffers() {
 	vec4BufferEntry.binding = 0;
 	vec4BufferEntry.offset = 0;
 	vec4BufferEntry.buffer = vec4Buf;
-	vec4BufferEntry.size = sizeof(vec4Buf);
+	vec4BufferEntry.size = sizeof(vec4Array);
 
 	WGPUBindGroupEntry floatBufferEntry = {};
 	floatBufferEntry.binding = 1;
@@ -667,6 +663,10 @@ static void createPipelineAndBuffers() {
 EM_JS(void, jsprint, ( float x), {
   console.log(x);
 });
+EM_JS(void, changeFPS, ( float x), {
+    var FPS = document.getElementById("showFPS");  
+    FPS.innerHTML= "FPS: "+x;
+});
 EM_JS(void, say, (const char* str), {
   console.log( UTF8ToString(str));
 });
@@ -721,6 +721,7 @@ EM_BOOL key_callback(int eventType, const EmscriptenKeyboardEvent *e, void *user
   return 0;
 }
 static bool redraw() {
+	auto lastTime = std::chrono::steady_clock::now();
 	random_num=emscripten_random();
 	EMSCRIPTEN_RESULT ret;
 	if (mouseflag%10==0)
@@ -827,6 +828,9 @@ static bool redraw() {
 #endif
 	wgpuTextureViewRelease(backBufView);													// release textureView
 
+	auto end = std::chrono::steady_clock::now();
+	std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>( end- lastTime);
+	changeFPS((float)(1 / time_span.count()) );
 	return true;
 }
 void load_images(SDL_Surface *image, int imgw,int imgh,unsigned char*& img )

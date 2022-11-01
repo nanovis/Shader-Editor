@@ -151,3 +151,11 @@ body { margin: 0; background-color: #f3f6fa }
   left: 3%;
   width: 80%;
 }
+.FPS
+{
+  position: absolute;
+  top: 60%;
+  left: 3%;
+  width: 20%;  
+  height: 5%;
+}

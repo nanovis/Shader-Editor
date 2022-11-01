@@ -45,7 +45,11 @@
   </nav>
   <div class="container">
     <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
-
+    <div class="FPS">
+      <p id="showFPS">
+        FPS: 60
+      </p>
+    </div>
     <div class="textbox">
       <div class="description" onclick="toggle('display_desc')">
         <span class="glyphicon glyphicon-menu-down" aria-hidden="true">Input</span>

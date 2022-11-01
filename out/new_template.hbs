@@ -44,6 +44,11 @@
   </nav>
   <div class="container">
     <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+    <div class="FPS">
+      <p id="showFPS">
+        FPS: 60
+      </p>
+    </div>
     <div class="save_part" id="save_part">
       <div class="form-group">
         <label for="save_name">Name of the shader</label>
@@ -124,6 +129,7 @@
   </div>
 
   <script>
+    
     var global_popover_code = "{{texture_code}}"
     var whether_decode = true
     var jsname = "new_template.js"
