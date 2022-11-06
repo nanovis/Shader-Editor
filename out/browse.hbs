@@ -46,6 +46,9 @@
 <div id="shaders_list">
 </div>
 <script type="text/javascript">
+//<div class="col-sm-6 col-md-3">
+//      <iframe src="/view?name=${e.name}&user=${e.user}&canvas=1" height="270" width="100%" style="border:none;"  autoplay="0"></iframe>
+//     </div>
 const _el = document.getElementById('shaders_list');
 const _d = {{{data}}};
 window.onload = () => {
@@ -53,7 +56,9 @@ _d.map((el) => {
   const obj = el.map((e) => {
     return `
      <div class="col-sm-6 col-md-3">
-      <iframe src="/view?name=${e.name}&user=${e.user}&canvas=1" height="270" width="100%" style="border:none;"  autoplay="0"></iframe>
+     <a href="/view?name=${e.name}&user=${e.user}">
+     <img src="./view/${e.name}_${e.user}.png" alt="${e.name}" height="270" width="100%">
+     </a>
      </div>
      `
   });

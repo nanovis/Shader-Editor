@@ -47,7 +47,7 @@
     <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
     <div class="FPS">
       <p id="showFPS">
-        FPS: 60
+        FPS: NULL
       </p>
     </div>
     <div class="textbox">
@@ -112,7 +112,7 @@
   <script>
     var global_popover_code = "{{texture_code}}"
     var whether_decode = true
-    var jsname = "{{jsname}}"
+    var jsname = "new.js"
     var username = "{{{username}}}"
     function click_texture(texture, image, image_name) {
       document.getElementById(texture).value = image_name;

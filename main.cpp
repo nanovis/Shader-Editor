@@ -85,6 +85,8 @@ int pressflag=0;
 float runtime = 0.0f;
 glm::vec2 resolution=glm::vec2(800.0f,600.0f);
 
+int frame_count=0;
+double total_time=0.0;
 static char const triangle_vert_wgsl[] = R"(
 	struct VertexIn {
 		@location(0) aPos : vec2<f32>,
@@ -663,7 +665,7 @@ static void createPipelineAndBuffers() {
 EM_JS(void, jsprint, ( float x), {
   console.log(x);
 });
-EM_JS(void, changeFPS, ( float x), {
+EM_JS(void, changeFPS, ( int x), {
     var FPS = document.getElementById("showFPS");  
     FPS.innerHTML= "FPS: "+x;
 });
@@ -830,7 +832,9 @@ static bool redraw() {
 
 	auto end = std::chrono::steady_clock::now();
 	std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>( end- lastTime);
-	changeFPS((float)(1 / time_span.count()) );
+	total_time+=time_span.count();
+	frame_count+=1;
+	changeFPS((int)(double(frame_count)/ time_span.count()) );
 	return true;
 }
 void load_images(SDL_Surface *image, int imgw,int imgh,unsigned char*& img )
