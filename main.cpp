@@ -834,7 +834,13 @@ static bool redraw() {
 	std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>( end- lastTime);
 	total_time+=time_span.count();
 	frame_count+=1;
-	changeFPS((int)(double(frame_count)/ time_span.count()) );
+	if(frame_count==60)
+	{
+		changeFPS((int)(double(frame_count)/ time_span.count()) );
+		frame_count=0;
+		total_time=0.0;
+	}
+	
 	return true;
 }
 void load_images(SDL_Surface *image, int imgw,int imgh,unsigned char*& img )
