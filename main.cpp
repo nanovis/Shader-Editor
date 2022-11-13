@@ -186,7 +186,7 @@ static WGPUTexture createTexture(unsigned char* data, unsigned int w, unsigned i
 
 
 	texDataLayout.offset = 0;
-	texDataLayout.bytesPerRow = 4 * w;
+	texDataLayout.bytesPerRow = sizeof(float) * w;
 	texDataLayout.rowsPerImage = h;
 	texCopy.texture = wgpuDeviceCreateTexture(device, &texDesc);
 	return texCopy.texture;
@@ -287,15 +287,16 @@ static void createPipelineAndBuffers() {
 	texViewDesc.format = WGPUTextureFormat_RGBA8Unorm;
 	texViewDesc.mipLevelCount=1;
 	texViewDesc.arrayLayerCount=1;
+	texViewDesc.aspect=WGPUTextureAspect_All;
 	texView1 = wgpuTextureCreateView(tex1, &texViewDesc);
 	texView2 = wgpuTextureCreateView(tex2, &texViewDesc);
 	texView3 = wgpuTextureCreateView(tex3, &texViewDesc);
 	texView4 = wgpuTextureCreateView(tex4, &texViewDesc);
 
 	WGPUSamplerDescriptor samplerDesc = {};
-	samplerDesc.addressModeU = WGPUAddressMode_ClampToEdge;
-	samplerDesc.addressModeV = WGPUAddressMode_ClampToEdge;
-	samplerDesc.addressModeW = WGPUAddressMode_ClampToEdge;
+	samplerDesc.addressModeU = WGPUAddressMode_Repeat;
+	samplerDesc.addressModeV = WGPUAddressMode_Repeat;
+	samplerDesc.addressModeW = WGPUAddressMode_Repeat;
 	samplerDesc.magFilter = WGPUFilterMode_Linear;
 	samplerDesc.minFilter = WGPUFilterMode_Nearest;
 	samplerDesc.mipmapFilter = WGPUFilterMode_Nearest;
@@ -852,7 +853,7 @@ void load_images(SDL_Surface *image, int imgw,int imgh,unsigned char*& img )
 			for (int j=0;j<imgw;j++)
 			{
 				SDL_GetRGB(pixel[i*imgw+j],image->format,&r,&g,&b);
-				int idx = (i*imgh+j) * 4;
+				int idx = (i*imgw+j) * 4;
 				img[idx] = int(r);
 				img[idx + 1] = int(g);
 				img[idx + 2] = int(b);
@@ -901,6 +902,7 @@ extern "C" int __main__(int /*argc*/, char* /*argv*/[]) {
 		int index=i%4;
 		randomArray[t][index]=emscripten_random();
 	}
+	
 	if (window::Handle wHnd = window::create()) {
 		if ((device = webgpu::create(wHnd))) {
 			queue = wgpuDeviceGetQueue(device);
@@ -909,6 +911,7 @@ extern "C" int __main__(int /*argc*/, char* /*argv*/[]) {
 			window::show(wHnd);
 			startTime = clock();
 			window::loop(wHnd, redraw);
+			
 		#ifndef __EMSCRIPTEN__
 			wgpuBindGroupRelease(bindGroup);
 			wgpuBindGroupRelease(texturebindGroup);
