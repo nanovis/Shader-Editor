@@ -32,8 +32,17 @@ exports.index = function (req, res) {
       throw err
     };
     const dbo = db.db('shadereditor');
-    const _data = await dbo.collection('shader').find({$or:[{ "status": "public" }, { "status": "Public" }]}).toArray();
-    const _chunked = chunkArray(_data, Math.ceil(_data.length / 4));
+    var _data = await dbo.collection('shader').find({$or:[{ "status": "public" }, { "status": "Public" }]}).toArray();
+    var _newdata=[];
+    for( var i=0;i<_data.length;i++)
+    {
+        const path=__dirname+"/../view/"+_data[i]["name"]+"_"+_data[i]["user"]+".png";
+        if(fs.existsSync(path))
+        {
+          _newdata[_newdata.length]=_data[i];
+        }
+    }
+    const _chunked = chunkArray(_newdata, Math.ceil(_newdata.length / 4));
     res.render(__dirname + "/../browse.hbs", { username: req.session.username, data: JSON.stringify(_chunked) })
   })
 };
