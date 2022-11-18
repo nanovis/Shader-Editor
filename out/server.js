@@ -46,6 +46,7 @@ app.get('/view_user', router.view_user)
 app.post('/changepassword', users.changepassword)
 app.post('/deleteuser', users.deleteuser)
 app.post('/save_shader', router.saveshader)
+app.post('/download_shader', router.downloadshader)
 app.use(function (request, response) {
   response.writeHead(404, { "Content-Type": "text/plain" });
   response.end("404 error!\n");

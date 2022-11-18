@@ -145,12 +145,27 @@ function save(){
         contentType: false,
         processData: false,
         success: function(res){
-
             alert(res)
         }
       })
 
     }
+} 
+function downloadShaders(username){
+  var formDate = new FormData()
+    $.ajax({
+      url: '/download_shader',
+      data: formDate,
+      type: 'post',
+      contentType: false,
+      processData: false,
+      success: function(res){
+        alert(res);
+        window.open("./shaders/"+username+".zip");
+      }
+    })
+
+
 } 
 
 

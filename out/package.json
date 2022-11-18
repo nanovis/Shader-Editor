@@ -24,6 +24,7 @@
   "homepage": "https://github.com/nanovis/Shader-Editor#readme",
   "dependencies": {
     "@tensorflow/tfjs-node": "^3.18.0",
+    "archiver": "^5.3.1",
     "express": "^4.18.1",
     "express-session": "^1.17.3",
     "express-validator": "^6.14.2",

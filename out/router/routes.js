@@ -1,5 +1,6 @@
 var cmd = require('node-cmd')
 var fs = require('fs');
+const archiver = require('archiver');
 const sizeOf = require('image-size')
 const { dirname } = require('path');
 const req = require('express/lib/request');
@@ -244,6 +245,36 @@ exports.saveshader = function (req, res) {
         });
       }
     });
+  })
+};
+exports.downloadshader = function (req, res) {
+  MongoClient.connect(url, function (err, db) {
+    if (err) throw err;
+    var dbo = db.db("shadereditor");
+    if (req.session.username == undefined) {
+      res.send("You should first log in.")
+    }
+    var query = { "user": req.session.username};
+   
+    dbo.collection("shader").find(query).toArray(function (err, result) {
+      if (err) throw err;
+      var dirpath=__dirname+"/../shaders/"+req.session.username;
+      if (!fs.existsSync(dirpath)) {
+        fs.mkdirSync(dirpath);
+      }
+      for(var i=0;i<result.length;i++)
+      {
+        var path=__dirname+"/../shaders/"+req.session.username+"/"+result[i]["name"]+".wgsl";
+        fs.writeFileSync(path,result[i]["code"]);
+      }
+      const output = fs.createWriteStream(__dirname + "/../shaders/"+req.session.username+".zip");
+      const archive = archiver('zip', {zlib: {level: 9}});
+      archive.pipe(output);
+      archive.directory(dirpath, false);
+      archive.finalize();
+      res.send("Please wait for a while before downloading starts");
+    });
+   
   })
 };
 exports.view_user = function (req, res) {

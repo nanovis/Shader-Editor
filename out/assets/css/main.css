@@ -33,6 +33,13 @@ body { margin: 0; background-color: #f3f6fa }
     left: 0%;
     width: 45%;
 }
+.download-shaders
+{
+    position: absolute;
+    top: 10%;
+    left: 45%;
+    width: 10%;
+}
 .show-textures
 {
     position: absolute;
