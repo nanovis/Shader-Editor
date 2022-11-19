@@ -262,6 +262,15 @@ exports.downloadshader = function (req, res) {
       if (!fs.existsSync(dirpath)) {
         fs.mkdirSync(dirpath);
       }
+      const files = fs.readdirSync(dirpath);
+      files.forEach(file => {
+        const filePath = `${dirpath}/${file}`;
+        const stats = fs.statSync(filePath);
+        if (!stats.isDirectory()) {
+            fs.unlinkSync(filePath);
+        }
+      });
+
       for(var i=0;i<result.length;i++)
       {
         var path=__dirname+"/../shaders/"+req.session.username+"/"+result[i]["name"]+".wgsl";
