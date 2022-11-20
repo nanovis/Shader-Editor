@@ -161,7 +161,8 @@ function downloadShaders(username){
       processData: false,
       success: function(res){
         alert(res);
-        window.open("./shaders/"+username+".zip");
+        if(res!="You should first log in.")
+        {window.open("./shaders/"+username+".zip");}
       }
     })
 
