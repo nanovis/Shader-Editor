@@ -42,7 +42,7 @@ WGPUBuffer floatBuf;
 WGPUBuffer intBuf;
 WGPUBuffer matrixBuf;
 WGPUBuffer vec4Buf;
-
+WGPUBuffer FrameBuf;
 
 WGPUBindGroup bindGroup;     // bind group for uniform buffers
 WGPUBindGroup texturebindGroup;  //bindgroup for textures
@@ -75,7 +75,7 @@ float floatArray[50]={0.0};
 int intArray[50]={0};
 glm::mat4 matrixArray[50];
 glm::vec4 vec4Array[50];
-
+float FrameBufferArray[800*600]={0.0};
 /**
  * Current rotation angle (in degrees, updated per frame).
  */
@@ -119,6 +119,7 @@ static char const triangle_frag_wgsl[] = R"(@group(0) @binding(0) var<uniform> T
 @group(2) @binding(0) var<storage,read_write> vec4Buffer: array<vec4<f32>,50>;
 @group(2) @binding(1) var<storage,read_write> floatBuffer: array<f32,50>;
 @group(2) @binding(2) var<storage,read_write> intBuffer: array<i32,50>;
+@group(2) @binding(3) var<storage,read_write> frameBuffer: array<f32,480000>;
 @group(3) @binding(0) var<storage,read_write> matrixBuffer: array<mat4x4<f32>,50>;
 )"; // fragment shader end
 
@@ -372,12 +373,18 @@ static void createPipelineAndBuffers() {
 	intBufferlEntry.visibility = WGPUShaderStage_Fragment;
 	intBufferlEntry.buffer = buf_storage;
 
-	WGPUBindGroupLayoutEntry* storageBgLayoutEntries = new WGPUBindGroupLayoutEntry[3];
+	WGPUBindGroupLayoutEntry FrameBufferlEntry = {};
+	FrameBufferlEntry.binding = 3;
+	FrameBufferlEntry.visibility = WGPUShaderStage_Fragment;
+	FrameBufferlEntry.buffer = buf_storage;
+
+	WGPUBindGroupLayoutEntry* storageBgLayoutEntries = new WGPUBindGroupLayoutEntry[4];
 	storageBgLayoutEntries[0] = vec4BufferlEntry;
 	storageBgLayoutEntries[1] = floatBufferlEntry;
 	storageBgLayoutEntries[2] = intBufferlEntry;
+	storageBgLayoutEntries[3] = FrameBufferlEntry;
 	WGPUBindGroupLayoutDescriptor storagebglDesc = {};
-	storagebglDesc.entryCount = 3; 
+	storagebglDesc.entryCount =4; 
 	storagebglDesc.entries = storageBgLayoutEntries;
 	WGPUBindGroupLayout storagebindGroupLayout = wgpuDeviceCreateBindGroupLayout(device, &storagebglDesc);
 
@@ -505,6 +512,7 @@ static void createPipelineAndBuffers() {
 	intBuf=createBuffer(&intArray,sizeof(intArray), WGPUBufferUsage_Storage);
 	matrixBuf=createBuffer(&matrixArray,sizeof(matrixArray), WGPUBufferUsage_Storage);
 	vec4Buf=createBuffer(&vec4Array,sizeof(vec4Array), WGPUBufferUsage_Storage);
+	FrameBuf=createBuffer(&FrameBufferArray,sizeof(FrameBufferArray),WGPUBufferUsage_Storage);
 	WGPUBindGroupEntry timeEntry = {};
 	timeEntry.binding = 0;
 	timeEntry.buffer = timeBuf;
@@ -622,18 +630,24 @@ static void createPipelineAndBuffers() {
 	intBufferEntry.buffer = intBuf;
 	intBufferEntry.size = sizeof(intArray);
 
+	WGPUBindGroupEntry FrameBufferEntry = {};
+	FrameBufferEntry.binding = 3;
+	FrameBufferEntry.buffer = FrameBuf;
+	FrameBufferEntry.size = sizeof(FrameBufferArray);
+
 	
 
 
-	WGPUBindGroupEntry* storageBgEntries = new WGPUBindGroupEntry[3];
+	WGPUBindGroupEntry* storageBgEntries = new WGPUBindGroupEntry[4];
 	storageBgEntries[0] = vec4BufferEntry;
 	storageBgEntries[1] = floatBufferEntry;
 	storageBgEntries[2] = intBufferEntry;
+	storageBgEntries[3] = FrameBufferEntry;
 	
 
 	WGPUBindGroupDescriptor storagebgDesc = {};
 	storagebgDesc.layout = storagebindGroupLayout;
-	storagebgDesc.entryCount = 3;   
+	storagebgDesc.entryCount = 4;   
 	storagebgDesc.entries = storageBgEntries;
 	
 	
