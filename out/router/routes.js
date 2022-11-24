@@ -8,6 +8,7 @@ var MongoClient = require('mongodb').MongoClient;
 var url = 'mongodb://localhost:27017/';
 const tf = require('@tensorflow/tfjs-node')
 const nsfw = require('nsfwjs');
+const session = require('express-session');
 
 
 exports.header = function (req, res, next) {
@@ -290,13 +291,29 @@ exports.view_user = function (req, res) {
   MongoClient.connect(url, function (err, db) {
     if (err) throw err;
     var dbo = db.db("shadereditor");
-    dbo.collection("shader").find({ user: req.query.user, name: req.query.name }).toArray(function (err, result) {
+    if (req.session.username==undefined) 
+    {
+      var query={$or:[{ "status": "public", "user": req.query.user, "name": req.query.name}, { "status": "Public","user": req.query.user, "name": req.query.name }]};
+    }
+    else
+    {
+      if(req.session.username==req.query.user)
+      {
+        var query = { "user": req.query.user, "name": req.query.name };
+      }
+      else
+      {
+        var query={$or:[{ "status": "public", "user": req.query.user, "name": req.query.name}, { "status": "Public","user": req.query.user, "name": req.query.name }]};
+      }
+    }
+    dbo.collection("shader").find(query).toArray(function (err, result) {
       if (err) throw err;
       db.close();
-      if (result.length == 0) {
+      if (result.length == 0 ) {
         res.send("Nothing find")
       }
       else {
+        
         code = result[0].code
         texture1 = result[0].texture1
         texture2 = result[0].texture2
