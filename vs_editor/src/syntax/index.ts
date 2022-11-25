@@ -152,7 +152,7 @@ export async function SyntaxCheck() {
     "@group(2) @binding(0) var<storage> vec4Buffer: array<vec4<f32>,50>;\n"+
     "@group(2) @binding(1) var<storage> floatBuffer: array<f32,50>;\n"+
     "@group(2) @binding(2) var<storage> intBuffer: array<i32,50>;\n"+
-    "@group(2) @binding(3) var<storage,read_write> frameBuffer: array<f32,480000>;\n"+
+    "@group(2) @binding(3) var<storage,read_write> frameBuffer: array<vec4<f32>,480000>;\n"+
     "@group(3) @binding(0) var<storage> matrixBuffer: array<mat4x4<f32>,50>;\n"+window.editor.getValue(),
   });
 

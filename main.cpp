@@ -75,7 +75,7 @@ float floatArray[50]={0.0};
 int intArray[50]={0};
 glm::mat4 matrixArray[50];
 glm::vec4 vec4Array[50];
-float FrameBufferArray[800*600]={0.0};
+glm::vec4 FrameBufferArray[800*600];
 /**
  * Current rotation angle (in degrees, updated per frame).
  */
@@ -119,7 +119,7 @@ static char const triangle_frag_wgsl[] = R"(@group(0) @binding(0) var<uniform> T
 @group(2) @binding(0) var<storage,read_write> vec4Buffer: array<vec4<f32>,50>;
 @group(2) @binding(1) var<storage,read_write> floatBuffer: array<f32,50>;
 @group(2) @binding(2) var<storage,read_write> intBuffer: array<i32,50>;
-@group(2) @binding(3) var<storage,read_write> frameBuffer: array<f32,480000>;
+@group(2) @binding(3) var<storage,read_write> frameBuffer: array<vec4<f32>,480000>;
 @group(3) @binding(0) var<storage,read_write> matrixBuffer: array<mat4x4<f32>,50>;
 )"; // fragment shader end
 
