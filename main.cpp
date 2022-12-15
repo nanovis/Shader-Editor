@@ -86,7 +86,7 @@ float runtime = 0.0f;
 glm::vec2 resolution=glm::vec2(800.0f,600.0f);
 
 int frame_count=0;
-double total_time=0.0;
+auto lastTime = std::chrono::steady_clock::now();
 static char const triangle_vert_wgsl[] = R"(
 	struct VertexIn {
 		@location(0) aPos : vec2<f32>,
@@ -738,7 +738,8 @@ EM_BOOL key_callback(int eventType, const EmscriptenKeyboardEvent *e, void *user
   return 0;
 }
 static bool redraw() {
-	auto lastTime = std::chrono::steady_clock::now();
+	if(frame_count==0)
+	{lastTime = std::chrono::steady_clock::now();}
 	random_num=emscripten_random();
 	EMSCRIPTEN_RESULT ret;
 	if (mouseflag%10==0)
@@ -844,18 +845,14 @@ static bool redraw() {
 	wgpuSwapChainPresent(swapchain);
 #endif
 	wgpuTextureViewRelease(backBufView);													// release textureView
-
-	auto end = std::chrono::steady_clock::now();
-	std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>( end- lastTime);
-	total_time+=time_span.count();
 	frame_count+=1;
-	if(frame_count==60)
+	auto now_ = std::chrono::steady_clock::now();
+	std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(now_ - lastTime);
+	if (time_span.count() >= 1.0)
 	{
-		changeFPS((int)(double(frame_count)/ time_span.count()) );
+		changeFPS(frame_count);
 		frame_count=0;
-		total_time=0.0;
 	}
-	
 	return true;
 }
 void load_images(SDL_Surface *image, int imgw,int imgh,unsigned char*& img )
