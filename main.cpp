@@ -909,7 +909,7 @@ extern "C" int __main__(int /*argc*/, char* /*argv*/[]) {
 	image_init();
 	for (int i=0;i<100;i++)
 	{
-		int t=i/4;__EMSCRIPTEN__
+		int t=i/4;
 		int index=i%4;
 		randomArray[t][index]=emscripten_random();
 	}
