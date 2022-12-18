@@ -147,6 +147,20 @@
       document.getElementById(image).src = "texture/" + image_name
       document.getElementById("popover" + image[3]).click();
     }
+    function reportWindowSize()
+    {
+      var obj = document.getElementById("canvas");
+      var width= window.innerWidth;
+      var height=window.innerHeight;
+      var new_height=45*16.0/9.0*height/width;
+      if(new_height>100.0)
+      {
+        obj.style.width=String(Math.floor(100.0/new_height*45.0))+"%";
+        new_height=100;
+      }
+      obj.style.height=String(Math.floor(new_height))+"%";
+    }
+    window.onresize = reportWindowSize;
   </script>
   <div class="footer">
     <footer class="bg-dark text-center text-white">

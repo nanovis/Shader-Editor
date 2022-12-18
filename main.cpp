@@ -65,7 +65,7 @@ int date1[3];
 int date2[3];
 glm::vec4 randomArray[25];
 float position[2]={0.0f,300.0f};
-float position_dino[2]={50.0f,600.0f};
+float position_dino[2]={50.0f,675.0f};
 int keypress=100; //ascii
 int mouseflag=0;
 float random_num=0.0f;
@@ -75,7 +75,7 @@ float floatArray[50]={0.0};
 int intArray[50]={0};
 glm::mat4 matrixArray[50];
 glm::vec4 vec4Array[50];
-glm::vec4 FrameBufferArray[800*600];
+glm::vec4 FrameBufferArray[1200*675];
 /**
  * Current rotation angle (in degrees, updated per frame).
  */
@@ -83,7 +83,7 @@ clock_t startTime,endTime;
 bool press=false;
 int pressflag=0;
 float runtime = 0.0f;
-glm::vec2 resolution=glm::vec2(800.0f,600.0f);
+glm::vec2 resolution=glm::vec2(1200.0f,675.0f);
 
 int frame_count=0;
 auto lastTime = std::chrono::steady_clock::now();
@@ -119,7 +119,7 @@ static char const triangle_frag_wgsl[] = R"(@group(0) @binding(0) var<uniform> T
 @group(2) @binding(0) var<storage,read_write> vec4Buffer: array<vec4<f32>,50>;
 @group(2) @binding(1) var<storage,read_write> floatBuffer: array<f32,50>;
 @group(2) @binding(2) var<storage,read_write> intBuffer: array<i32,50>;
-@group(2) @binding(3) var<storage,read_write> frameBuffer: array<vec4<f32>,480000>;
+@group(2) @binding(3) var<storage,read_write> frameBuffer: array<vec4<f32>,4120000>;
 @group(3) @binding(0) var<storage,read_write> matrixBuffer: array<mat4x4<f32>,50>;
 )"; // fragment shader end
 
@@ -728,13 +728,13 @@ EM_BOOL key_callback(int eventType, const EmscriptenKeyboardEvent *e, void *user
 	press=true;
   }
   if(position[0]<0.0f){position[0]=0.0f;}
-  if(position[0]>800.0f){position[0]=800.0f;}
+  if(position[0]>1200.0f){position[0]=1200.0f;}
   if(position[1]<0.0f){position[1]=0.0f;}
-  if(position[1]>600.0f){position[1]=600.0f;}
+  if(position[1]>675.0f){position[1]=675.0f;}
   if(position_dino[0]<0.0f){position_dino[0]=0.0f;}
-  if(position_dino[0]>800.0f){position_dino[0]=800.0f;}
+  if(position_dino[0]>1200.0f){position_dino[0]=1200.0f;}
   if(position_dino[1]<0.0f){position_dino[1]=0.0f;}
-  if(position_dino[1]>600.0f){position_dino[1]=600.0f;}
+  if(position_dino[1]>675.0f){position_dino[1]=675.0f;}
   return 0;
 }
 static bool redraw() {
@@ -768,9 +768,9 @@ static bool redraw() {
 	{
 		position[1]+=5.0f;
 		position_dino[1]+=5.0f;
-		if(position_dino[1]>600.0f)
+		if(position_dino[1]>675.0f)
 		{
-			position_dino[1]=600.0f;
+			position_dino[1]=675.0f;
 		}
 	}
 	ret = emscripten_set_keypress_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, key_callback);
@@ -909,7 +909,7 @@ extern "C" int __main__(int /*argc*/, char* /*argv*/[]) {
 	image_init();
 	for (int i=0;i<100;i++)
 	{
-		int t=i/4;
+		int t=i/4;__EMSCRIPTEN__
 		int index=i%4;
 		randomArray[t][index]=emscripten_random();
 	}

@@ -50,7 +50,6 @@ exports.index = function (req, res) {
 };
 exports.new = function (req, res) {
   gettexturecode(req.session.username, function (err, texturecode) {
-    console.log(__dirname)
     res.render(__dirname + "/../new.hbs", { texture_code: texturecode, username: req.session.username })
   });
 };
