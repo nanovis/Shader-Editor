@@ -75,7 +75,7 @@ float floatArray[50]={0.0};
 int intArray[50]={0};
 glm::mat4 matrixArray[50];
 glm::vec4 vec4Array[50];
-glm::vec4 FrameBufferArray[1200*675];
+glm::vec4 FrameBufferArray[800*600];
 /**
  * Current rotation angle (in degrees, updated per frame).
  */
