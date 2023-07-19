@@ -143,12 +143,20 @@ body { margin: 0; background-color: #f3f6fa }
     image-rendering: pixelated;
     -ms-interpolation-mode: nearest-neighbor;
 }
-.footer
+.footer-browse
 {
   position: relative;
   top: 100%;
   left: 0%;
   width: 100%;
+  height: 20%;
+}
+.footer
+{
+  position: absolute;
+  top: 90%;
+  left: 25%;
+  width: 100;
   height: 20%;
 }
 .about_text
