@@ -19,10 +19,17 @@ exports.header = function (req, res, next) {
 };
 
 function chunkArray(arr, n) {
-  let chunkLength = Math.max(arr.length / n, 1);
+  let chunkLength = Math.max(Math.ceil(arr.length / n), 1);
   let chunks = [];
   for (let i = 0; i < n; i++) {
-    if (chunkLength * (i + 1) <= arr.length) chunks.push(arr.slice(chunkLength * i, chunkLength * (i + 1)));
+    if (chunkLength * (i + 1) < arr.length) 
+    {
+      chunks.push(arr.slice(chunkLength * i, chunkLength * (i + 1)));
+    }
+    else
+    {
+      chunks.push(arr.slice(chunkLength*i,arr.length));
+    }
   }
   return chunks;
 }

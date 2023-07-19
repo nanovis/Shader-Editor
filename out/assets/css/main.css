@@ -145,7 +145,7 @@ body { margin: 0; background-color: #f3f6fa }
 }
 .footer
 {
-  position: absolute;
+  position: relative;
   top: 100%;
   left: 0%;
   width: 100%;
