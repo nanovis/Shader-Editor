@@ -4,19 +4,21 @@ const router = require('./router/routes')
 const multer = require('multer')
 const bodyParser = require("body-parser")
 const hbs = require('hbs')
-//const { check, validationResult } = require('express-validator');
 const session = require('express-session')
-//const { route } = require('express/lib/application')
 const app = express()
 const port = 8080
 
+const { Server } = require('socket.io');
+const http = require('http');
+const server = http.createServer(app);
+const io = new Server(server);
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use(session({
-  secret: 'keyboard cat',
-  resave: false,
-  saveUninitialized: true
+	  secret: 'keyboard cat',
+	  resave: false,
+	  saveUninitialized: true
 }));
 app.use(express.static(__dirname))
 app.use(express.static(".."))
@@ -33,7 +35,9 @@ app.get('/signin', users.signin)
 app.get('/browse', router.browse)
 app.get('/about', router.about)
 app.get('/signup', users.signup)
-app.post('/compile', router.compile)
+app.post('/compile', (req, res) => {
+	  router.compile(req,res,io);
+});
 app.get('/view', router.view)
 app.get('/userprofile', users.userprofile)
 app.post('/file_upload', router.file_upload)
@@ -48,10 +52,11 @@ app.post('/deleteuser', users.deleteuser)
 app.post('/save_shader', router.saveshader)
 app.post('/download_shader', router.downloadshader)
 app.use(function (request, response) {
-  response.writeHead(404, { "Content-Type": "text/plain" });
-  response.end("404 error!\n");
+	  response.writeHead(404, { "Content-Type": "text/plain" });
+	  response.end("404 error!\n");
 })
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
+	  console.log(`Example app listening on port ${port}`)
 })
+
